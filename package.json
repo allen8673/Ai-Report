@@ -15,7 +15,8 @@
     "primereact": "^10.0.9",
     "react": "^18",
     "react-dom": "^18",
-    "react-transition-group": "^4.4.5"
+    "react-transition-group": "^4.4.5",
+    "reactflow": "^11.9.4"
   },
   "devDependencies": {
     "@types/node": "^20",
