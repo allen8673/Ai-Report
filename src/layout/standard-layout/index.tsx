@@ -11,7 +11,7 @@ export default function StandarLayout({
         <div className="standar-layout flex items-stretch">
             <SideMenu />
             <div className='grow shrink'>
-                <HeaderBar />
+                <HeaderBar title='Home' />
                 <div className='main-view'>
                     {children}
                 </div>
