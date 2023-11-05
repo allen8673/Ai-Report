@@ -1,0 +1,5 @@
+.standar-layout {
+    & .main-view {
+        background-color: beige;
+    }
+}

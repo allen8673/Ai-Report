@@ -4,11 +4,11 @@
     "es6": true
   },
   "extends": [
-    "airbnb",
-    "airbnb/hooks",
+    // "airbnb",
+    // "airbnb/hooks",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
-    // "plugin:jsx-a11y/recommended"
+    "plugin:jsx-a11y/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -35,14 +35,25 @@
     "react/jsx-filename-extension": [1, {
       "extensions": [".tsx"]
     }], // Only .tsx files for JSX
-    "import/extensions": [
+    // "import/extensions": [
+    //   "error",
+    //   "ignorePackages",
+    //   {
+    //     "js": "never",
+    //     "jsx": "never",
+    //     "ts": "never",
+    //     "tsx": "never"
+    //   }
+    // ],
+    "import/order": [
       "error",
-      "ignorePackages",
       {
-        "js": "never",
-        "jsx": "never",
-        "ts": "never",
-        "tsx": "never"
+        "alphabetize": {
+          /* sort in ascending order. Options: ['ignore', 'asc', 'desc'] */
+          "caseInsensitive": false,
+          "order": "asc" /* ignore case. Options: [true, false] */
+        },
+        "newlines-between": "always"
       }
     ],
     "import/no-unresolved": "off", // TypeScript takes care of this
