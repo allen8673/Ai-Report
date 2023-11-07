@@ -1,7 +1,8 @@
-import { faBook, faQuestion, faFile, faFolder, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faQuestion, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from 'react';
 
+import { iconMap } from '../mapper';
 import { IReportItem } from "../type";
 import './report-item.css';
 
@@ -9,16 +10,13 @@ export interface ReportItemProps extends IReportItem {
     onDelete?: () => void;
 }
 
-const iconMap: { [type: string]: React.JSX.Element } = {
-    'type-1': <FontAwesomeIcon color='#517ECB' icon={faBook} />,
-    'type-2': <FontAwesomeIcon color='#51CBB3' icon={faFile} />,
-    'type-3': <FontAwesomeIcon color='#CBC751' icon={faFolder} />
-};
+
 
 export default function ReportItem({ name, type, onDelete }: ReportItemProps) {
+    const { icon, color } = iconMap[type] || { icon: faQuestion, color: 'rgba(255, 0, 0, 0.56)' }
     return <div className="report-item flex-center std-border bg-[#FAFAFA]" >
         <span className="icon circle-border">
-            {iconMap[type] || <FontAwesomeIcon icon={faQuestion} />}
+            <FontAwesomeIcon icon={icon} color={color} />
         </span>
         <div className="name">{name}</div>
         <FontAwesomeIcon onClick={onDelete} className='w-4 h-4 cursor-default' color='rgba(255, 0, 0, 0.56)' icon={faTrash} />

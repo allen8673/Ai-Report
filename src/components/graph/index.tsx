@@ -57,7 +57,7 @@ export default function Grapth<NData, EData, NNormal, ENormal>(props: IGrapth<ND
 
     useEffect(() => {
         setNodes(initialNodes || []);
-        setEdges(initialEdges || []);
+        setEdges(_.map(initialEdges, e => ({ ...e, type: 'smoothstep', animated: true })) || []);
     }, []);
 
     useEffect(() => {
@@ -221,7 +221,6 @@ export default function Grapth<NData, EData, NNormal, ENormal>(props: IGrapth<ND
             const newEdges = !_.isEmpty(changes) ? applyEdgeChanges(changes, es) : edges || es;
             if (_.isEqual(es, newEdges)) return es;
             debounceonEdgesChange(newEdges);
-            // onEdgesChange?.(newEdges);
             return newEdges;
         });
     };
@@ -249,13 +248,6 @@ export default function Grapth<NData, EData, NNormal, ENormal>(props: IGrapth<ND
                 };
             })
         );
-
-        // _setEdges([
-        //     {
-        //         type: 'reset',
-        //         item: { ...oldEdge, ...handles, source, target },
-        //     },
-        // ]);
     }, []);
 
     const _onNodesChange = useCallback((changes: NodeChange[]): void => {
