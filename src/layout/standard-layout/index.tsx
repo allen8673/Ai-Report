@@ -12,11 +12,10 @@ export default function StandarLayout({
             <SideMenu />
             <div className='grow shrink'>
                 <HeaderBar title='Home' />
-                <div className='main-view'>
+                <main className='main-view'>
                     {children}
-                </div>
+                </main>
             </div>
-
         </div>
     );
 }
