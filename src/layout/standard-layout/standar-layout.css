@@ -2,6 +2,5 @@
     & .main-view {
         height: calc(100vh - theme('spacing.10'));
         overflow: scroll;
-        background-color: beige;
     }
 }
