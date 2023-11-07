@@ -129,7 +129,7 @@ export default function DndList<T extends { [key: string]: any }>({
 
     return <DndContext className={`w-full h-full std-border ${className || ''}`} {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}>
         {(_items): JSX.Element => (
-            <DndDroppable className="std-content" items={_items} droppableId={droppableId}>
+            <DndDroppable className="std-content h-full" items={_items} droppableId={droppableId}>
                 {(_items): React.JSX.Element[] =>
                     _items.map((item, index: number) => {
                         return (
