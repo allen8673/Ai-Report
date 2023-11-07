@@ -4,7 +4,16 @@
 
 @layer components {
   .flex-center {
-    @apply flex items-center justify-center
+    @apply flex items-center justify-center;
+  }
+
+  .std-border {
+    @apply border-[1px] border-[#EBEBEB] rounded-md;
+  }
+
+  .circle-border {
+    @apply rounded-full overflow-hidden;
+    @apply flex items-center justify-center;
   }
 }
 
