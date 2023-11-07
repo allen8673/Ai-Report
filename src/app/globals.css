@@ -8,12 +8,16 @@
   }
 
   .std-border {
-    @apply border-[1px] border-[#EBEBEB] rounded-md;
+    @apply border-[1px] border-[#EBEBEB] rounded-md overflow-hidden;
   }
 
   .circle-border {
     @apply rounded-full overflow-hidden;
     @apply flex items-center justify-center;
+  }
+
+  .std-content {
+    @apply p-[5px] bg-white
   }
 }
 

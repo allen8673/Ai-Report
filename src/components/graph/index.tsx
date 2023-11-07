@@ -36,7 +36,7 @@ export default function Grapth<NData, EData>(props: IGrapth<NData, EData>) {
         [setEdges]
     );
 
-    return <div id='graph' className={`w-full h-full bg-slate-50 ${className}`} ref={rfWrapper}>
+    return <div id='graph' className={`w-full h-full std-border std-content ${className}`} ref={rfWrapper}>
         <ReactFlow
             nodes={nodes}
             edges={edges}
