@@ -21,6 +21,7 @@ export interface DndDroppableProps<T> {
     onSelectItem?: any;
     onUnmount?: any;
     children: (_items: T[], provided: DroppableProvided) => JSX.Element | JSX.Element[];
+    className?: string
 }
 
 export interface DndItemProps<T> {

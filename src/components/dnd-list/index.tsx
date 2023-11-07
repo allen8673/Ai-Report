@@ -27,7 +27,7 @@ const DndContext = <T extends { [key: string]: any }>({
         onDragStart?.(initial, items[initial.source.index]);
     };
     return (
-        <div id="rb-dnd-context" className={className} style={style}>
+        <div id="dnd-context" className={className} style={style}>
             <DragDropContext onDragEnd={dndOnDragEnd} onDragStart={dndOnDragStart}>
                 {children(items)}
             </DragDropContext>
@@ -35,17 +35,18 @@ const DndContext = <T extends { [key: string]: any }>({
     );
 };
 
-const RbDndDroppable = <T extends { [key: string]: any }>({
+const DndDroppable = <T extends { [key: string]: any }>({
     items = [],
     droppableId,
     type,
     children,
+    className
 }: DndDroppableProps<T>): JSX.Element => {
     const [id] = useState<string>(droppableId || v4());
     return (
         <Droppable key={id} droppableId={id} type={type || v4()}>
             {(provided: DroppableProvided): JSX.Element => (
-                <div ref={provided.innerRef}>
+                <div id='dnd-droppable' className={className} ref={provided.innerRef}>
                     {children(items, provided)}
                     {provided.placeholder}
                 </div>
@@ -68,7 +69,7 @@ const RbDndItem = <T extends { [key: string]: any }>({
     return (
         <Element
             key={index}
-            className="rb-dnd-item"
+            className="dnd-item m-[7px]"
             name={item?.id || ''}
             onClick={(): void => {
                 onClickItem?.(item);
@@ -126,9 +127,9 @@ export default function DndList<T extends { [key: string]: any }>({
         setItems(items);
     }, [items]);
 
-    return <DndContext className={`w-full h-full ${className || ''}`} {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}>
+    return <DndContext className={`w-full h-full std-border p-[5px] bg-white ${className || ''}`} {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}>
         {(_items): JSX.Element => (
-            <RbDndDroppable items={_items} droppableId={droppableId}>
+            <DndDroppable className="h-full" items={_items} droppableId={droppableId}>
                 {(_items): React.JSX.Element[] =>
                     _items.map((item, index: number) => {
                         return (
@@ -147,7 +148,7 @@ export default function DndList<T extends { [key: string]: any }>({
                         );
                     })
                 }
-            </RbDndDroppable>
+            </DndDroppable>
         )}
     </DndContext>
 }
