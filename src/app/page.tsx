@@ -1,5 +1,7 @@
+'use client'
 import { Node, Edge } from "reactflow";
 
+import DndList from "@/components/dnd-list";
 import Grapth from "@/components/graph";
 
 export default function Home() {
@@ -35,8 +37,13 @@ export default function Home() {
   ];
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24 ">
-      <Grapth className="w-full" initialNodes={initialNodes} initialEdges={initialEdges} />
+    <main className="flex min-h-screen flex-row p-12 gap-4 items-stretch">
+      <div className="w-60 ">
+        <DndList items={[{ name: '1' }, { name: '2' }]} renderContent={(prop) => <div className=" bg-stone-400">{prop.name}</div>} />
+      </div>
+      <div className="shrink grow">
+        <Grapth className="" initialNodes={initialNodes} initialEdges={initialEdges} />
+      </div>
     </main>
   );
 }
