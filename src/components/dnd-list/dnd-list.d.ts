@@ -44,7 +44,7 @@ export interface DndListProps<T> extends Omit<DndContextProps<T>, 'children' | '
     idPath?: string | string[];
     disableWholeDraghandle?: boolean;
     disableChangeOrder?: boolean;
-    renderContent: (props: T, idx: number, draggableProvided: DraggableProvided) => JSX.Element;
+    renderContent: (data: T, idx: number, draggableProvided: DraggableProvided) => JSX.Element;
     onClickItem?: (item: T) => void;
     onMouseDownItem?: (item: T) => void;
     onDragEnd?: (result: DropResult, resultItems: T[]) => void;

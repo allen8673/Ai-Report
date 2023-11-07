@@ -10,7 +10,11 @@ export default function ReportGenerator() {
         <div className="w-60 ">
             <DndList
                 items={reportItems}
-                renderContent={ReportItem}
+                renderContent={(data) => <ReportItem
+                    {...data}
+                    onDelete={() => {
+                        alert('on delete');
+                    }} />}
             />
         </div>
         <div className="shrink grow">
