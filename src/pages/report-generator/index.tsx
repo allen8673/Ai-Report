@@ -1,5 +1,6 @@
 'use client'
-import { initialEdges, initialNodes } from "./mock";
+import { initialEdges, initialNodes, reportItems } from "./mock";
+import ReportItem from "./report-item";
 
 import DndList from "@/components/dnd-list";
 import Grapth from "@/components/graph";
@@ -7,7 +8,10 @@ import Grapth from "@/components/graph";
 export default function ReportGenerator() {
     return <div className="flex h-full flex-row p-12 gap-4 items-stretch">
         <div className="w-60 ">
-            <DndList items={[{ name: '1' }, { name: '2' }]} renderContent={(prop) => <div className=" bg-stone-400">{prop.name}</div>} />
+            <DndList
+                items={reportItems}
+                renderContent={ReportItem}
+            />
         </div>
         <div className="shrink grow">
             <Grapth className="" initialNodes={initialNodes} initialEdges={initialEdges} />
