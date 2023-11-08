@@ -32,7 +32,7 @@ export default function ReportGenerator() {
         ...e, ...EDGE_DEF_SETTING
     }))
 
-    return <div className="flex h-full flex-row p-12 gap-4 items-stretch">
+    return <div className="flex h-full flex-row gap-4 items-stretch">
         <GeneratorContext.Provider value={{ onDragItem }}>
             <div className="w-60 ">
                 <DndList

@@ -7,8 +7,28 @@
     @apply flex items-center justify-center;
   }
 
+  .std-p {
+    @apply px-[12px] py-[18px]
+  }
+
+  .std-rounded {
+    @apply rounded-[10px]
+  }
+
+  .std-sm-rounded {
+    @apply rounded-[4px]
+  }
+
+  .std-text-color {
+    @apply text-[#ffffff]
+  }
+
+  .std-text-deep-color {
+    @apply text-[#5B5B5B]
+  }
+
   .std-border {
-    @apply border-[1px] border-[#EBEBEB] rounded-md overflow-hidden;
+    @apply border-[1px] border-[#EBEBEB] overflow-hidden;
   }
 
   .circle-border {
