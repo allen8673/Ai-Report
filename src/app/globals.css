@@ -31,6 +31,14 @@
     @apply text-[#5B5B5B]
   }
 
+  .std-bg {
+    @apply bg-[#0a0a0a]
+  }
+
+  .std-light-bg {
+    @apply bg-[#2c2c2c]
+  }
+
   .std-border {
     @apply border-[1px] border-[#EBEBEB] overflow-hidden;
   }
