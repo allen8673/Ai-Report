@@ -22,7 +22,7 @@ import { EventType, GraphInstance, IGrapth } from "./graph";
 
 
 
-export default function Grapth<NData, EData, NNormal, ENormal>(props: IGrapth<NData, EData, NNormal, ENormal>) {
+export default function Grapth<NData, EData, NNormal = NData, ENormal = EData>(props: IGrapth<NData, EData, NNormal, ENormal>) {
 
     const {
         className,
@@ -57,7 +57,7 @@ export default function Grapth<NData, EData, NNormal, ENormal>(props: IGrapth<ND
 
     useEffect(() => {
         setNodes(initialNodes || []);
-        setEdges(_.map(initialEdges, e => ({ ...e, type: 'smoothstep', animated: true })) || []);
+        setEdges(initialEdges || []);
     }, []);
 
     useEffect(() => {
