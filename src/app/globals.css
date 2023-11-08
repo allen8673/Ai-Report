@@ -11,6 +11,10 @@
     @apply px-[12px] py-[18px]
   }
 
+  .std-gap {
+    @apply gap-[20px]
+  }
+
   .std-rounded {
     @apply rounded-[10px]
   }
