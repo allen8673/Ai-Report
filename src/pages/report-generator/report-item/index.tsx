@@ -14,7 +14,7 @@ export interface ReportItemProps extends IReportItem {
 
 export default function ReportItem({ name, type, onDelete }: ReportItemProps) {
     const { icon, color } = iconMap[type] || { icon: faQuestion, color: 'rgba(255, 0, 0, 0.56)' }
-    return <div className="report-item flex-center std-border bg-[#FAFAFA]" >
+    return <div className="report-item flex-center std-sm-rounded std-light-bg std-text-color" >
         <span className="icon circle-border">
             <FontAwesomeIcon icon={icon} color={color} />
         </span>

@@ -47,6 +47,7 @@ export default function Grapth<NData, EData, NNormal = NData, ENormal = EData>(p
         onDiagramsContextMenu,
         onNodeContextMenu,
         onEdgeContextMenu,
+        children,
         ...others } = props;
 
     const rfWrapper = useRef<HTMLDivElement>(null);
@@ -328,7 +329,7 @@ export default function Grapth<NData, EData, NNormal = NData, ENormal = EData>(p
         });
     };
 
-    return <div id='graph' className={`w-full h-full std-border std-content ${className}`} ref={rfWrapper}>
+    return <div id='graph' className={`w-full h-full std-content ${className}`} ref={rfWrapper}>
         <ReactFlow
             nodes={!!normalizeNode ? _.map(nodes, (n) => normalizeNode(n)) : nodes}
             edges={!!normalizeEdge ? _.map(edges, (e) => normalizeEdge(e)) : edges}
@@ -355,9 +356,10 @@ export default function Grapth<NData, EData, NNormal = NData, ENormal = EData>(p
             onNodeMouseMove={_onNodeMouseMove}
             {...others}
         >
+            {children}
             {!hideMiniMap && <MiniMap nodeBorderRadius={2} />}
             <Controls />
-            <Background color="#aaa" gap={16} />
+            <Background gap={16} />
         </ReactFlow>
     </div>
 }

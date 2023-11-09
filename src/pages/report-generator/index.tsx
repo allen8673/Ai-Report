@@ -5,37 +5,37 @@ import { Connection, ConnectionLineType, Edge, MarkerType, Node } from 'reactflo
 import { v4 } from "uuid";
 
 import { GeneratorContext } from "./context";
+import TurboEdge, { TurboEdgeAsset } from "./graph-assets/turbo-edge";
+import TurboNode from "./graph-assets/turbo-node";
 import { initialEdges, initialNodes, reportItems } from "./mock";
 import ReportItem from "./report-item";
-import MiddleNode from "./report-nodes/middle";
 import { IReportItem } from "./type";
 
 import DndList from "@/components/dnd-list";
 import Grapth from "@/components/graph";
 import { useGraphRef } from "@/components/graph/helper";
 
+import './graph-assets/turbo-style.css'
+import './report-generator.css'
+
 const EDGE_DEF_SETTING: Partial<Edge> = {
-    type: 'smoothstep',
+    type: 'turbo',
     animated: true,
-    markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 },
     style: { strokeWidth: 3 }
 }
 
 export default function ReportGenerator() {
 
-
     const [onDragItem, setOnDragItem] = useState<IReportItem>();
     const { graphRef } = useGraphRef<IReportItem, any>();
 
-    const nodes: Node<IReportItem>[] = _.map(initialNodes, n => ({ ...n, type: 'middle' }));
-    const edges: Edge[] = _.map(initialEdges, e => ({
-        ...e, ...EDGE_DEF_SETTING
-    }))
+    const nodes: Node<IReportItem>[] = _.map(initialNodes, n => ({ ...n, type: 'turbo' }));
 
     return <div className="flex h-full flex-row gap-4 items-stretch">
         <GeneratorContext.Provider value={{ onDragItem }}>
             <div className="w-60 ">
                 <DndList
+                    className="std-rounded std-bg"
                     items={reportItems}
                     disableChangeOrder
                     renderContent={(data) => <ReportItem
@@ -51,12 +51,13 @@ export default function ReportGenerator() {
             </div>
             <div className="shrink grow">
                 <Grapth
-                    className=""
+                    className="std-rounded std-bg"
                     initialNodes={nodes}
-                    initialEdges={edges}
-                    nodeTypes={{ middle: MiddleNode }}
+                    initialEdges={initialEdges}
+                    nodeTypes={{ turbo: TurboNode }}
+                    edgeTypes={{ turbo: TurboEdge }}
                     graphRef={graphRef}
-                    connectionLineType={ConnectionLineType.SmoothStep}
+                    defaultEdgeOptions={EDGE_DEF_SETTING}
                     onConnect={({ source, target }: Connection) => {
                         if (!source || !target) return;
                         const id = v4();
@@ -65,11 +66,13 @@ export default function ReportGenerator() {
                     onMouseUp={(e, position) => {
                         if (!onDragItem || !position) return;
                         const id = v4();
-                        graphRef.current?.addNode({ id, position, data: onDragItem, type: 'middle' });
+                        graphRef.current?.addNode({ id, position, data: onDragItem, type: 'turbo' });
                         setOnDragItem(() => undefined);
                     }}
 
-                />
+                >
+                    <TurboEdgeAsset />
+                </Grapth>
             </div>
         </GeneratorContext.Provider>
     </div>

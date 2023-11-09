@@ -31,12 +31,16 @@
     @apply text-[#5B5B5B]
   }
 
+  .std-deep-bg {
+    @apply bg-[#0c0c0c]
+  }
+
   .std-bg {
-    @apply bg-[#0a0a0a]
+    @apply bg-[#1c1c1c]
   }
 
   .std-light-bg {
-    @apply bg-[#2c2c2c]
+    @apply bg-[#3c3c3c]
   }
 
   .std-border {
@@ -49,7 +53,7 @@
   }
 
   .std-content {
-    @apply p-[5px] bg-white
+    @apply p-[5px]
   }
 }
 
