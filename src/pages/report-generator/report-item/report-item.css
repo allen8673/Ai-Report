@@ -2,7 +2,7 @@
 
 @layer components {
     .report-item {
-        background: theme('colors.turbo.normal');
+
 
         & .wrapper {
             @apply gap-2;

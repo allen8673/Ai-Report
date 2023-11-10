@@ -12,7 +12,7 @@
             padding: 1px;
             position: relative;
             flex-grow: 1;
-            box-shadow: theme('colors.turbo.shadow');
+            box-shadow: theme('backgroundImage.turbo-shadow');
         }
 
         & .gradient:before {
@@ -20,7 +20,7 @@
             position: absolute;
             padding-bottom: calc(100% * 1.41421356237);
             width: calc(100% * 1.41421356237);
-            background: theme('colors.turbo.normal');
+            background: theme('backgroundImage.turbo');
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
@@ -61,7 +61,7 @@
     .react-flow__node-turbo.selected {
         & .wrapper.gradient:before {
             content: '';
-            background: theme('colors.turbo.selected');
+            background: theme('backgroundImage.turbo-selected');
             animation: spinner 4s linear infinite;
             transform: translate(-50%, -50%) rotate(0deg);
             z-index: -1;
@@ -76,8 +76,7 @@
         /* border-width: 1 !important; */
         opacity: 0.75;
         border: none !important;
-        box-shadow: theme('colors.turbo.shadow');
-        /* background: theme('colors.turbo.simple') !important; */
+        box-shadow: theme('backgroundImage.turbo-shadow');
 
         &::before {
             content: '';
