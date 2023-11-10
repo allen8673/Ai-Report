@@ -27,7 +27,7 @@ const DndContext = <T extends { [key: string]: any }>({
         onDragStart?.(initial, items[initial.source.index]);
     };
     return (
-        <div id="dnd-context" className={className} style={style}>
+        <div id="dnd-context" className={className} style={style} >
             <DragDropContext onDragEnd={dndOnDragEnd} onDragStart={dndOnDragStart}>
                 {children(items)}
             </DragDropContext>

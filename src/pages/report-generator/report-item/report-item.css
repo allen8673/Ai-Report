@@ -3,20 +3,14 @@
 @layer components {
     .report-item {
 
+        & .icon {
+            @apply border-2 border-gray-300 w-[30px] h-[30px]
+        }
 
-        & .wrapper {
-            @apply gap-2;
-            @apply px-[12px] py-[7px] h-[50px];
-
-
-            & .icon {
-                @apply border-2 border-gray-300 w-[30px] h-[30px]
-            }
-
-            & .name {
-                @apply shrink grow;
-            }
+        & .name {
+            @apply shrink grow;
         }
 
     }
+
 }

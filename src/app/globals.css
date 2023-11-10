@@ -23,26 +23,6 @@
     @apply rounded-[4px]
   }
 
-  .std-text-color {
-    @apply text-[#ffffff]
-  }
-
-  .std-text-deep-color {
-    @apply text-[#5B5B5B]
-  }
-
-  .std-deep-bg {
-    @apply bg-[#0c0c0c]
-  }
-
-  .std-bg {
-    @apply bg-[#1c1c1c]
-  }
-
-  .std-light-bg {
-    @apply bg-[#3c3c3c]
-  }
-
   .std-border {
     @apply border-[1px] border-[#EBEBEB] overflow-hidden;
   }
@@ -71,6 +51,11 @@
   }
 }
 
+@keyframes spinner {
+  100% {
+    transform: translate(-50%, -50%) rotate(-360deg);
+  }
+}
 
 
 /* 

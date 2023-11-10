@@ -1,27 +1,32 @@
+
 import { faQuestion, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from 'react';
 
 import { iconMap } from '../mapper';
 import { IReportItem } from "../type";
+
 import './report-item.css';
+import GradientBorder from '@/components/gradient-border';
 
 export interface ReportItemProps extends IReportItem {
     onDelete?: () => void;
+    onClick?: (id: string) => void;
+    onSelected?: boolean;
 }
 
-
-
-export default function ReportItem({ name, type, onDelete }: ReportItemProps) {
+export default function ReportItem({ id, name, type, onDelete, onSelected, onClick }: ReportItemProps) {
     const { icon, color } = iconMap[type] || { icon: faQuestion, color: 'rgba(255, 0, 0, 0.56)' }
-    return <div className="report-item std-sm-rounded std-text-color p-[1px] bg-turbo" >
-        <div className='wrapper flex-center std-sm-rounded std-light-bg'>
+    return <GradientBorder className='std-sm-rounded' borderClass='std-sm-rounded' onSelected={onSelected}>
+        <div
+            className='report-item flex-center gap-2 px-[12px] py-[7px] h-[50px] grow'
+            role="presentation"
+            onClick={(): void => { onClick?.(id); }}>
             <span className="icon circle-border">
                 <FontAwesomeIcon icon={icon} color={color} />
             </span>
-            <div className="name">{name}</div>
+            <div className="name text-std-light">{name}</div>
             <FontAwesomeIcon onClick={onDelete} className='w-4 h-4 cursor-default' color='rgba(255, 0, 0, 0.56)' icon={faTrash} />
         </div>
-
-    </div>
+    </GradientBorder>
 }

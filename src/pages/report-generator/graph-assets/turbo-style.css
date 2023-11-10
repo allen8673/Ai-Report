@@ -97,11 +97,12 @@
 
 }
 
+/* 
 @keyframes spinner {
     100% {
         transform: translate(-50%, -50%) rotate(-360deg);
     }
-}
+} */
 
 .react-flow__handle.source {
     right: -20px;

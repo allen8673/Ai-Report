@@ -28,6 +28,7 @@ export default function ReportGenerator() {
 
     const [onDragItem, setOnDragItem] = useState<IReportItem>();
     const { graphRef } = useGraphRef<IReportItem, any>();
+    const [selectedItem, setSelectedItem] = useState<string>()
 
     const nodes: Node<IReportItem>[] = _.map(initialNodes, n => ({ ...n, type: 'turbo' }));
 
@@ -35,11 +36,13 @@ export default function ReportGenerator() {
         <GeneratorContext.Provider value={{ onDragItem }}>
             <div className="w-60 ">
                 <DndList
-                    className="std-rounded std-bg"
+                    className="std-rounded bg-std-deep"
                     items={reportItems}
                     disableChangeOrder
                     renderContent={(data) => <ReportItem
                         {...data}
+                        onSelected={selectedItem === data.id}
+                        onClick={(id) => { setSelectedItem(id) }}
                         onDelete={() => {
                             alert('on delete');
                         }} />}
@@ -51,7 +54,7 @@ export default function ReportGenerator() {
             </div>
             <div className="shrink grow">
                 <Grapth
-                    className="std-rounded std-bg"
+                    className="std-rounded bg-std-deep"
                     initialNodes={nodes}
                     initialEdges={initialEdges}
                     nodeTypes={{ turbo: TurboNode }}
