@@ -1,4 +1,4 @@
-@tailwind base;
+/* @tailwind base; */
 @tailwind components;
 @tailwind utilities;
 
@@ -9,18 +9,6 @@
 
   .std-p {
     @apply px-[12px] py-[18px]
-  }
-
-  .std-gap {
-    @apply gap-[20px]
-  }
-
-  .std-rounded {
-    @apply rounded-[10px]
-  }
-
-  .std-sm-rounded {
-    @apply rounded-[4px]
   }
 
   .std-border {
@@ -35,12 +23,22 @@
   .std-content {
     @apply p-[5px]
   }
+
+  .std-title-pane {
+    @apply bg-std-deep-weak h-[60px] px-[12px] py-[18px];
+    @apply flex items-center;
+    @apply text-std-light text-[22px] justify-between;
+  }
 }
 
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  margin: 0px;
 }
 
 @media (prefers-color-scheme: dark) {
