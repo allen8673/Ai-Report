@@ -11,9 +11,9 @@ function TurboNodeInstance(elm: NodeProps<IReportItem>) {
 
     return (
         <>
-            <div className="middle wrapper gradient std-sm-rounded flex-center flex-col gap-[5px] " >
-                <div className="inner std-sm-rounded bg-std-deep-weak">
-                    <div className="body std-sm-rounded text-std-light">
+            <div className="middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] " >
+                <div className="inner rounded-std-sm bg-std-deep-weak">
+                    <div className="body rounded-std-sm text-std-light">
                         <FontAwesomeIcon className='icon' icon={icon} color={'white'} />
                         <div>
                             <div className="title">{data.name}</div>

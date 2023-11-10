@@ -1,4 +1,3 @@
-export type FlowTyep = 'file-upload' | 'prompt' | 'file-download';
 
 export interface IReportItem {
     id: string;

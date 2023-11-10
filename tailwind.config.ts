@@ -17,14 +17,18 @@ const config: Config = {
         'turbo-selected': 'conic-gradient(from -160deg at 50% 50%, #e92a67 0deg, #a853ba 120deg, #2a8af6 240deg, rgba(42, 138, 246, 0) 360deg)',
       },
       keyframes: {
-        bbb: {
+        spinner: {
           '100%': {
             transform: 'translate(-50%, -50%) rotate(-360deg);',
           }
         },
       },
       animation: {
-        aaa: 'bbb 4s linear infinite',
+        mySpinner: 'bbb 4s linear infinite',
+      },
+      borderRadius: {
+        'std': '10px',
+        'std-sm': '4px'
       },
       colors: {
         std: {
@@ -38,6 +42,9 @@ const config: Config = {
             strong: '#0c0c0c'
           }
         }
+      },
+      spacing: {
+        std: '20px'
       }
     },
   },

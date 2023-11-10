@@ -1,4 +1,4 @@
-import { faBook, faFile, faFolder, IconDefinition, faUpload, faDownload, faBrain } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition, faUpload, faDownload, faBrain } from '@fortawesome/free-solid-svg-icons'
 
 
 

@@ -1,5 +1,6 @@
 'use client'
 import _ from "lodash";
+import { Button } from 'primereact/button';
 import { useState } from "react";
 import { Connection, Edge, Node } from 'reactflow'
 import { v4 } from "uuid";
@@ -26,17 +27,19 @@ const EDGE_DEF_SETTING: Partial<Edge> = {
 
 export default function FlowGenerator() {
 
+    const projectName = 'Demo Project';
+
     const [onDragItem, setOnDragItem] = useState<IReportItem>();
     const { graphRef } = useGraphRef<IReportItem, any>();
     const [selectedItem, setSelectedItem] = useState<string>()
 
     const nodes: Node<IReportItem>[] = _.map(initialNodes, n => ({ ...n, type: 'turbo' }));
 
-    return <div className="flex h-full flex-row gap-4 items-stretch">
+    return <div className="flex h-full flex-row gap-std items-stretch">
         <GeneratorContext.Provider value={{ onDragItem }}>
             <div className="w-60 ">
                 <DndList
-                    className="std-rounded bg-std-deep"
+                    className="rounded-std bg-std-deep"
                     items={reportItems}
                     disableChangeOrder
                     renderContent={(data) => <ReportItem
@@ -52,9 +55,13 @@ export default function FlowGenerator() {
 
                 />
             </div>
-            <div className="shrink grow">
+            <div className="shrink grow flex flex-col gap-std">
+                <div className="rounded-std bg-std-deep std-title-pane">
+                    {projectName}
+                    <Button label="Submit" />
+                </div>
                 <Grapth
-                    className="std-rounded bg-std-deep"
+                    className="rounded-std bg-std-deep"
                     initialNodes={nodes}
                     initialEdges={initialEdges}
                     nodeTypes={{ turbo: TurboNode }}

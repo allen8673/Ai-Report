@@ -1,10 +1,9 @@
 import { faFire, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import 'primeicons/primeicons.css';
 
 export default function SideMenu() {
 
-    return <div className={`w-[50px] bg-std-deep std-rounded flex flex-col justify-center std-p`}>
+    return <div className={`w-[50px] bg-std-deep rounded-std flex flex-col justify-center std-p`}>
         <div className='flex flex-row grow shrink'>
             <FontAwesomeIcon className='h-[30px] w-[30px]' icon={faFire} color={'white'} />
         </div>

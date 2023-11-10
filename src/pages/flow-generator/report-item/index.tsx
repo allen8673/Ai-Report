@@ -1,5 +1,5 @@
 
-import { faQuestion, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faQuestion } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from 'react';
 
@@ -15,9 +15,9 @@ export interface ReportItemProps extends IReportItem {
     onSelected?: boolean;
 }
 
-export default function ReportItem({ id, name, type, onDelete, onSelected, onClick }: ReportItemProps) {
+export default function ReportItem({ id, name, type, onSelected, onClick }: ReportItemProps) {
     const { icon, color } = flowInfoMap[type] || { icon: faQuestion, color: 'rgba(255, 0, 0, 0.56)' }
-    return <GradientBorder className='std-sm-rounded' borderClass='std-sm-rounded' onSelected={onSelected}>
+    return <GradientBorder className='rounded-std-sm' borderClass='rounded-std-sm' onSelected={onSelected}>
         <div
             className='report-item flex-center gap-2 px-[12px] py-[7px] h-[50px] grow'
             role="presentation"
