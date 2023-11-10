@@ -1,8 +1,8 @@
 import { Node, Edge } from "reactflow";
 
-import { IReportItem } from "../pages/flow-editor/type";
+import { IFlow, IProject } from "@/interface/project";
 
-export const initialNodes: Node<IReportItem>[] = [
+export const initialNodes: Node<IFlow>[] = [
     {
         id: '1',
         data: {
@@ -48,20 +48,16 @@ export const initialEdges: Edge[] = [
     { id: 'e1-3', source: '1', target: '3' },
 ];
 
-export const reportItems: IReportItem[] = [
+
+export const mock_projects: IProject[] = [
     {
-        id: 'r-1',
-        name: 'Custom Promt',
-        type: 'prompt'
+        id: 'p-1',
+        name: 'project 1',
+        flows: []
     },
     {
-        id: 'r-2',
-        name: 'File Upload',
-        type: 'file-upload'
-    },
-    {
-        id: 'r-3',
-        name: 'File Download',
-        type: 'file-download'
-    },
+        id: 'p-2',
+        name: 'project 2',
+        flows: []
+    }
 ]

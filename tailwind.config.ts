@@ -31,16 +31,18 @@ const config: Config = {
         'std-sm': '4px'
       },
       colors: {
-        std: {
-          light: {
-            DEFAULT: '#ffffff',
-            weak: '#5B5B5B'
-          },
-          deep: {
-            DEFAULT: '#1c1c1c',
-            weak: '#3c3c3c',
-            strong: '#0c0c0c'
-          }
+        light: {
+          DEFAULT: '#ffffff',
+          weak: '#5B5B5B'
+        },
+        deep: {
+          DEFAULT: '#1c1c1c',
+          weak: '#3c3c3c',
+          strong: '#0c0c0c'
+        },
+        turbo: {
+          deep: '#a853ba',
+          light: '#2a8af6',
         }
       },
       spacing: {

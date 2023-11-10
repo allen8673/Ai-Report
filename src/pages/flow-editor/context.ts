@@ -2,15 +2,15 @@ import { MutableRefObject, useContext } from "react";
 import React from "react";
 import { Node, Edge } from 'reactflow'
 
-import { IReportItem } from "./type";
 
 import { GraphInstance } from "@/components/graph/graph";
+import { IFlow } from "@/interface/project";
 
 export interface GeneratorStore {
-    diagramRef?: MutableRefObject<GraphInstance<IReportItem, any> | null>;
-    activeNode?: Node<IReportItem>;
+    diagramRef?: MutableRefObject<GraphInstance<IFlow, any> | null>;
+    activeNode?: Node<IFlow>;
     activeEdge?: Edge;
-    onDragItem?: IReportItem;
+    onDragItem?: IFlow;
 }
 
 export const GeneratorContext = React.createContext<GeneratorStore>({

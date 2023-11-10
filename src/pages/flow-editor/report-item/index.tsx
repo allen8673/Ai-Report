@@ -4,12 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from 'react';
 
 import { flowInfoMap } from '../configuration';
-import { IReportItem } from "../type";
 
 import './report-item.css';
 import GradientBorder from '@/components/gradient-border';
+import { IFlow } from '@/interface/project';
 
-export interface ReportItemProps extends IReportItem {
+export interface ReportItemProps extends IFlow {
     onDelete?: () => void;
     onClick?: (id: string) => void;
     onSelected?: boolean;
@@ -25,7 +25,7 @@ export default function ReportItem({ id, name, type, onSelected, onClick }: Repo
             <span className="icon circle-border">
                 <FontAwesomeIcon icon={icon} color={color} />
             </span>
-            <div className="name text-std-light">{name}</div>
+            <div className="name text-light">{name}</div>
             {/* <FontAwesomeIcon onClick={onDelete} className='w-4 h-4 cursor-default' color='rgba(255, 0, 0, 0.56)' icon={faTrash} /> */}
         </div>
     </GradientBorder>

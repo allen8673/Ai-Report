@@ -14,12 +14,11 @@ import { GeneratorContext } from "./context";
 import TurboEdge, { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import ReportItem from "./report-item";
-import { IReportItem } from "./type";
 
 import DndList from "@/components/dnd-list";
 import Grapth from "@/components/graph";
 import { useGraphRef } from "@/components/graph/helper";
-
+import { IFlow } from "@/interface/project";
 import './graph-assets/turbo-style.css'
 
 
@@ -28,17 +27,17 @@ export default function FlowGenerator() {
 
     const projectName = 'Demo Project';
 
-    const [onDragItem, setOnDragItem] = useState<IReportItem>();
-    const { graphRef } = useGraphRef<IReportItem, any>();
+    const [onDragItem, setOnDragItem] = useState<IFlow>();
+    const { graphRef } = useGraphRef<IFlow, any>();
     const [selectedItem, setSelectedItem] = useState<string>()
 
-    const nodes: Node<IReportItem>[] = _.map(initialNodes, n => ({ ...n, type: 'turbo' }));
+    const nodes: Node<IFlow>[] = _.map(initialNodes, n => ({ ...n, type: 'turbo' }));
 
     return <div className="flex h-full flex-row gap-std items-stretch">
         <GeneratorContext.Provider value={{ onDragItem }}>
             <div className="w-60 ">
                 <DndList
-                    className="rounded-std bg-std-deep"
+                    className="rounded-std bg-deep"
                     items={REPORT_ITEMS}
                     disableChangeOrder
                     renderContent={(data) => <ReportItem
@@ -71,7 +70,7 @@ export default function FlowGenerator() {
                     </div>
                 </div>
                 <Grapth
-                    className="rounded-std bg-std-deep"
+                    className="rounded-std bg-deep"
                     initialNodes={nodes}
                     initialEdges={initialEdges}
                     nodeTypes={{ turbo: TurboNode }}

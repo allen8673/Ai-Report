@@ -3,17 +3,18 @@ import React from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 
 import { flowInfoMap } from "../configuration";
-import { IReportItem } from "../type";
 
-function TurboNodeInstance(elm: NodeProps<IReportItem>) {
+import { IFlow } from '@/interface/project';
+
+function TurboNodeInstance(elm: NodeProps<IFlow>) {
     const { id, data, isConnectable } = elm;
     const { icon } = flowInfoMap[data.type] || {}
 
     return (
         <>
             <div className="middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] " >
-                <div className="inner rounded-std-sm bg-std-deep-weak">
-                    <div className="body rounded-std-sm text-std-light">
+                <div className="inner rounded-std-sm bg-deep-weak">
+                    <div className="body rounded-std-sm text-light">
                         <FontAwesomeIcon className='icon' icon={icon} color={'white'} />
                         <div>
                             <div className="title">{data.name}</div>

@@ -7,7 +7,7 @@ export default function TurboLayout({
     children: React.ReactNode
 }) {
     return (
-        <div className="turbo-layout flex items-stretch bg-std-deep-strong h-screen p-[21px] gap-std">
+        <div className="turbo-layout flex items-stretch bg-deep-strong h-screen p-[21px] gap-std">
             <SideMenu />
             <main className='main-view grow shrink'>
                 {children}
