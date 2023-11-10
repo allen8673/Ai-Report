@@ -4,12 +4,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import _ from "lodash";
 import { Button } from 'primereact/button';
 import { useState } from "react";
-import { Connection, Edge, Node } from 'reactflow'
+import { Connection, Node } from 'reactflow'
 import { v4 } from "uuid";
 
 import { initialEdges, initialNodes } from "../../app/mock";
 
-import { REPORT_ITEMS } from "./configuration";
+import { EDGE_DEF_SETTING, REPORT_ITEMS } from "./configuration";
 import { GeneratorContext } from "./context";
 import TurboEdge, { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
@@ -22,11 +22,7 @@ import { useGraphRef } from "@/components/graph/helper";
 
 import './graph-assets/turbo-style.css'
 
-const EDGE_DEF_SETTING: Partial<Edge> = {
-    type: 'turbo',
-    animated: true,
-    style: { strokeWidth: 3 }
-}
+
 
 export default function FlowGenerator() {
 

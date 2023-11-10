@@ -1,7 +1,13 @@
 import { IconDefinition, faUpload, faDownload, faBrain } from '@fortawesome/free-solid-svg-icons'
+import { Edge } from 'reactflow';
 
 import { IReportItem } from './type';
 
+export const EDGE_DEF_SETTING: Partial<Edge> = {
+    type: 'turbo',
+    animated: true,
+    style: { strokeWidth: 3 }
+}
 
 export const REPORT_ITEMS: IReportItem[] = [
     {
@@ -20,7 +26,6 @@ export const REPORT_ITEMS: IReportItem[] = [
         type: 'file-download'
     },
 ]
-
 
 export const flowInfoMap: {
     [type: string]: {
