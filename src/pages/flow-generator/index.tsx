@@ -1,7 +1,7 @@
 'use client'
 import _ from "lodash";
 import { useState } from "react";
-import { Connection, ConnectionLineType, Edge, MarkerType, Node } from 'reactflow'
+import { Connection, Edge, Node } from 'reactflow'
 import { v4 } from "uuid";
 
 import { GeneratorContext } from "./context";
@@ -24,7 +24,7 @@ const EDGE_DEF_SETTING: Partial<Edge> = {
     style: { strokeWidth: 3 }
 }
 
-export default function ReportGenerator() {
+export default function FlowGenerator() {
 
     const [onDragItem, setOnDragItem] = useState<IReportItem>();
     const { graphRef } = useGraphRef<IReportItem, any>();

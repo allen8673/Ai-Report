@@ -3,7 +3,7 @@ import { faQuestion, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from 'react';
 
-import { iconMap } from '../mapper';
+import { flowInfoMap } from '../mapper';
 import { IReportItem } from "../type";
 
 import './report-item.css';
@@ -16,7 +16,7 @@ export interface ReportItemProps extends IReportItem {
 }
 
 export default function ReportItem({ id, name, type, onDelete, onSelected, onClick }: ReportItemProps) {
-    const { icon, color } = iconMap[type] || { icon: faQuestion, color: 'rgba(255, 0, 0, 0.56)' }
+    const { icon, color } = flowInfoMap[type] || { icon: faQuestion, color: 'rgba(255, 0, 0, 0.56)' }
     return <GradientBorder className='std-sm-rounded' borderClass='std-sm-rounded' onSelected={onSelected}>
         <div
             className='report-item flex-center gap-2 px-[12px] py-[7px] h-[50px] grow'
@@ -26,7 +26,7 @@ export default function ReportItem({ id, name, type, onDelete, onSelected, onCli
                 <FontAwesomeIcon icon={icon} color={color} />
             </span>
             <div className="name text-std-light">{name}</div>
-            <FontAwesomeIcon onClick={onDelete} className='w-4 h-4 cursor-default' color='rgba(255, 0, 0, 0.56)' icon={faTrash} />
+            {/* <FontAwesomeIcon onClick={onDelete} className='w-4 h-4 cursor-default' color='rgba(255, 0, 0, 0.56)' icon={faTrash} /> */}
         </div>
     </GradientBorder>
 }

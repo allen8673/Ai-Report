@@ -2,12 +2,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 
-import { iconMap } from "../mapper";
+import { flowInfoMap } from "../mapper";
 import { IReportItem } from "../type";
 
 function TurboNodeInstance(elm: NodeProps<IReportItem>) {
     const { id, data, isConnectable } = elm;
-    const { icon } = iconMap[data.type]
+    const { icon } = flowInfoMap[data.type] || {}
 
     return (
         <>
