@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 
-import { flowInfoMap } from "../mapper";
+import { flowInfoMap } from "../configuration";
 import { IReportItem } from "../type";
 
 function TurboNodeInstance(elm: NodeProps<IReportItem>) {

@@ -6,8 +6,8 @@ import React from 'react';
 import TurboLayout from '@/layout/turbo-layout';
 
 // primereact style
-// import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/themes/lara-light-indigo/theme.css';   // theme
+import 'primereact/resources/themes/saga-purple/theme.css';
+// import 'primereact/resources/themes/lara-light-indigo/theme.css';   // theme
 import 'primeflex/primeflex.css';                                   // css utility
 import 'primeicons/primeicons.css';
 import 'primereact/resources/primereact.css';

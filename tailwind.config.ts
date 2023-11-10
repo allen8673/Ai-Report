@@ -44,7 +44,8 @@ const config: Config = {
         }
       },
       spacing: {
-        std: '20px'
+        std: '20px',
+        'std-sm': '12px',
       }
     },
   },

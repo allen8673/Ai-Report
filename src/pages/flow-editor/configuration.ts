@@ -1,5 +1,25 @@
 import { IconDefinition, faUpload, faDownload, faBrain } from '@fortawesome/free-solid-svg-icons'
 
+import { IReportItem } from './type';
+
+
+export const REPORT_ITEMS: IReportItem[] = [
+    {
+        id: 'custom-promt',
+        name: 'Custom Promt',
+        type: 'prompt'
+    },
+    {
+        id: 'file-upload',
+        name: 'File Upload',
+        type: 'file-upload'
+    },
+    {
+        id: 'file-download',
+        name: 'File Download',
+        type: 'file-download'
+    },
+]
 
 
 export const flowInfoMap: {

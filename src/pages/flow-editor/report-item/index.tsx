@@ -3,7 +3,7 @@ import { faQuestion } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from 'react';
 
-import { flowInfoMap } from '../mapper';
+import { flowInfoMap } from '../configuration';
 import { IReportItem } from "../type";
 
 import './report-item.css';

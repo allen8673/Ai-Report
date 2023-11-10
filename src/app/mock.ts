@@ -1,6 +1,6 @@
 import { Node, Edge } from "reactflow";
 
-import { IReportItem } from "./type";
+import { IReportItem } from "../pages/flow-editor/type";
 
 export const initialNodes: Node<IReportItem>[] = [
     {

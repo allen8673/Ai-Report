@@ -1,14 +1,18 @@
 'use client'
+import { faMagicWandSparkles, faPlayCircle, faSave } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import _ from "lodash";
 import { Button } from 'primereact/button';
 import { useState } from "react";
 import { Connection, Edge, Node } from 'reactflow'
 import { v4 } from "uuid";
 
+import { initialEdges, initialNodes } from "../../app/mock";
+
+import { REPORT_ITEMS } from "./configuration";
 import { GeneratorContext } from "./context";
 import TurboEdge, { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
-import { initialEdges, initialNodes, reportItems } from "./mock";
 import ReportItem from "./report-item";
 import { IReportItem } from "./type";
 
@@ -17,7 +21,6 @@ import Grapth from "@/components/graph";
 import { useGraphRef } from "@/components/graph/helper";
 
 import './graph-assets/turbo-style.css'
-import './report-generator.css'
 
 const EDGE_DEF_SETTING: Partial<Edge> = {
     type: 'turbo',
@@ -40,15 +43,13 @@ export default function FlowGenerator() {
             <div className="w-60 ">
                 <DndList
                     className="rounded-std bg-std-deep"
-                    items={reportItems}
+                    items={REPORT_ITEMS}
                     disableChangeOrder
                     renderContent={(data) => <ReportItem
                         {...data}
                         onSelected={selectedItem === data.id}
                         onClick={(id) => { setSelectedItem(id) }}
-                        onDelete={() => {
-                            alert('on delete');
-                        }} />}
+                    />}
                     onDragStart={(init, item): void => {
                         setOnDragItem(() => item)
                     }}
@@ -56,9 +57,22 @@ export default function FlowGenerator() {
                 />
             </div>
             <div className="shrink grow flex flex-col gap-std">
-                <div className="rounded-std bg-std-deep std-title-pane">
+                <div className="rounded-std  std-title-pane">
                     {projectName}
-                    <Button label="Submit" />
+                    <div className="act-pane">
+                        <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
+                            severity="secondary"
+                            tooltip="Save as template"
+                            tooltipOptions={{ position: 'left' }} />
+                        <Button icon={<FontAwesomeIcon icon={faSave} />}
+                            tooltip="Save"
+                            tooltipOptions={{ position: 'left' }} />
+                        <Button icon={<FontAwesomeIcon icon={faPlayCircle} />}
+                            severity='success'
+                            tooltip="Run Flow"
+                            tooltipOptions={{ position: 'left' }}
+                        />
+                    </div>
                 </div>
                 <Grapth
                     className="rounded-std bg-std-deep"

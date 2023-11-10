@@ -25,9 +25,13 @@
   }
 
   .std-title-pane {
-    @apply bg-std-deep-weak h-[60px] px-[12px] py-[18px];
+    @apply h-[60px] py-[18px];
     @apply flex items-center;
     @apply text-std-light text-[22px] justify-between;
+
+    .act-pane {
+      @apply flex gap-std-sm
+    }
   }
 }
 
