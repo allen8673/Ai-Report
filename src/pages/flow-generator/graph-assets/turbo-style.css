@@ -1,4 +1,4 @@
-@tailwind base;
+/* @tailwind base; */
 @tailwind components;
 @tailwind utilities;
 
@@ -73,7 +73,6 @@
         /* right: -10px !important; */
         height: 16px !important;
         width: 16px !important;
-        /* border-width: 1 !important; */
         opacity: 0.75;
         border: none !important;
         box-shadow: theme('backgroundImage.turbo-shadow');
