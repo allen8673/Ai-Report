@@ -1,6 +1,6 @@
 'use client'
-import HomePage from "@/pages/home-page";
+import ProjectViewer from "@/pages/project-viewer";
 
 export default function Home() {
-  return <HomePage />
+  return <ProjectViewer />
 }
