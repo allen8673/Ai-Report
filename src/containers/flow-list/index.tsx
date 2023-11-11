@@ -24,9 +24,9 @@ export default function FlowList() {
         <div className="rounded-std std-title-pane">
             WorkFlow List
             <div className="act-pane">
-                <Button icon={<FontAwesomeIcon icon={faAdd} />}
+                <Button icon={<FontAwesomeIcon className='mr-[7px]' icon={faAdd} />}
                     severity="success"
-                    tooltip="Save as template"
+                    label='Add New Workflow'
                     tooltipOptions={{ position: 'left' }} />
             </div>
         </div>
