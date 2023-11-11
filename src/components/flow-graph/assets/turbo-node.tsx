@@ -8,8 +8,15 @@ import { flowInfoMap } from "../configuration";
 import { IFlow } from '@/interface/workflow';
 
 function TurboNodeInstance(elm: NodeProps<IFlow>) {
-    const { id, data, isConnectable } = elm;
+    const { id, data, isConnectable, } = elm;
+    const { running } = data || {}
     const { icon } = flowInfoMap[data.type] || {}
+    let bg_color = 'bg-deep-weak';
+    switch (data.status) {
+        case 'success': bg_color = 'bg-success-deep'; break;
+        case 'failure': bg_color = 'bg-failure-deep'; break;
+        default: bg_color = 'bg-deep-weak'; break;
+    }
 
     return (
         <>
@@ -18,8 +25,8 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                     <FontAwesomeIcon className='icon flex-center ' icon={faCloud} />
                 </div>
             </div>
-            <div className="run middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] " >
-                <div className="inner rounded-std-sm bg-deep-weak">
+            <div className={`middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] ${running ? "running" : ''}`} >
+                <div className={`inner rounded-std-sm ${bg_color}`}>
                     <div className="body rounded-std-sm text-light">
                         <FontAwesomeIcon className='icon mr-[8px]' icon={icon} color={'white'} />
                         <div>

@@ -7,7 +7,7 @@ export const mock_flows: IFlow[] = [
         name: 'upload stix',
         type: 'file-upload',
         position: { x: 100, y: 200 },
-        forwards: ['f-2', 'f-4']
+        forwards: ['f-2', 'f-4'],
     },
     {
         id: 'f-2',

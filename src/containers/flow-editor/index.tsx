@@ -53,11 +53,19 @@ export default function FlowEditor() {
                             tooltipOptions={{ position: 'left' }} />
                         <Button icon={<FontAwesomeIcon icon={faSave} />}
                             tooltip="Save"
-                            tooltipOptions={{ position: 'left' }} />
+                            tooltipOptions={{ position: 'left' }}
+                            onClick={(): void => {
+                                // graphRef.current?.setNode('f-1', pre => ({ ...pre, data: { ...pre.data, status: 'success' } }))
+                                // graphRef.current?.setNode('f-2', pre => ({ ...pre, data: { ...pre.data, status: 'failure' } }))
+                            }}
+                        />
                         <Button icon={<FontAwesomeIcon icon={faPlayCircle} />}
                             severity='success'
                             tooltip="Run Flow"
                             tooltipOptions={{ position: 'left' }}
+                            onClick={(): void => {
+                                // graphRef.current?.setNode('f-1', pre => ({ ...pre, data: { ...pre.data, running: true } }))
+                            }}
                         />
                     </div>
                 </div>
@@ -76,7 +84,7 @@ export default function FlowEditor() {
                         graphRef.current?.addNode({ id, position, data: { ...onDragItem, position }, type: 'turbo' });
                         setOnDragItem(() => undefined);
                     }}
-
+                    hideMiniMap
                 />
             </div>
         </GeneratorContext.Provider>

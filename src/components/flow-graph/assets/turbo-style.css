@@ -75,7 +75,7 @@
             }
         }
 
-        & .run.wrapper.gradient:before {
+        & .running.wrapper.gradient:before {
             content: '';
             background: theme('backgroundImage.turbo-selected');
             animation: spinner 4s linear infinite;
@@ -86,8 +86,6 @@
 
 
     .turbo-handle {
-        /* @apply h-[50px] w-[50px]; */
-        /* right: -10px !important; */
         height: 16px !important;
         width: 16px !important;
         opacity: 0.75;
@@ -123,14 +121,11 @@
 .react-flow__handle.source {
     right: -20px;
     background: #a853ba;
-    /* transform: translate(8px, -8px); */
-
 }
 
 .react-flow__handle.target {
     left: -20px;
     background: #2a8af6;
-    /* transform: translate(-8px, -8px); */
 }
 
 .react-flow__node:focus {
