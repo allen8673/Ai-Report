@@ -16,6 +16,7 @@ import ReportItem from "./report-item";
 import DndList from "@/components/dnd-list";
 import FlowGraph from "@/components/flow-graph";
 import { useGraphRef } from "@/components/graph/helper";
+import TitlePane from "@/components/title-pane";
 import { FlowStatus, IFlow, IFlowBase } from "@/interface/workflow";
 
 export default function FlowEditor() {
@@ -71,9 +72,8 @@ export default function FlowEditor() {
                 />
             </div>
             <div className="shrink grow flex flex-col gap-std">
-                <div className="rounded-std  std-title-pane">
-                    {projectName}
-                    <div className="act-pane">
+                <TitlePane title={projectName} postContent={
+                    <>
                         <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
                             severity="secondary"
                             tooltip="Save as template"
@@ -97,8 +97,8 @@ export default function FlowEditor() {
                                 mock_run(['f-1'])
                             }}
                         />
-                    </div>
-                </div>
+                    </>}
+                />
                 <FlowGraph
                     className="rounded-std bg-deep"
                     flows={mock_flows}
