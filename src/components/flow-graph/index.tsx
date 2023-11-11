@@ -1,0 +1,43 @@
+import _ from "lodash";
+import { Edge, Node } from 'reactflow'
+
+import Graph from "../graph";
+import { GraphProps } from "../graph/graph";
+
+import TurboEdge, { TurboEdgeAsset } from "./assets/turbo-edge";
+import TurboNode from "./assets/turbo-node";
+import { EDGE_DEF_SETTING } from "./configuration";
+
+import { IFlow } from "@/interface/workflow";
+import './assets/turbo-style.css';
+
+interface FlowGraphProps extends Omit<GraphProps<IFlow>,
+    'initialNodes' |
+    'initialEdges' |
+    'nodeTypes' |
+    'edgeTypes' |
+    'defaultEdgeOptions'> {
+    flows: IFlow[]
+}
+
+export default function FlowGraph({ flows, ...others }: FlowGraphProps) {
+    const edges: Edge[] = []
+    const nodes = _.map<IFlow, Node<IFlow>>(flows, flow => {
+        const { id, position, forwards } = flow;
+        _.forEach(forwards, fw => {
+            edges.push({ id: `${flow.id}-${fw}`, source: flow.id, target: fw })
+        })
+        return ({ id, position, type: 'turbo', data: flow })
+    })
+    return <Graph
+        className="rounded-std bg-deep"
+        initialNodes={nodes}
+        initialEdges={edges}
+        nodeTypes={{ turbo: TurboNode }}
+        edgeTypes={{ turbo: TurboEdge }}
+        defaultEdgeOptions={EDGE_DEF_SETTING}
+        {...others}
+    >
+        <TurboEdgeAsset />
+    </Graph>
+}

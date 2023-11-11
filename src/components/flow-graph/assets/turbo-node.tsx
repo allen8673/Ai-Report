@@ -1,3 +1,4 @@
+import { faCloud } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from "react";
 import { Handle, NodeProps, Position } from "reactflow";
@@ -7,15 +8,28 @@ import { flowInfoMap } from "../configuration";
 import { IFlow } from '@/interface/workflow';
 
 function TurboNodeInstance(elm: NodeProps<IFlow>) {
-    const { id, data, isConnectable } = elm;
+    const { id, data, isConnectable, } = elm;
+    const { running } = data || {}
     const { icon } = flowInfoMap[data.type] || {}
+    let bg_color = 'bg-deep-weak';
+    switch (data.status) {
+        case 'success': bg_color = 'bg-success-deep'; break;
+        case 'failure': bg_color = 'bg-failure-deep'; break;
+        case 'warning': bg_color = 'bg-warning-deep'; break;
+        default: bg_color = 'bg-deep-weak'; break;
+    }
 
     return (
         <>
-            <div className="middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] " >
-                <div className="inner rounded-std-sm bg-deep-weak">
+            <div className="cloud gradient text-light-weak hover:text-light cursor-default">
+                <div className='bg-deep-weak flex-center'>
+                    <FontAwesomeIcon className='icon flex-center ' icon={faCloud} />
+                </div>
+            </div>
+            <div className={`middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] ${running ? "running" : ''}`} >
+                <div className={`inner rounded-std-sm ${bg_color}`}>
                     <div className="body rounded-std-sm text-light">
-                        <FontAwesomeIcon className='icon' icon={icon} color={'white'} />
+                        <FontAwesomeIcon className='icon mr-[8px]' icon={icon} color={'white'} />
                         <div>
                             <div className="title">{data.name}</div>
                             <div className="subline">{data.type}</div>
@@ -23,7 +37,6 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                     </div>
                 </div>
             </div >
-
             <Handle
                 className='turbo-handle'
                 type="target"
@@ -33,7 +46,7 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                     alert('haha')
                 }}
                 isConnectable={isConnectable}
-            ><div className='123' /></Handle>
+            />
             <Handle
                 className='turbo-handle'
                 type="source"
@@ -42,8 +55,6 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                 isConnectable={isConnectable}
             />
         </>
-
-
     );
 }
 const TurboNode = React.memo(TurboNodeInstance)

@@ -1,52 +1,38 @@
-import { Node, Edge } from "reactflow";
 
 import { IFlow, IWorkflow } from "@/interface/workflow";
 
-export const initialNodes: Node<IFlow>[] = [
+export const mock_flows: IFlow[] = [
     {
-        id: '1',
-        data: {
-            id: 'f-1',
-            name: 'upload stix',
-            type: 'file-upload'
-        },
+        id: 'f-1',
+        name: 'upload stix',
+        type: 'file-upload',
         position: { x: 100, y: 200 },
+        forwards: ['f-2', 'f-4'],
     },
     {
-        id: '2',
-        data: {
-            id: 'f-2',
-            name: 'analysis ip',
-            type: 'prompt'
-        },
+        id: 'f-2',
+        name: 'analysis ip',
+        type: 'prompt',
         position: { x: 600, y: 300 },
+        forwards: ['f-5']
 
     },
     {
-        id: '3',
-        data: {
-            id: 'f-4',
-            name: 'analysis add.',
-            type: 'prompt'
-        },
+        id: 'f-4',
+        name: 'analysis add.',
+        type: 'prompt',
         position: { x: 600, y: 100 },
+        forwards: ['f-5']
     },
     {
-        id: '4',
-        data: {
-            id: 'f-5',
-            name: 'Done',
-            type: 'file-download'
-        },
+        id: 'f-5',
+        name: 'Done',
+        type: 'file-download',
         position: { x: 1100, y: 200 },
-    },
+    }
 
-];
+]
 
-export const initialEdges: Edge[] = [
-    { id: 'e1-2', source: '1', target: '2' },
-    { id: 'e1-3', source: '1', target: '3' },
-];
 
 
 export const mock_projects: IWorkflow[] = [

@@ -1,7 +1,7 @@
 import { IconDefinition, faUpload, faDownload, faBrain } from '@fortawesome/free-solid-svg-icons'
 import { Edge } from 'reactflow';
 
-import { IFlowBase } from '@/interface/workflow';
+import { IFlow } from '@/interface/workflow';
 
 export const EDGE_DEF_SETTING: Partial<Edge> = {
     type: 'turbo',
@@ -9,7 +9,7 @@ export const EDGE_DEF_SETTING: Partial<Edge> = {
     style: { strokeWidth: 3 }
 }
 
-export const REPORT_ITEMS: IFlowBase[] = [
+export const REPORT_ITEMS: Partial<IFlow>[] = [
     {
         id: 'custom-promt',
         name: 'Custom Promt',

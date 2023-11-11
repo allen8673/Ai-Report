@@ -43,6 +43,21 @@ const config: Config = {
         turbo: {
           deep: '#a853ba',
           light: '#2a8af6',
+        },
+        success: {
+          light: '#10b981',
+          DEFAULT: '#047857',
+          deep: '#064e3b',
+        },
+        failure: {
+          light: '#ef4444',
+          DEFAULT: '#b91c1c',
+          deep: '#7f1d1d',
+        },
+        warning: {
+          light: '#eab308',
+          DEFAULT: '#a16207',
+          deep: '#713f12',
         }
       },
       spacing: {

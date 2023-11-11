@@ -1,6 +1,4 @@
-/* @tailwind base; */
 @tailwind components;
-@tailwind utilities;
 
 @layer components {
 
@@ -33,7 +31,6 @@
 
         & .icon {
             @apply h-[16px] w-[16px];
-            margin-right: 8px;
         }
 
         & .title {
@@ -56,10 +53,29 @@
             position: relative;
         }
 
-    }
+        & .cloud {
+            border-radius: 100%;
+            width: 30px;
+            height: 30px;
+            right: 0;
+            position: absolute;
+            top: 0;
+            transform: translate(50%, -50%);
+            display: flex;
+            transform-origin: center center;
+            padding: 2px;
+            overflow: hidden;
+            box-shadow: theme('backgroundImage.turbo-shadow');
+            z-index: 1;
 
-    .react-flow__node-turbo.selected {
-        & .wrapper.gradient:before {
+            & div {
+                flex-grow: 1;
+                border-radius: 100%;
+                position: relative;
+            }
+        }
+
+        & .running.wrapper.gradient:before {
             content: '';
             background: theme('backgroundImage.turbo-selected');
             animation: spinner 4s linear infinite;
@@ -68,9 +84,8 @@
         }
     }
 
+
     .turbo-handle {
-        /* @apply h-[50px] w-[50px]; */
-        /* right: -10px !important; */
         height: 16px !important;
         width: 16px !important;
         opacity: 0.75;
@@ -106,14 +121,11 @@
 .react-flow__handle.source {
     right: -20px;
     background: #a853ba;
-    /* transform: translate(8px, -8px); */
-
 }
 
 .react-flow__handle.target {
     left: -20px;
     background: #2a8af6;
-    /* transform: translate(-8px, -8px); */
 }
 
 .react-flow__node:focus {

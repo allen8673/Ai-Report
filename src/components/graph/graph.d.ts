@@ -2,7 +2,7 @@ import { Node, Edge, ReactFlowInstance, ReactFlowProps, NodeChange, XYPosition }
 
 export type AddEdge = Edge | Connection;
 export type EventType = 'drop' | 'change' | '';
-export interface IGrapth<NData, EData = any, NNormal = NData, ENormal = EData> extends Omit<ReactFlowProps,
+export interface GraphProps<NData, EData = any, NNormal = NData, ENormal = EData> extends Omit<ReactFlowProps,
     | 'nodes'
     | 'edges'
     | 'defaultNodes'
