@@ -26,7 +26,6 @@ import './graph-assets/turbo-style.css'
 export default function FlowGenerator() {
 
     const projectName = 'Demo Project';
-
     const [onDragItem, setOnDragItem] = useState<IFlow>();
     const { graphRef } = useGraphRef<IFlow, any>();
     const [selectedItem, setSelectedItem] = useState<string>()

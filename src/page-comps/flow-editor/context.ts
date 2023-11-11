@@ -2,7 +2,6 @@ import { MutableRefObject, useContext } from "react";
 import React from "react";
 import { Node, Edge } from 'reactflow'
 
-
 import { GraphInstance } from "@/components/graph/graph";
 import { IFlow } from "@/interface/project";
 
