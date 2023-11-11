@@ -1,6 +1,6 @@
 import FlowEditor from "@/containers/flow-editor";
 
-export default function WorkflowEditor() {
+export default function Page() {
     return (
         <FlowEditor />
     );

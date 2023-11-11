@@ -1,6 +1,6 @@
 import FlowList from "@/containers/flow-list";
 
-export default function Report() {
+export default function Page() {
     return (
         <FlowList />
     );
