@@ -1,6 +1,6 @@
 import { Node, Edge } from "reactflow";
 
-import { IFlow, IProject } from "@/interface/project";
+import { IFlow, IWorkflow } from "@/interface/workflow";
 
 export const initialNodes: Node<IFlow>[] = [
     {
@@ -49,7 +49,7 @@ export const initialEdges: Edge[] = [
 ];
 
 
-export const mock_projects: IProject[] = [
+export const mock_projects: IWorkflow[] = [
     {
         id: 'p-1',
         name: 'project 1',

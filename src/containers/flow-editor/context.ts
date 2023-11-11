@@ -3,7 +3,7 @@ import React from "react";
 import { Node, Edge } from 'reactflow'
 
 import { GraphInstance } from "@/components/graph/graph";
-import { IFlow } from "@/interface/project";
+import { IFlow } from "@/interface/workflow";
 
 export interface GeneratorStore {
     diagramRef?: MutableRefObject<GraphInstance<IFlow, any> | null>;

@@ -1,7 +1,7 @@
 import { IconDefinition, faUpload, faDownload, faBrain } from '@fortawesome/free-solid-svg-icons'
 import { Edge } from 'reactflow';
 
-import { IFlow } from '@/interface/project';
+import { IFlow } from '@/interface/workflow';
 
 export const EDGE_DEF_SETTING: Partial<Edge> = {
     type: 'turbo',

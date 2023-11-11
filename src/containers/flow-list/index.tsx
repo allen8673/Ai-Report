@@ -5,20 +5,19 @@ import { Button } from 'primereact/button';
 import { mock_projects } from '@/app/mock';
 import Table from '@/components/table';
 import { Column } from '@/components/table/table';
-import { IProject } from '@/interface/project';
+import { IWorkflow } from '@/interface/workflow';
 
 
-export default function ProjectViewer() {
+export default function FlowList() {
 
-    const columns: Column<IProject>[] = [
+    const columns: Column<IWorkflow>[] = [
         { key: 'id', title: 'ID' },
         { key: 'name', title: 'Name' }
     ]
 
-
     return <div className="flex h-full flex-col gap-std items-stretch text-light">
         <div className="rounded-std std-title-pane">
-            Project List
+            WorkFlow List
             <div className="act-pane">
                 <Button icon={<FontAwesomeIcon icon={faAdd} />}
                     severity="success"

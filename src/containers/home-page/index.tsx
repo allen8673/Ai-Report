@@ -1,3 +1,3 @@
 export default function HomePage() {
-    return <div className="flex-center w-full h-full" >Welcome Home</div>
+    return <div className="flex-center w-full h-full text-light" >Welcome Home</div>
 }

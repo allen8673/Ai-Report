@@ -18,12 +18,12 @@ import ReportItem from "./report-item";
 import DndList from "@/components/dnd-list";
 import Grapth from "@/components/graph";
 import { useGraphRef } from "@/components/graph/helper";
-import { IFlow } from "@/interface/project";
+import { IFlow } from "@/interface/workflow";
 import './graph-assets/turbo-style.css'
 
 
 
-export default function FlowGenerator() {
+export default function FlowEditor() {
 
     const projectName = 'Demo Project';
     const [onDragItem, setOnDragItem] = useState<IFlow>();

@@ -4,7 +4,7 @@ import { Handle, NodeProps, Position } from "reactflow";
 
 import { flowInfoMap } from "../configuration";
 
-import { IFlow } from '@/interface/project';
+import { IFlow } from '@/interface/workflow';
 
 function TurboNodeInstance(elm: NodeProps<IFlow>) {
     const { id, data, isConnectable } = elm;
