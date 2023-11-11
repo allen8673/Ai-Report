@@ -1,3 +1,5 @@
+import { XYPosition } from "reactflow";
+
 export interface IWorkflow {
     id: string;
     name: string;
@@ -6,10 +8,15 @@ export interface IWorkflow {
 
 export type FlowTyep = 'prompt' | 'file-upload' | 'file-download';
 
-export interface IFlow {
+export interface IFlowBase {
     id: string;
     type: FlowTyep;
     name: string;
-    sources?: string[];
-    targets?: string[];
 }
+
+export interface IFlow extends IFlowBase {
+
+    forwards?: string[];
+    position: XYPosition
+}
+

@@ -7,9 +7,9 @@ import { flowInfoMap } from '../configuration';
 
 import './report-item.css';
 import GradientBorder from '@/components/gradient-border';
-import { IFlow } from '@/interface/workflow';
+import { IFlowBase } from '@/interface/workflow';
 
-export interface ReportItemProps extends IFlow {
+export interface ReportItemProps extends IFlowBase {
     onDelete?: () => void;
     onClick?: (id: string) => void;
     onSelected?: boolean;

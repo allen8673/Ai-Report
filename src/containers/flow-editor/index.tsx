@@ -1,36 +1,29 @@
 'use client'
 import { faMagicWandSparkles, faPlayCircle, faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import _ from "lodash";
 import { Button } from 'primereact/button';
 import { useState } from "react";
-import { Connection, Node } from 'reactflow'
+import { Connection } from "reactflow";
 import { v4 } from "uuid";
 
-import { initialEdges, initialNodes } from "../../mock-data/mock";
+import { mock_flows } from "../../mock-data/mock";
 
 import { EDGE_DEF_SETTING, REPORT_ITEMS } from "./configuration";
 import { GeneratorContext } from "./context";
-import TurboEdge, { TurboEdgeAsset } from "./graph-assets/turbo-edge";
-import TurboNode from "./graph-assets/turbo-node";
 import ReportItem from "./report-item";
 
 import DndList from "@/components/dnd-list";
-import Grapth from "@/components/graph";
+import FlowGraph from "@/components/flow-graph";
 import { useGraphRef } from "@/components/graph/helper";
-import { IFlow } from "@/interface/workflow";
-import './graph-assets/turbo-style.css'
-
-
+import { IFlow, IFlowBase } from "@/interface/workflow";
 
 export default function FlowEditor() {
 
     const projectName = 'Demo Project';
-    const [onDragItem, setOnDragItem] = useState<IFlow>();
+    const [onDragItem, setOnDragItem] = useState<IFlowBase>();
     const { graphRef } = useGraphRef<IFlow, any>();
     const [selectedItem, setSelectedItem] = useState<string>()
 
-    const nodes: Node<IFlow>[] = _.map(initialNodes, n => ({ ...n, type: 'turbo' }));
 
     return <div className="flex h-full flex-row gap-std items-stretch">
         <GeneratorContext.Provider value={{ onDragItem }}>
@@ -68,14 +61,10 @@ export default function FlowEditor() {
                         />
                     </div>
                 </div>
-                <Grapth
+                <FlowGraph
                     className="rounded-std bg-deep"
-                    initialNodes={nodes}
-                    initialEdges={initialEdges}
-                    nodeTypes={{ turbo: TurboNode }}
-                    edgeTypes={{ turbo: TurboEdge }}
+                    flows={mock_flows}
                     graphRef={graphRef}
-                    defaultEdgeOptions={EDGE_DEF_SETTING}
                     onConnect={({ source, target }: Connection) => {
                         if (!source || !target) return;
                         const id = v4();
@@ -84,13 +73,11 @@ export default function FlowEditor() {
                     onMouseUp={(e, position) => {
                         if (!onDragItem || !position) return;
                         const id = v4();
-                        graphRef.current?.addNode({ id, position, data: onDragItem, type: 'turbo' });
+                        graphRef.current?.addNode({ id, position, data: { ...onDragItem, position }, type: 'turbo' });
                         setOnDragItem(() => undefined);
                     }}
 
-                >
-                    <TurboEdgeAsset />
-                </Grapth>
+                />
             </div>
         </GeneratorContext.Provider>
     </div>

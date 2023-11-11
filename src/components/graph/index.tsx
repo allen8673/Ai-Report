@@ -18,11 +18,11 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { v4 } from "uuid";
 
-import { EventType, GraphInstance, IGrapth } from "./graph";
+import { EventType, GraphInstance, GraphProps } from "./graph";
 
 
 
-export default function Grapth<NData, EData, NNormal = NData, ENormal = EData>(props: IGrapth<NData, EData, NNormal, ENormal>) {
+export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(props: GraphProps<NData, EData, NNormal, ENormal>) {
 
     const {
         className,
