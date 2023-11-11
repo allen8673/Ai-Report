@@ -30,8 +30,8 @@ export default function ProjectViewer() {
             paginator rows={10}
             first={0}
             totalRecords={5}
-            onRowClick={(row) => {
-                console.log(row)
+            onRowClick={() => {
+                // console.log(row)
             }}
         />
     </div>

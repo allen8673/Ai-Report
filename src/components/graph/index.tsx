@@ -267,7 +267,7 @@ export default function Grapth<NData, EData, NNormal = NData, ENormal = EData>(p
 
     const _onMouseUp = (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
         if (readonly) {
-            setOndrag((pre) => false);
+            setOndrag(() => false);
         }
 
         if (!rfWrapper?.current || !onMouseUp) return;
@@ -283,7 +283,7 @@ export default function Grapth<NData, EData, NNormal = NData, ENormal = EData>(p
 
     const _onMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
         if (readonly) {
-            setOndrag((pre) => true);
+            setOndrag(() => true);
         }
 
         if (!rfWrapper?.current || !onMouseDown) return;

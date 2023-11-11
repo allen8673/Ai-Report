@@ -29,7 +29,7 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                 type="target"
                 position={Position.Left}
                 id={`tgt-${id}`}
-                onConnect={(params): void => {
+                onConnect={(): void => {
                     alert('haha')
                 }}
                 isConnectable={isConnectable}

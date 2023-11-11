@@ -2,7 +2,7 @@
 
 import _ from "lodash";
 import { useEffect, useState } from "react";
-import { DragDropContext, DragStart, Draggable, DropResult, Droppable, DroppableProvided, ResponderProvided } from "react-beautiful-dnd";
+import { DragDropContext, DragStart, Draggable, DropResult, Droppable, DroppableProvided } from "react-beautiful-dnd";
 import { Element } from 'react-scroll'
 import { v4 } from 'uuid'
 
@@ -16,14 +16,14 @@ const DndContext = <T extends { [key: string]: any }>({
     onDragEnd,
     children,
 }: DndContextProps<T>): JSX.Element => {
-    const dndOnDragEnd = (result: DropResult, provided: ResponderProvided): void => {
+    const dndOnDragEnd = (result: DropResult): void => {
         if (!result.source || !result.destination) return;
         const resultItems = _.cloneDeep(items);
         resultItems.splice(result.destination.index, 0, resultItems.splice(result.source.index, 1)[0]);
         onDragEnd(result, resultItems);
         return;
     };
-    const dndOnDragStart = (initial: DragStart, provided: ResponderProvided): void => {
+    const dndOnDragStart = (initial: DragStart): void => {
         onDragStart?.(initial, items[initial.source.index]);
     };
     return (
@@ -80,7 +80,7 @@ const RbDndItem = <T extends { [key: string]: any }>({
             style={{ cursor: 'pointer' }}
         >
             <Draggable key={id} draggableId={id} index={index} isDragDisabled={isDragDisabled} >
-                {(provided, snapshot): JSX.Element => (
+                {(provided): JSX.Element => (
                     <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
@@ -112,7 +112,7 @@ export default function DndList<T extends { [key: string]: any }>({
 }: DndListProps<T>) {
     const [_items, setItems] = useState<T[]>(items || []);
     _items.map
-    const dewfaultDragEnd = (result: DropResult, resultItems: T[]): void => {
+    const dewfaultDragEnd = (result: DropResult): void => {
         if (!disableChangeOrder) {
             // default behavior is move the item according to dropdown position
             setItems((pre) => {
