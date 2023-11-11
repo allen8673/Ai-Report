@@ -7,7 +7,7 @@ export interface IWorkflow {
 }
 
 export type FlowTyep = 'prompt' | 'file-upload' | 'file-download';
-export type FlowStatus = 'none' | 'success' | 'failure';
+export type FlowStatus = 'none' | 'success' | 'failure' | 'warning';
 export interface IFlowBase {
     id: string;
     type: FlowTyep;

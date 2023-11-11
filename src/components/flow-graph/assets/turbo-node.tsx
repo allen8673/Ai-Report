@@ -15,6 +15,7 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
     switch (data.status) {
         case 'success': bg_color = 'bg-success-deep'; break;
         case 'failure': bg_color = 'bg-failure-deep'; break;
+        case 'warning': bg_color = 'bg-warning-deep'; break;
         default: bg_color = 'bg-deep-weak'; break;
     }
 

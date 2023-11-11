@@ -1,6 +1,7 @@
 'use client'
 import { faMagicWandSparkles, faPlayCircle, faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import _ from "lodash";
 import { Button } from 'primereact/button';
 import { useState } from "react";
 import { Connection } from "reactflow";
@@ -15,7 +16,7 @@ import ReportItem from "./report-item";
 import DndList from "@/components/dnd-list";
 import FlowGraph from "@/components/flow-graph";
 import { useGraphRef } from "@/components/graph/helper";
-import { IFlow, IFlowBase } from "@/interface/workflow";
+import { FlowStatus, IFlow, IFlowBase } from "@/interface/workflow";
 
 export default function FlowEditor() {
 
@@ -24,6 +25,32 @@ export default function FlowEditor() {
     const { graphRef } = useGraphRef<IFlow, any>();
     const [selectedItem, setSelectedItem] = useState<string>()
 
+    let timer: any;
+    const mock_run = (forwards: string[]): void => {
+        if (!!timer) clearTimeout(timer);
+        let next: string[] = [];
+        graphRef.current?.setNodes(pre => {
+            if (_.includes(forwards, pre.id)) {
+                next = _.uniq(next.concat(pre.data.forwards || []))
+                return { ...pre, data: { ...pre.data, running: true } }
+            }
+            return pre
+        });
+
+        timer = setTimeout(async () => {
+            graphRef.current?.setNodes(pre => {
+                if (_.includes(forwards, pre.id)) {
+                    let status: FlowStatus = 'success';
+                    if (pre.id == 'f-2') status = 'failure';
+                    else if (pre.id == 'f-5') status = 'warning';
+                    return { ...pre, data: { ...pre.data, status: status, running: false } }
+                }
+                return pre
+            });
+            await new Promise(resolve => setTimeout(resolve, 500));
+            if (!!next.length) mock_run(next);
+        }, 3000);
+    }
 
     return <div className="flex h-full flex-row gap-std items-stretch">
         <GeneratorContext.Provider value={{ onDragItem }}>
@@ -55,16 +82,19 @@ export default function FlowEditor() {
                             tooltip="Save"
                             tooltipOptions={{ position: 'left' }}
                             onClick={(): void => {
-                                // graphRef.current?.setNode('f-1', pre => ({ ...pre, data: { ...pre.data, status: 'success' } }))
-                                // graphRef.current?.setNode('f-2', pre => ({ ...pre, data: { ...pre.data, status: 'failure' } }))
+                                // 
                             }}
                         />
                         <Button icon={<FontAwesomeIcon icon={faPlayCircle} />}
                             severity='success'
                             tooltip="Run Flow"
                             tooltipOptions={{ position: 'left' }}
-                            onClick={(): void => {
-                                // graphRef.current?.setNode('f-1', pre => ({ ...pre, data: { ...pre.data, running: true } }))
+                            onClick={async () => {
+                                graphRef.current?.setNodes(pre => {
+                                    return { ...pre, data: { ...pre.data, status: 'none', running: false } }
+                                });
+                                await new Promise(resolve => setTimeout(resolve, 500));
+                                mock_run(['f-1'])
                             }}
                         />
                     </div>

@@ -53,6 +53,11 @@ const config: Config = {
           light: '#ef4444',
           DEFAULT: '#b91c1c',
           deep: '#7f1d1d',
+        },
+        warning: {
+          light: '#eab308',
+          DEFAULT: '#a16207',
+          deep: '#713f12',
         }
       },
       spacing: {
