@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Connection, Node } from 'reactflow'
 import { v4 } from "uuid";
 
-import { initialEdges, initialNodes } from "../../app/mock";
+import { initialEdges, initialNodes } from "../../mock-data/mock";
 
 import { EDGE_DEF_SETTING, REPORT_ITEMS } from "./configuration";
 import { GeneratorContext } from "./context";

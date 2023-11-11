@@ -4,10 +4,10 @@ import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from 'primereact/button';
 
-import { mock_projects } from '@/app/mock';
 import Table from '@/components/table';
 import { Column } from '@/components/table/table';
 import { IWorkflow } from '@/interface/workflow';
+import { mock_projects } from '@/mock-data/mock';
 
 
 export default function FlowList() {
