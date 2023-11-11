@@ -1,4 +1,4 @@
-import FlowGenerator from "@/page-comps/flow-editor";
+import FlowGenerator from "@/containers/flow-editor";
 
 export default function Report() {
     return (

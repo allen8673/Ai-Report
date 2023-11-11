@@ -1,5 +1,5 @@
 'use client'
-import ProjectViewer from "@/page-comps/project-viewer";
+import ProjectViewer from "@/containers/project-viewer";
 
 export default function Home() {
   return <ProjectViewer />
