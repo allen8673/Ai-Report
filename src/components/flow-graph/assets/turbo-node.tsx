@@ -11,28 +11,30 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
     const { id, data, isConnectable, } = elm;
     const { running } = data || {}
     const { icon } = flowInfoMap[data.type] || {}
-    let bg_color = 'bg-deep-weak';
+    let status_color = '';
     switch (data.status) {
-        case 'success': bg_color = 'bg-success-deep'; break;
-        case 'failure': bg_color = 'bg-failure-deep'; break;
-        case 'warning': bg_color = 'bg-warning-deep'; break;
-        default: bg_color = 'bg-deep-weak'; break;
+        case 'success': status_color = 'bg-success'; break;
+        case 'failure': status_color = 'bg-failure'; break;
+        case 'warning': status_color = 'bg-warning'; break;
+        default: status_color = ''; break;
     }
 
     return (
         <>
             <div className="cloud gradient text-light-weak hover:text-light cursor-default">
                 <div className='bg-deep-weak flex-center'>
-                    <FontAwesomeIcon className='icon flex-center ' icon={faCloud} />
+                    <FontAwesomeIcon className='h-[16px] w-[16px] flex-center ' icon={faCloud} />
                 </div>
             </div>
             <div className={`middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] ${running ? "running" : ''}`} >
-                <div className={`inner rounded-std-sm ${bg_color}`}>
-                    <div className="body rounded-std-sm text-light">
-                        <FontAwesomeIcon className='icon mr-[8px]' icon={icon} color={'white'} />
-                        <div>
-                            <div className="title">{data.name}</div>
-                            <div className="subline">{data.type}</div>
+                <div className={`inner rounded-std-sm bg-deep-weak`}>
+                    <div className={`py-[16px] px-[20px] ${status_color}`}>
+                        <div className={`flex rounded-std-sm text-light`}>
+                            <FontAwesomeIcon className='h-[20px] w-[20px] mr-[8px] mt-[2px]' icon={icon} color={'white'} />
+                            <div>
+                                <div className="text-[20px] mb-[2px] leading-1">{data.name}</div>
+                                <div className="text-[16px] text-light-weak">{data.type}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
