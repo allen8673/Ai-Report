@@ -1,6 +1,4 @@
 import { IconDefinition, faBarsProgress, faHome, faMagicWandSparkles } from "@fortawesome/free-solid-svg-icons";
-import _ from "lodash";
-
 export interface IRouter {
     title: string;
     folder: string;
@@ -16,12 +14,13 @@ const RouterInfo: { [key: string]: IRouter } = {
 }
 
 export function getFullUrl(router: IRouter): string {
+    if (!router.folder) return ''
     let parentUrl = '';
     const parent = RouterInfo[router.parent || '']
     if (!!parent) {
         parentUrl = getFullUrl(parent)
     }
-    return _.filter([parentUrl, router.folder], i => !!i).join('/')
+    return `${parentUrl}/${router.folder}`;
 }
 
 export default RouterInfo

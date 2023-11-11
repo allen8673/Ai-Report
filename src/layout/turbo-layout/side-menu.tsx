@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import Link from 'next/link';
 
-import RouterInfo, { getFullUrl } from '@/configurations/router-setting';
+import RouterInfo, { getFullUrl } from '@/settings/router-setting';
 
 export default function SideMenu() {
     const navigations = _.filter(RouterInfo, ['isNavigation', true])
@@ -13,7 +13,7 @@ export default function SideMenu() {
             {_.map(navigations, n => {
                 const url = getFullUrl(n);
                 return (
-                    <Link key={n.title} className='text-light-weak' href={`/${url}`}>
+                    <Link key={n.title} className='text-light-weak' href={url || "/"}>
                         <FontAwesomeIcon className='flex-center h-[20px] w-[20px] hover:text-light' icon={n.icon || faQuestion} />
                     </Link>
                 )
