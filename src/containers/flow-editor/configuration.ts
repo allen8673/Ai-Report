@@ -1,13 +1,6 @@
 import { IconDefinition, faUpload, faDownload, faBrain } from '@fortawesome/free-solid-svg-icons'
-import { Edge } from 'reactflow';
 
 import { IFlowBase } from '@/interface/workflow';
-
-export const EDGE_DEF_SETTING: Partial<Edge> = {
-    type: 'turbo',
-    animated: true,
-    style: { strokeWidth: 3 }
-}
 
 export const REPORT_ITEMS: IFlowBase[] = [
     {

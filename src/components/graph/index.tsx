@@ -108,6 +108,9 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
                 'change'
             );
         },
+        getNodes: (): Node<NData>[] => {
+            return nodes
+        },
         removeNode: (nodeId: string): void => {
             const connectEdge = _.filter(edges, (e) => e.source === nodeId || e.target === nodeId);
             _setNodes([{ type: 'remove', id: nodeId }], 'change');
@@ -166,9 +169,9 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
         removeEdge: (edgeId: string): void => {
             _setEdges([{ type: 'remove', id: edgeId }]);
         },
-        resetAllElements: (_nodes: Node<NData>[], _edges: Edge<EData>[]): void => {
-            setNodes(() => _nodes);
-            setEdges(() => _edges);
+        resetAllElements: (_nodes?: Node<NData>[], _edges?: Edge<EData>[]): void => {
+            setNodes(() => (_nodes || initialNodes || []));
+            setEdges(() => _edges || initialEdges || []);
         },
         reactFlowInstance,
     }));
@@ -198,9 +201,8 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
     const _setNodes = useMemo(
         () =>
             (changes: NodeChange[], eventType: EventType): void => {
-                if (!!readonly) {
-                    if (!!eventType) onReadonly?.(eventType);
-                    return;
+                if (!!readonly && !!eventType) {
+                    onReadonly?.(eventType);
                 }
                 setNodes((ns) => {
                     const newNodes = applyNodeChanges(changes, ns);
@@ -209,12 +211,11 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
                         return ns;
                     } else {
                         debounceOnNodesChange(changes, newNodes);
-                        // onNodesChange?.(changes, newNodes);
                         return newNodes;
                     }
                 });
             },
-        []
+        [, readonly]
     );
 
     const _setEdges = (changes: EdgeChange[], edges?: Edge<EData>[]): void => {
@@ -253,7 +254,7 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
 
     const _onNodesChange = useCallback((changes: NodeChange[]): void => {
         _setNodes(changes, _.some(changes, (c: NodeChange) => _.includes(['add', 'remove', 'reset'], c.type)) ? 'change' : '');
-    }, []);
+    }, [, readonly]);
 
     const _onEdgesChange = useCallback((changes: EdgeChange[]) => {
         _setEdges(changes);
@@ -354,6 +355,7 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
                 onEdgeContextMenu?.(e, edge);
             }}
             onNodeMouseMove={_onNodeMouseMove}
+            nodesDraggable={!readonly}
             {...others}
         >
             {children}

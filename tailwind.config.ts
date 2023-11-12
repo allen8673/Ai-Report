@@ -33,7 +33,7 @@ const config: Config = {
       colors: {
         light: {
           DEFAULT: '#ffffff',
-          weak: '#5B5B5B'
+          weak: '#8f8f8f'
         },
         deep: {
           DEFAULT: '#1c1c1c',
@@ -45,19 +45,19 @@ const config: Config = {
           light: '#2a8af6',
         },
         success: {
-          light: '#10b981',
-          DEFAULT: '#047857',
-          deep: '#064e3b',
+          light: 'rgba(16, 185, 129, 0.4)',
+          DEFAULT: 'rgba(4, 119, 86, 0.4)',
+          deep: 'rgba(6, 78, 59, 0.4)',
         },
         failure: {
-          light: '#ef4444',
-          DEFAULT: '#b91c1c',
-          deep: '#7f1d1d',
+          light: 'rgba(239, 68, 68, 0.4)',
+          DEFAULT: 'rgba(185, 28, 28, 0.4)',
+          deep: 'rgba(127, 29, 29, 0.4)',
         },
         warning: {
-          light: '#eab308',
-          DEFAULT: '#a16207',
-          deep: '#713f12',
+          light: 'rgba(234, 179, 8, 0.4)',
+          DEFAULT: 'rgba(161, 98, 7, 0.4)',
+          deep: 'rgba(113, 63, 18, 0.4)',
         }
       },
       spacing: {

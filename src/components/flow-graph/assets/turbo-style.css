@@ -25,27 +25,8 @@
             border-radius: 100%;
         }
 
-        & .body {
-            display: flex;
-        }
-
-        & .icon {
-            @apply h-[16px] w-[16px];
-        }
-
-        & .title {
-            font-size: 16px;
-            margin-bottom: 2px;
-            line-height: 1;
-        }
-
-        & .subline {
-            font-size: 12px;
-            color: #777;
-        }
-
         & .inner {
-            padding: 16px 20px;
+            /* padding: 16px 20px; */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -110,13 +91,6 @@
     }
 
 }
-
-/* 
-@keyframes spinner {
-    100% {
-        transform: translate(-50%, -50%) rotate(-360deg);
-    }
-} */
 
 .react-flow__handle.source {
     right: -20px;
