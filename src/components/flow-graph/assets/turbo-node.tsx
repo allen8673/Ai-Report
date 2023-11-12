@@ -4,13 +4,16 @@ import React from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 
 import { flowInfoMap } from "../configuration";
+import { useFlowGrapContext } from '../context';
 
 import { IFlow } from '@/interface/workflow';
 
 function TurboNodeInstance(elm: NodeProps<IFlow>) {
-    const { id, data, isConnectable, } = elm;
+    const { id, data, } = elm;
     const { running } = data || {}
     const { icon } = flowInfoMap[data.type] || {}
+    const { inEdit } = useFlowGrapContext()
+
     let status_color = '';
     switch (data.status) {
         case 'success': status_color = 'bg-success'; break;
@@ -47,14 +50,14 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                 onConnect={(): void => {
                     alert('haha')
                 }}
-                isConnectable={isConnectable}
+                isConnectable={inEdit}
             />
             <Handle
                 className='turbo-handle'
                 type="source"
                 position={Position.Right}
                 id={`src-${id}`}
-                isConnectable={isConnectable}
+                isConnectable={inEdit}
             />
         </>
     );

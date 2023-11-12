@@ -1,15 +1,12 @@
 'use client'
-import { faMagicWandSparkles, faPlayCircle, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import _ from "lodash";
 import { Button } from 'primereact/button';
 import { useState } from "react";
-import { Connection } from "reactflow";
 import { v4 } from "uuid";
 
-import { mock_flows } from "../../mock-data/mock";
-
-import { EDGE_DEF_SETTING, REPORT_ITEMS } from "./configuration";
+import { REPORT_ITEMS } from "./configuration";
 import { GeneratorContext } from "./context";
 import ReportItem from "./report-item";
 
@@ -17,18 +14,22 @@ import DndList from "@/components/dnd-list";
 import FlowGraph from "@/components/flow-graph";
 import { useGraphRef } from "@/components/graph/helper";
 import TitlePane from "@/components/title-pane";
-import { FlowStatus, IFlow, IFlowBase } from "@/interface/workflow";
+import { FlowStatus, IFlow, IFlowBase, IWorkflow } from "@/interface/workflow";
 
-export default function FlowEditor() {
+export interface FlowEditorProps {
+    workflow: IWorkflow;
+    mode?: 'edit' | 'read';
+    onSave?: (wf: IWorkflow) => void
+}
 
-    const projectName = 'Demo Project';
+export default function FlowEditor({ workflow, mode = 'read', onSave }: FlowEditorProps) {
+
     const [onDragItem, setOnDragItem] = useState<IFlowBase>();
     const { graphRef } = useGraphRef<IFlow, any>();
-    const [selectedItem, setSelectedItem] = useState<string>()
+    const [selectedItem, setSelectedItem] = useState<string>();
+    const [inEdit, setInEdit] = useState<boolean>(mode === 'edit')
 
-    let timer: any;
     const mock_run = (forwards: string[]): void => {
-        if (!!timer) clearTimeout(timer);
         let next: string[] = [];
         graphRef.current?.setNodes(pre => {
             if (_.includes(forwards, pre.id)) {
@@ -38,7 +39,7 @@ export default function FlowEditor() {
             return pre
         });
 
-        timer = setTimeout(async () => {
+        _.debounce(async () => {
             graphRef.current?.setNodes(pre => {
                 if (_.includes(forwards, pre.id)) {
                     let status: FlowStatus = 'success';
@@ -48,14 +49,15 @@ export default function FlowEditor() {
                 }
                 return pre
             });
-            await new Promise(resolve => setTimeout(resolve, 500));
-            if (!!next.length) mock_run(next);
-        }, 3000);
+            _.debounce(() => {
+                if (!!next.length) mock_run(next);
+            }, 500)()
+        }, 3000)()
     }
 
     return <div className="flex h-full flex-row gap-std items-stretch">
         <GeneratorContext.Provider value={{ onDragItem }}>
-            <div className="w-60 ">
+            {!!inEdit && <div className="w-60 ">
                 <DndList
                     className="rounded-std bg-deep"
                     items={REPORT_ITEMS}
@@ -70,43 +72,72 @@ export default function FlowEditor() {
                     }}
 
                 />
-            </div>
+            </div>}
             <div className="shrink grow flex flex-col gap-std">
-                <TitlePane title={projectName} postContent={
+                <TitlePane title={workflow.name} postContent={
                     <>
                         <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
                             severity="secondary"
                             tooltip="Save as template"
-                            tooltipOptions={{ position: 'left' }} />
-                        <Button icon={<FontAwesomeIcon icon={faSave} />}
-                            tooltip="Save"
-                            tooltipOptions={{ position: 'left' }}
-                            onClick={(): void => {
-                                // 
-                            }}
-                        />
-                        <Button icon={<FontAwesomeIcon icon={faPlayCircle} />}
-                            severity='success'
-                            tooltip="Run Flow"
-                            tooltipOptions={{ position: 'left' }}
-                            onClick={async () => {
-                                graphRef.current?.setNodes(pre => {
-                                    return { ...pre, data: { ...pre.data, status: 'none', running: false } }
-                                });
-                                await new Promise(resolve => setTimeout(resolve, 500));
-                                mock_run(['f-1'])
-                            }}
-                        />
+                            tooltipOptions={{ position: 'bottom' }} />
+                        {inEdit ?
+                            <>
+                                <Button icon={<FontAwesomeIcon icon={faCancel} />}
+                                    severity='danger'
+                                    tooltip="Cancel"
+                                    tooltipOptions={{ position: 'bottom' }}
+                                    onClick={async () => {
+                                        graphRef.current?.resetAllElements();
+                                        setInEdit(false)
+                                    }}
+                                />
+
+                                <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faSave} />}
+                                    label="Save"
+                                    tooltipOptions={{ position: 'bottom' }}
+                                    onClick={async () => {
+                                        const flows: IFlow[] = _.map(graphRef.current?.getNodes() || [], n => ({
+                                            ...n.data, position: n.position
+                                        }));
+                                        onSave?.({ ...workflow, flows })
+                                        setInEdit(false)
+                                    }}
+                                />
+                            </> :
+                            <>
+                                <Button icon={<FontAwesomeIcon icon={faPlayCircle} />}
+                                    severity='success'
+                                    tooltip="Run Flow"
+                                    tooltipOptions={{ position: 'bottom' }}
+                                    onClick={async () => {
+                                        graphRef.current?.setNodes(pre => {
+                                            return { ...pre, data: { ...pre.data, status: 'none', running: false } }
+                                        });
+                                        await new Promise(resolve => setTimeout(resolve, 500));
+                                        mock_run(['f-1'])
+                                    }}
+                                />
+                                <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}
+                                    label="Edit"
+                                    tooltipOptions={{ position: 'left' }}
+                                    onClick={(): void => {
+                                        setInEdit(true);
+                                    }}
+                                />
+                            </>}
                     </>}
                 />
                 <FlowGraph
                     className="rounded-std bg-deep"
-                    flows={mock_flows}
+                    flows={workflow.flows}
                     graphRef={graphRef}
-                    onConnect={({ source, target }: Connection) => {
+                    onConnect={({ source, target, newEdge }) => {
                         if (!source || !target) return;
-                        const id = v4();
-                        graphRef.current?.addEdge({ id, source, target, ...EDGE_DEF_SETTING })
+                        graphRef.current?.addEdge(newEdge);
+                        graphRef.current?.setNode(source, (pre) => {
+                            pre.data.forwards?.push(target);
+                            return pre
+                        })
                     }}
                     onMouseUp={(e, position) => {
                         if (!onDragItem || !position) return;
@@ -115,6 +146,7 @@ export default function FlowEditor() {
                         setOnDragItem(() => undefined);
                     }}
                     hideMiniMap
+                    inEdit={inEdit}
                 />
             </div>
         </GeneratorContext.Provider>
