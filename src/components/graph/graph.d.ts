@@ -19,6 +19,7 @@ export interface GraphProps<NData, EData = any, NNormal = NData, ENormal = EData
     | 'onMouseUp'
     | 'onMouseDown'
     | 'onContextMenu'
+    | 'nodesDraggable'
 > {
     className?: string
     initialNodes?: Node<NData>[];
@@ -53,12 +54,13 @@ export interface GraphInstance<NData, EData = any> {
     addNode: (node: Node<NData>) => void;
     setNode: (nodeId: string, data: ((oldNode: Node<NData>) => Node<NData>) | Node<NData>) => void;
     setNodes: (data: ((oldNode: Node<NData>) => Node<NData>) | Node<NData>) => void;
+    getNodes: () => Node<NData>[];
     removeNode: (nodeId: string) => void;
     duplicateNode: (nodeId: string, setNewNode?: (node: Node<NData>) => Node<NData>) => void;
     addEdge: (edge: Edge<EData>) => void;
     setEdge: (edgeId: string, data: ((oldEdge: Edge<EData>) => Edge<EData>) | Edge<EData>) => void;
     setEdges: (data: ((oldEdge: Edge<EData>) => Edge<EData>) | Edge<EData>) => void;
     removeEdge: (edgeId: string) => void;
-    resetAllElements: (nodes: Node<NData>[], edges: Edge<EData>[]) => void;
+    resetAllElements: (nodes?: Node<NData>[], edges?: Edge<EData>[]) => void;
     reactFlowInstance?: ReactFlowInstance;
 }
