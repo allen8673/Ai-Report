@@ -61,15 +61,15 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
         setEdges(initialEdges || []);
     }, []);
 
-    // useEffect(() => {
-    //     _setNodes(
-    //         _.map<Node<NData>, NodeChange>(nodes, (n) => ({
-    //             type: 'reset',
-    //             item: { ...n, draggable: n.draggable && !readonly },
-    //         })),
-    //         ''
-    //     );
-    // }, [readonly]);
+    useEffect(() => {
+        _setNodes(
+            _.map<Node<NData>, NodeChange>(nodes, (n) => ({
+                type: 'reset',
+                item: { ...n, draggable: n.draggable && !readonly },
+            })),
+            ''
+        );
+    }, [readonly]);
 
     /**
      * Announce exposed functionalities by treeRef
@@ -201,9 +201,8 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
     const _setNodes = useMemo(
         () =>
             (changes: NodeChange[], eventType: EventType): void => {
-                if (!!readonly) {
-                    if (!!eventType) onReadonly?.(eventType);
-                    return;
+                if (!!readonly && !!eventType) {
+                    onReadonly?.(eventType);
                 }
                 setNodes((ns) => {
                     const newNodes = applyNodeChanges(changes, ns);
@@ -212,7 +211,6 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
                         return ns;
                     } else {
                         debounceOnNodesChange(changes, newNodes);
-                        // onNodesChange?.(changes, newNodes);
                         return newNodes;
                     }
                 });
