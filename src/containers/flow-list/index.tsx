@@ -9,11 +9,11 @@ import Table from '@/components/table';
 import { Column } from '@/components/table/table';
 import TitlePane from '@/components/title-pane';
 import { IWorkflow } from '@/interface/workflow';
-import { mock_projects } from '@/mock-data/mock';
 import RouterInfo, { getFullUrl } from '@/settings/router-setting';
 
 
-export default function FlowList() {
+export default function WorkflowList({ workflows }: { workflows: IWorkflow[] }) {
+
     const router = useRouter();
     const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
     const columns: Column<IWorkflow>[] = [
@@ -35,7 +35,7 @@ export default function FlowList() {
                     />
                 </>}
         />
-        <Table className='' data={mock_projects} columns={columns}
+        <Table className='' data={workflows} columns={columns}
             paginator rows={10}
             first={0}
             totalRecords={5}
