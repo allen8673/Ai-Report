@@ -131,18 +131,10 @@ export default function FlowEditor({ workflow, mode = 'read', onSave }: FlowEdit
                     className="rounded-std bg-deep"
                     flows={workflow.flows}
                     graphRef={graphRef}
-                    onConnect={({ source, target, newEdge }) => {
-                        if (!source || !target) return;
-                        graphRef.current?.addEdge(newEdge);
-                        graphRef.current?.setNode(source, (pre) => {
-                            pre.data.forwards?.push(target);
-                            return pre
-                        })
-                    }}
                     onMouseUp={(e, position) => {
                         if (!onDragItem || !position) return;
                         const id = v4();
-                        graphRef.current?.addNode({ id, position, data: { ...onDragItem, position }, type: 'turbo' });
+                        graphRef.current?.addNode({ id, position, data: { ...onDragItem, id, position, forwards: [] }, type: 'turbo' });
                         setOnDragItem(() => undefined);
                     }}
                     hideMiniMap

@@ -1,10 +1,10 @@
-import { MutableRefObject, useRef } from 'react';
+import { MutableRefObject, Ref, useRef } from 'react';
 import { Node } from 'reactflow'
 
 import { GraphInstance } from './graph';
 
-
-export const useGraphRef = <NData, EData = any>(): { graphRef: MutableRefObject<GraphInstance<NData, EData> | null> } => {
+export const useGraphRef = <NData, EData = any>(ref?: Ref<GraphInstance<NData, EData>>)
+    : { graphRef: MutableRefObject<GraphInstance<NData, EData>> } => {
     const graphRef = useRef<GraphInstance<NData, EData>>({
         addNode: (): void => {
             //
@@ -40,5 +40,5 @@ export const useGraphRef = <NData, EData = any>(): { graphRef: MutableRefObject<
             //
         },
     });
-    return { graphRef };
+    return { graphRef: (ref as MutableRefObject<GraphInstance<NData, EData>>) || graphRef };
 };
