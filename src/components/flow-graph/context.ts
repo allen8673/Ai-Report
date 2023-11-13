@@ -5,7 +5,7 @@ import { GraphInstance } from "@/components/graph/graph";
 import { IFlow } from "@/interface/workflow";
 
 export interface FlowGraphStore {
-    diagramRef?: MutableRefObject<GraphInstance<IFlow, any> | null>;
+    graphRef?: MutableRefObject<GraphInstance<IFlow, any> | null>;
     inEdit?: boolean;
 }
 
