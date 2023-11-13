@@ -1,8 +1,8 @@
-import WorkflowList from "@/containers/flow-list";
+import FlowOverview from "@/containers/flow-overview";
 import { mock_projects } from "@/mock-data/mock";
 
 export default function Page() {
     return (
-        <WorkflowList workflows={mock_projects} />
+        <FlowOverview workflows={mock_projects} />
     );
 }

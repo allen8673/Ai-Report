@@ -12,7 +12,7 @@ import { IWorkflow } from '@/interface/workflow';
 import RouterInfo, { getFullUrl } from '@/settings/router-setting';
 
 
-export default function WorkflowList({ workflows }: { workflows: IWorkflow[] }) {
+export default function FlowOverview({ workflows }: { workflows: IWorkflow[] }) {
 
     const router = useRouter();
     const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
@@ -25,15 +25,14 @@ export default function WorkflowList({ workflows }: { workflows: IWorkflow[] }) 
         <TitlePane
             title='WorkFlow List'
             postContent={
-                <>
-                    <Button icon={<FontAwesomeIcon className='mr-[7px]' icon={faAdd} />}
-                        severity="success"
-                        label='Add New Workflow'
-                        tooltipOptions={{ position: 'left' }}
-                        onClick={() => router.push(editorUrl)
-                        }
-                    />
-                </>}
+                <Button icon={<FontAwesomeIcon className='mr-[7px]' icon={faAdd} />}
+                    severity="success"
+                    label='Add New Workflow'
+                    tooltipOptions={{ position: 'left' }}
+                    onClick={() => router.push(editorUrl)
+                    }
+                />
+            }
         />
         <Table className='' data={workflows} columns={columns}
             paginator rows={10}

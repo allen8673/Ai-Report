@@ -1,8 +1,8 @@
-import TemplateList from "@/containers/template-list";
+import TemplateOverview from "@/containers/template-overview";
 import { mock_template } from "@/mock-data/mock";
 
 export default function Page() {
     return (
-        <TemplateList templates={mock_template} />
+        <TemplateOverview templates={mock_template} />
     );
 }

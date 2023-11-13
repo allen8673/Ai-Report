@@ -10,7 +10,7 @@ import TitlePane from '@/components/title-pane';
 import { ITemplate } from '@/interface/workflow';
 
 
-export default function TemplateList({ templates }: { templates: ITemplate[] }) {
+export default function TemplateOverview({ templates }: { templates: ITemplate[] }) {
     const columns: Column<ITemplate>[] = [
         { key: 'id', title: 'ID' },
         { key: 'name', title: 'Name' }
