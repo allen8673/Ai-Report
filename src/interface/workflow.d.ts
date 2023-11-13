@@ -6,6 +6,12 @@ export interface IWorkflow {
     flows: IFlow[]
 }
 
+export interface ITemplate {
+    id: string;
+    name: string;
+    flows: IFlow[]
+}
+
 export type FlowTyep = 'prompt' | 'file-upload' | 'file-download';
 export type FlowStatus = 'none' | 'success' | 'failure' | 'warning';
 export interface IFlowBase {

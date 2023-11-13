@@ -8,10 +8,32 @@ export interface IRouter {
 }
 
 const RouterInfo: { [key: string]: IRouter } = {
-    HOME: { title: 'Home', icon: faHome, folder: '', isNavigation: true },
-    WORKFLOW: { title: 'Workflow', folder: 'workflow', icon: faBarsProgress, isNavigation: true, parent: "HOME" },
-    TEMPLATE: { title: 'template', folder: 'template', icon: faMagicWandSparkles, isNavigation: true, parent: "HOME" },
-    WORKFLOW_EDITOR: { title: 'Workflow', folder: 'workflow-editor', icon: faBarsProgress, parent: "WORKFLOW" },
+    HOME: {
+        title: 'Home',
+        icon: faHome,
+        folder: '',
+        isNavigation: true
+    },
+    WORKFLOW: {
+        title: 'Workflow',
+        folder: 'workflow',
+        icon: faBarsProgress,
+        isNavigation: true,
+        parent: "HOME"
+    },
+    WORKFLOW_EDITOR: {
+        title: 'Workflow',
+        folder: 'workflow-editor',
+        icon: faBarsProgress,
+        parent: "WORKFLOW"
+    },
+    TEMPLATE: {
+        title: 'Template',
+        folder: 'template',
+        icon: faMagicWandSparkles,
+        isNavigation: true,
+        parent: "HOME"
+    },
 }
 
 export function getFullUrl(router: IRouter | undefined): string {

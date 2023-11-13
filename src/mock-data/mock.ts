@@ -1,5 +1,5 @@
 
-import { IWorkflow } from "@/interface/workflow";
+import { ITemplate, IWorkflow } from "@/interface/workflow";
 
 
 export const mock_projects: IWorkflow[] = [
@@ -39,6 +39,14 @@ export const mock_projects: IWorkflow[] = [
     {
         id: 'p-2',
         name: 'project 2',
+        flows: []
+    }
+]
+
+export const mock_template: ITemplate[] = [
+    {
+        id: 'temp-1',
+        name: 'Template 1',
         flows: []
     }
 ]
