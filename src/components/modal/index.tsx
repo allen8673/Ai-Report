@@ -20,8 +20,8 @@ export default function Modal({ children, title, onOk, onCancel, okLabel, cancel
         closable={false}
         footer={
             <div>
-                <Button label={okLabel || 'OK'} icon="pi pi-check" onClick={onOk} />
-                <Button label={cancelLabel || 'Cancel'} icon="pi pi-times" onClick={onCancel} />
+                <Button label={cancelLabel || 'Cancel'} severity='danger' icon="pi pi-times" onClick={onCancel} />
+                <Button label={okLabel || 'OK'} severity='success' icon="pi pi-check" onClick={onOk} />
             </div>}
         visible={visible}
         style={{ width: '50vw' }}
