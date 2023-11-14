@@ -1,4 +1,4 @@
-import { faCloud } from '@fortawesome/free-solid-svg-icons';
+import { faCloud, faGear } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from "react";
 import { Handle, NodeProps, Position } from "reactflow";
@@ -12,7 +12,7 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
     const { id, data, } = elm;
     const { running } = data || {}
     const { icon } = flowInfoMap[data.type] || {}
-    const { inEdit } = useFlowGrapContext()
+    const { inEdit, clickOnSetting } = useFlowGrapContext()
 
     let status_color = '';
     switch (data.status) {
@@ -24,11 +24,26 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
 
     return (
         <>
-            <div className="cloud gradient text-light-weak hover:text-light cursor-default">
-                <div className='bg-deep-weak flex-center'>
-                    <FontAwesomeIcon className='h-[16px] w-[16px] flex-center ' icon={faCloud} />
+            {inEdit ?
+                <div className={`cloud gradient ${!!data.promt || !!data.file ? 'text-light' : 'text-light-weak'} hover:text-light cursor-default`}>
+                    <div className='bg-deep-weak flex-center'>
+                        <FontAwesomeIcon
+                            className='h-[16px] w-[16px] flex-center '
+                            icon={faGear}
+                            onClick={() => { clickOnSetting?.(data) }}
+                        />
+                    </div>
                 </div>
-            </div>
+                :
+                <div className={`cloud gradient ${!!data.promt || !!data.file ? 'text-light' : 'text-light-weak'}`}>
+                    <div className='bg-deep-weak flex-center'>
+                        <FontAwesomeIcon
+                            className='h-[16px] w-[16px] flex-center '
+                            icon={faCloud}
+                        />
+                    </div>
+                </div>}
+
             <div className={`middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] ${running ? "running" : ''}`} >
                 <div className={`inner rounded-std-sm bg-deep-weak`}>
                     <div className={`py-[16px] px-[20px] ${status_color}`}>

@@ -7,6 +7,7 @@ import { IFlow } from "@/interface/workflow";
 export interface FlowGraphStore {
     graphRef?: MutableRefObject<GraphInstance<IFlow, any> | null>;
     inEdit?: boolean;
+    clickOnSetting?: (flow: IFlow) => void;
 }
 
 export const FlowGrapContext = React.createContext<FlowGraphStore>({

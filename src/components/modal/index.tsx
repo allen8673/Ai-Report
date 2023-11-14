@@ -8,10 +8,12 @@ export interface ModalProps {
     onCancel?: () => void;
     okLabel?: string;
     cancelLabel?: string;
-    cancelByMask?: boolean
+    cancelByMask?: boolean;
+    visible?: boolean;
+    stickyContentOnClose?: boolean
 }
 
-export default function Modal({ children, title, onOk, onCancel, okLabel, cancelLabel, cancelByMask }: React.PropsWithChildren<ModalProps>) {
+export default function Modal({ children, title, onOk, onCancel, okLabel, cancelLabel, cancelByMask, visible, stickyContentOnClose, }: React.PropsWithChildren<ModalProps>) {
     return <Dialog
         header={title}
         onHide={() => { }}
@@ -21,11 +23,11 @@ export default function Modal({ children, title, onOk, onCancel, okLabel, cancel
                 <Button label={okLabel || 'OK'} icon="pi pi-check" onClick={onOk} />
                 <Button label={cancelLabel || 'Cancel'} icon="pi pi-times" onClick={onCancel} />
             </div>}
-        visible={true}
+        visible={visible}
         style={{ width: '50vw' }}
         modal
         onMaskClick={cancelByMask ? onCancel : undefined}
     >
-        {children}
+        {(visible || stickyContentOnClose) && children}
     </Dialog>
 }

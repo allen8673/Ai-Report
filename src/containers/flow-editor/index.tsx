@@ -15,6 +15,7 @@ import FlowGraph from "@/components/flow-graph";
 import { useGraphRef } from "@/components/graph/helper";
 import TitlePane from "@/components/title-pane";
 import { FlowStatus, IFlow, IFlowBase, IWorkflow } from "@/interface/workflow";
+import { useLayoutContext } from "@/layout/context";
 
 export interface FlowEditorProps {
     workflow: IWorkflow;
@@ -28,6 +29,7 @@ export default function FlowEditor({ workflow, mode = 'read', onSave }: FlowEdit
     const { graphRef } = useGraphRef<IFlow, any>();
     const [selectedItem, setSelectedItem] = useState<string>();
     const [inEdit, setInEdit] = useState<boolean>(mode === 'edit')
+    const { showMessage } = useLayoutContext();
 
     const mock_run = (forwards: string[]): void => {
         let next: string[] = [];
@@ -51,6 +53,9 @@ export default function FlowEditor({ workflow, mode = 'read', onSave }: FlowEdit
             });
             _.debounce(() => {
                 if (!!next.length) mock_run(next);
+                else {
+                    showMessage('workflow is done')
+                }
             }, 500)()
         }, 3000)()
     }
@@ -79,7 +84,10 @@ export default function FlowEditor({ workflow, mode = 'read', onSave }: FlowEdit
                         <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
                             severity="secondary"
                             tooltip="Save as template"
-                            tooltipOptions={{ position: 'bottom' }} />
+                            tooltipOptions={{ position: 'bottom' }}
+                            onClick={() => {
+                            }}
+                        />
                         {inEdit ?
                             <>
                                 <Button icon={<FontAwesomeIcon icon={faCancel} />}
