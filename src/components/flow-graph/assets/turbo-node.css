@@ -1,7 +1,6 @@
 @tailwind components;
 
 @layer components {
-
     .react-flow__node-turbo {
 
         & .wrapper {
@@ -11,6 +10,10 @@
             position: relative;
             flex-grow: 1;
             box-shadow: theme('backgroundImage.turbo-shadow');
+        }
+
+        &.selected .wrapper {
+            box-shadow: theme('backgroundImage.turbo-selected');
         }
 
         & .gradient:before {
@@ -26,7 +29,6 @@
         }
 
         & .inner {
-            /* padding: 16px 20px; */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -34,17 +36,14 @@
             position: relative;
         }
 
-        & .cloud {
+        & .icon {
             border-radius: 100%;
             width: 30px;
             height: 30px;
-            right: 0;
+            padding: 2px;
             position: absolute;
-            top: 0;
-            transform: translate(50%, -50%);
             display: flex;
             transform-origin: center center;
-            padding: 2px;
             overflow: hidden;
             box-shadow: theme('backgroundImage.turbo-shadow');
             z-index: 1;
@@ -56,9 +55,24 @@
             }
         }
 
+        & .cloud {
+            right: 0;
+            top: 0;
+            transform: translate(50%, -50%);
+        }
+
+        & .status {
+            right: 0;
+            bottom: 0;
+            /* width: 20px; */
+            /* height: 20px; */
+            padding: 2px;
+            transform: translate(50%, 50%);
+        }
+
         & .running.wrapper.gradient:before {
             content: '';
-            background: theme('backgroundImage.turbo-selected');
+            background: theme('backgroundImage.turbo-running');
             animation: spinner 4s linear infinite;
             transform: translate(-50%, -50%) rotate(0deg);
             z-index: -1;
@@ -89,59 +103,4 @@
             opacity: 1;
         }
     }
-
-}
-
-.react-flow__handle.source {
-    right: -20px;
-    background: #a853ba;
-}
-
-.react-flow__handle.target {
-    left: -20px;
-    background: #2a8af6;
-}
-
-.react-flow__node:focus {
-    outline: none;
-}
-
-.react-flow__edge .react-flow__edge-path {
-    stroke: url(#edge-gradient);
-    stroke-width: 1;
-    stroke-opacity: 0.75;
-}
-
-.react-flow__controls {
-    & button {
-        background-color: rgb(17, 17, 17);
-        color: rgb(243, 244, 246);
-        border: 1px solid #95679e;
-        border-bottom: none;
-
-        &:hover {
-            background-color: rgb(37, 37, 37);
-        }
-
-        &:first-child {
-            border-radius: 5px 5px 0 0;
-        }
-
-        &:last-child {
-            border-bottom: 1px solid #95679e;
-            border-radius: 0 0 5px 5px;
-        }
-
-        & path {
-            fill: rgb(243, 244, 246);
-        }
-    }
-}
-
-.react-flow__attribution {
-    background: rgba(200, 200, 200, 0.2);
-}
-
-.react-flow__attribution a {
-    color: #95679e;
 }

@@ -18,7 +18,7 @@ import { FlowGrapContext } from "./context";
 
 import { IFlow } from "@/interface/workflow";
 
-import './assets/turbo-style.css';
+import './assets/turbo-node.css';
 
 interface FlowGraphProps extends Omit<GraphProps<IFlow>,
     'initialNodes' |
@@ -27,6 +27,7 @@ interface FlowGraphProps extends Omit<GraphProps<IFlow>,
     'edgeTypes' |
     'defaultEdgeOptions' |
     'onConnect' |
+    'onEdgesDelete' |
     'readonly'> {
     flows: IFlow[];
     inEdit?: boolean;
@@ -56,14 +57,19 @@ export default function FlowGraph({ flows, inEdit, graphRef: ref, ...others }: F
         const nodes = _.map<IFlow, Node<IFlow>>(flows, flow => {
             const { id, position, forwards } = flow;
             _.forEach(forwards, fw => {
-                edges.push({ id: `${flow.id}-${fw}`, source: flow.id, target: fw })
+                edges.push({ id: `${flow.id}-${fw}`, source: flow.id, target: fw, deletable: inEdit })
             })
-            return ({ id, position, type: 'turbo', data: flow, })
+            return ({ id, position, type: 'turbo', data: flow, selectable: inEdit })
         });
         setInitialEdges(edges);
         setInitialNodes(nodes);
         graphRef.current.resetAllElements(nodes, edges);
     }, [flows]);
+
+    useEffect(() => {
+        graphRef.current.setNodes(n => ({ ...n, selectable: inEdit, selected: false }))
+        graphRef.current.setEdges(e => ({ ...e, deletable: inEdit, selected: false }))
+    }, [inEdit]);
 
     return <FlowGrapContext.Provider value={{ inEdit, clickOnSetting }}>
         <Graph
@@ -82,6 +88,28 @@ export default function FlowGraph({ flows, inEdit, graphRef: ref, ...others }: F
                 graphRef?.current?.addEdge({ id, source, target, ...EDGE_DEF_SETTING });
                 graphRef?.current?.setNode(source, (pre) => {
                     pre.data.forwards?.push(target);
+                    return pre
+                })
+            }}
+            onEdgesDelete={(e) => {
+                const edge = e[0];
+                if (!edge) return;
+                const { source, target } = edge;
+                graphRef.current.setNode(source, pre => {
+                    if (!pre.data.forwards) return pre
+                    const idx = pre.data.forwards?.indexOf(target);
+                    pre.data.forwards.splice(idx, 1);
+                    return pre
+                })
+            }}
+            onNodesDelete={(n) => {
+                const node = n[0];
+                if (!node) return;
+                const { id } = node;
+                graphRef.current.setNodes(pre => {
+                    if (!pre.data.forwards?.includes(id)) return pre;
+                    const idx = pre.data.forwards.indexOf(id);
+                    pre.data.forwards.splice(idx, 1);
                     return pre
                 })
             }}

@@ -1,31 +1,56 @@
-import { faCloud, faGear } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faCheck, faCloud, faExclamation, faGear, faQuestion, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React from "react";
+import React, { ReactNode } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 
 import { flowInfoMap } from "../configuration";
 import { useFlowGrapContext } from '../context';
 
-import { IFlow } from '@/interface/workflow';
+import { FlowStatus, IFlow } from '@/interface/workflow';
+
+const getStatusIcon = (status?: FlowStatus): ReactNode => {
+    if (!status || status === 'none') return <></>
+
+    let status_color = 'bg-deep-weak';
+    let icon: IconDefinition = faQuestion
+
+    switch (status) {
+        case 'success':
+            status_color = 'bg-success';
+            icon = faCheck
+            break;
+        case 'failure':
+            status_color = 'bg-failure';
+            icon = faXmark
+            break;
+        case 'warning':
+            status_color = 'bg-warning';
+            icon = faExclamation
+            break;
+    }
+
+    return (
+        <div className={`status icon gradient text-light `}>
+            <div className={` ${status_color} flex-center`}>
+                <FontAwesomeIcon
+                    className={`h-[16px] w-[16px] flex-center ${status_color}`}
+                    icon={icon}
+                />
+            </div>
+        </div>
+    )
+}
 
 function TurboNodeInstance(elm: NodeProps<IFlow>) {
     const { id, data, } = elm;
     const { running } = data || {}
     const { icon } = flowInfoMap[data.type] || {}
-    const { inEdit, clickOnSetting } = useFlowGrapContext()
-
-    let status_color = '';
-    switch (data.status) {
-        case 'success': status_color = 'bg-success'; break;
-        case 'failure': status_color = 'bg-failure'; break;
-        case 'warning': status_color = 'bg-warning'; break;
-        default: status_color = ''; break;
-    }
+    const { inEdit, clickOnSetting } = useFlowGrapContext();
 
     return (
         <>
             {inEdit ?
-                <div className={`cloud gradient ${!!data.promt || !!data.file ? 'text-light' : 'text-light-weak'} hover:text-light cursor-default`}>
+                <div className={`cloud icon gradient ${!!data.promt || !!data.file ? 'text-light' : 'text-light-weak'} hover:text-light cursor-default`}>
                     <div className='bg-deep-weak flex-center'>
                         <FontAwesomeIcon
                             className='h-[16px] w-[16px] flex-center '
@@ -33,20 +58,20 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                             onClick={() => { clickOnSetting?.(data) }}
                         />
                     </div>
-                </div>
-                :
-                <div className={`cloud gradient ${!!data.promt || !!data.file ? 'text-light' : 'text-light-weak'}`}>
+                </div> :
+                <div className={`cloud icon gradient ${!!data.promt || !!data.file ? 'text-light' : 'text-light-weak'}`}>
                     <div className='bg-deep-weak flex-center'>
                         <FontAwesomeIcon
                             className='h-[16px] w-[16px] flex-center '
                             icon={faCloud}
                         />
                     </div>
-                </div>}
-
+                </div>
+            }
+            {getStatusIcon(data.status)}
             <div className={`middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] ${running ? "running" : ''}`} >
                 <div className={`inner rounded-std-sm bg-deep-weak`}>
-                    <div className={`py-[16px] px-[20px] ${status_color}`}>
+                    <div className={`py-[16px] px-[20px]`}>
                         <div className={`flex rounded-std-sm text-light`}>
                             <FontAwesomeIcon className='h-[20px] w-[20px] mr-[8px] mt-[2px]' icon={icon} color={'white'} />
                             <div>
