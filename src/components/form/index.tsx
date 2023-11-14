@@ -3,9 +3,6 @@ import React, { ReactNode, useEffect } from "react";
 import { Controller, DefaultValues, Path, UseFormReturn, useForm } from "react-hook-form";
 
 import { FormInstance, FormItemProps, FormValue, GetItemProps } from "./form";
-import './form.css'
-
-
 
 function GetItem<T extends FormValue>({ formInstance, }: GetItemProps<T>) {
     const { control, formState: { errors } } = formInstance;
