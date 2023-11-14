@@ -2,10 +2,10 @@
 
 @layer components {
     .report-item {
-
+        /* 
         & .icon {
             @apply border-2 border-gray-300 w-[30px] h-[30px]
-        }
+        } */
 
         & .name {
             @apply shrink grow;

@@ -330,7 +330,7 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
         });
     };
 
-    return <div id='graph' className={`w-full h-full std-content ${className}`} ref={rfWrapper}>
+    return <div id='graph' className={`w-full h-full p-std-min ${className}`} ref={rfWrapper}>
         <ReactFlow
             nodes={!!normalizeNode ? _.map(nodes, (n) => normalizeNode(n)) : nodes}
             edges={!!normalizeEdge ? _.map(edges, (e) => normalizeEdge(e)) : edges}

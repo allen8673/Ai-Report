@@ -22,7 +22,7 @@ export default function ReportItem({ id, name, type, onSelected, onClick }: Repo
             className='report-item flex-center gap-2 px-[12px] py-[7px] h-[50px] grow'
             role="presentation"
             onClick={(): void => { onClick?.(id); }}>
-            <span className="icon circle-border">
+            <span className="icon">
                 <FontAwesomeIcon icon={icon} color={color} />
             </span>
             <div className="name text-light">{name}</div>
