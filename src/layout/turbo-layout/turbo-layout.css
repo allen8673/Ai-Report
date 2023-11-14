@@ -1,0 +1,7 @@
+@tailwind components;
+
+@layer components {
+    .turbo-toast-message {
+        @apply border-0 border-x-[6px]
+    }
+}

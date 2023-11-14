@@ -2,7 +2,7 @@
 
 
 @layer components {
-    .custom-table {
+    .zd-table {
         @apply flex flex-col justify-between gap-std-sm;
 
         & .p-datatable-table {
