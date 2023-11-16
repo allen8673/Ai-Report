@@ -11,6 +11,7 @@ import { ITemplate } from '@/interface/workflow';
 
 
 export default function TemplateOverview({ templates }: { templates: ITemplate[] }) {
+    // push test
     const columns: Column<ITemplate>[] = [
         { key: 'id', title: 'ID' },
         { key: 'name', title: 'Name' }
