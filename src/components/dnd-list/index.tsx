@@ -69,7 +69,7 @@ const RbDndItem = <T extends { [key: string]: any }>({
     return (
         <Element
             key={index}
-            className="dnd-item m-[7px]"
+            className="dnd-item"
             name={item?.id || ''}
             onClick={(): void => {
                 onClickItem?.(item);
@@ -129,7 +129,7 @@ export default function DndList<T extends { [key: string]: any }>({
 
     return <DndContext className={`w-full h-full ${className || ''}`} {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}>
         {(_items): JSX.Element => (
-            <DndDroppable className="p-std-min h-full" items={_items} droppableId={droppableId}>
+            <DndDroppable className="h-full" items={_items} droppableId={droppableId}>
                 {(_items): React.JSX.Element[] =>
                     _items.map((item, index: number) => {
                         return (

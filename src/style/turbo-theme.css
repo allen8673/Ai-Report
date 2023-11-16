@@ -1,6 +1,7 @@
-@import 'primereact/resources/themes/saga-purple/theme.css';
-/* @import 'primereact/resources/themes/lara-light-indigo/theme.cs'; */
+/* @import 'primereact/resources/themes/saga-purple/theme.css'; */
+/* @import 'primereact/resources/themes/lara-dark-purple/theme.css'; */
 @tailwind components;
+@tailwind utilities;
 
 @layer components {
     .zd-table {
@@ -25,33 +26,20 @@
             @apply rounded-std border-light-weak border-[1px];
         }
     }
+
+
 }
 
 .react-flow__handle.source {
+    @apply bg-turbo;
     right: -20px;
-    background: #a853ba;
-}
-
-.react-flow__handle.target {
-    left: -20px;
-    background: #2a8af6;
-}
-
-.react-flow__node:focus {
-    outline: none;
-}
-
-.react-flow__edge .react-flow__edge-path {
-    stroke: url(#edge-gradient);
-    stroke-width: 1;
-    stroke-opacity: 0.75;
 }
 
 .react-flow__controls {
     & button {
-        background-color: rgb(17, 17, 17);
+        @apply bg-deep-strong;
+        @apply border-turbo-deep border-[1px] border-solid;
         color: rgb(243, 244, 246);
-        border: 1px solid #95679e;
         border-bottom: none;
 
         &:hover {
@@ -73,10 +61,27 @@
     }
 }
 
+.react-flow__handle.target {
+    @apply bg-turbo-light;
+    left: -20px;
+}
+
+.react-flow__node:focus {
+    outline: none;
+}
+
+.react-flow__edge .react-flow__edge-path {
+    stroke: url(#edge-gradient);
+    stroke-width: 1;
+    stroke-opacity: 0.75;
+}
+
+
+
 .react-flow__attribution {
-    background: rgba(200, 200, 200, 0.2);
+    @apply bg-deep !important;
 }
 
 .react-flow__attribution a {
-    color: #95679e;
+    @apply text-turbo-deep !important;
 }
