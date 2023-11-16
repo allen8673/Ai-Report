@@ -15,13 +15,13 @@ import Modal from "../modal";
 
 import { EDGE_DEF_SETTING, REPORT_ITEMS } from "./configuration";
 import { FlowGrapContext } from "./context";
-import TurboEdge, { TurboEdgeAsset } from "./graph-assets/turbo-edge";
+import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import ReportItem from "./report-item";
 
 import { IFlow, IFlowBase } from "@/interface/workflow";
 
-import './graph-assets/turbo-node.css';
+import './graph-assets/turbo-elements.css';
 
 interface FlowGraphProps extends Omit<GraphProps<IFlow>,
     'initialNodes' |
@@ -36,7 +36,7 @@ interface FlowGraphProps extends Omit<GraphProps<IFlow>,
     inEdit?: boolean;
 }
 
-export default function FlowGraph({ flows, inEdit, graphRef: ref, ...others }: FlowGraphProps) {
+export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...others }: FlowGraphProps) {
 
     const [onDragItem, setOnDragItem] = useState<IFlowBase>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
@@ -49,20 +49,21 @@ export default function FlowGraph({ flows, inEdit, graphRef: ref, ...others }: F
     const clickOnSetting = (flow: IFlow) => {
         setOpenModal(flow)
     }
-    const onOk = () => {
+    const setPromt = () => {
         const val = form?.getValues();
         if (!val) return
         graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, promt: val.promt, name: val.name } }))
         setOpenModal(undefined);
     }
-    const onCancel = () => { setOpenModal(undefined) }
+
+    const closeModal = () => { setOpenModal(undefined) }
 
     useEffect(() => {
         const edges: Edge[] = [];
         const nodes = _.map<IFlow, Node<IFlow>>(flows, flow => {
             const { id, position, forwards } = flow;
             _.forEach(forwards, fw => {
-                edges.push({ id: `${flow.id}-${fw}`, source: flow.id, target: fw, deletable: inEdit })
+                edges.push({ id: `${flow.id}-${fw}`, source: flow.id, target: fw, deletable: inEdit, type: 'smoothstep' })
             })
             return ({ id, position, type: 'turbo', data: flow, selectable: inEdit })
         });
@@ -72,13 +73,22 @@ export default function FlowGraph({ flows, inEdit, graphRef: ref, ...others }: F
     }, [flows]);
 
     useEffect(() => {
-        graphRef.current.setNodes(n => ({ ...n, selectable: inEdit, selected: false }))
-        graphRef.current.setEdges(e => ({ ...e, deletable: inEdit, selected: false }))
+        graphRef.current.setNodes(n => ({ ...n, selectable: inEdit, selected: false }));
+        graphRef.current.setEdges(e => ({ ...e, deletable: inEdit, selected: false, type: 'smoothstep' }));
     }, [inEdit]);
 
     return <FlowGrapContext.Provider value={{ inEdit, clickOnSetting }}>
         <div className="h-full w-full relative">
-            {inEdit && <div className="absolute z-20 top-[22px] left-[22px] right-[22px] rounded-std bg-opacity-50 bg-deep-weak " >
+            {inEdit && <div className={`absolute 
+            z-20 
+            top-[22px] 
+            px-[7px] 
+            py-[3px] 
+            left-[22px] 
+            right-[22px] 
+            rounded-std 
+            bg-opacity-50 
+            bg-deep-weak`} >
                 <DndList
                     className="rounded-std"
                     items={REPORT_ITEMS}
@@ -97,7 +107,6 @@ export default function FlowGraph({ flows, inEdit, graphRef: ref, ...others }: F
                 initialNodes={initialNodes}
                 className="rounded-std bg-deep"
                 nodeTypes={{ turbo: TurboNode }}
-                edgeTypes={{ turbo: TurboEdge }}
                 defaultEdgeOptions={EDGE_DEF_SETTING}
                 readonly={!inEdit}
                 graphRef={graphRef}
@@ -145,8 +154,8 @@ export default function FlowGraph({ flows, inEdit, graphRef: ref, ...others }: F
             </Graph>
             <Modal
                 title="Set the promt"
-                onOk={onOk}
-                onCancel={onCancel}
+                onOk={setPromt}
+                onCancel={closeModal}
                 visible={openModal?.type === 'prompt'}
             >
                 <Form defaultValues={openModal} onLoad={form => setForm(form)}>{
@@ -160,6 +169,24 @@ export default function FlowGraph({ flows, inEdit, graphRef: ref, ...others }: F
                             </Item>
                         </>
                 }</Form>
+            </Modal>
+            <Modal
+                title="Upload your files"
+                onOk={setPromt}
+                onCancel={closeModal}
+                visible={openModal?.type === 'file-upload'}
+            >
+                {/* <Form defaultValues={openModal} onLoad={form => setForm(form)}>{
+                    (Item) =>
+                        <>
+                            <Item name='name' label="Name" >
+                                <InputText />
+                            </Item>
+                            <Item name='promt' label="Promt" >
+                                <InputTextarea className="w-full min-h-[100px]" />
+                            </Item>
+                        </>
+                }</Form> */}
             </Modal>
         </div>
 
