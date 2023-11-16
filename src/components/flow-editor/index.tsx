@@ -78,7 +78,7 @@ export default function FlowGraph({ flows, inEdit, graphRef: ref, ...others }: F
 
     return <FlowGrapContext.Provider value={{ inEdit, clickOnSetting }}>
         <div className="h-full w-full relative">
-            {inEdit && <div className="absolute z-20 top-std-sm left-[22px] bottom-[150px] rounded-std bg-opacity-60 bg-deep-strong " >
+            {inEdit && <div className="absolute z-20 top-[22px] left-[22px] right-[22px] rounded-std bg-opacity-50 bg-deep-weak " >
                 <DndList
                     className="rounded-std"
                     items={REPORT_ITEMS}
@@ -89,6 +89,7 @@ export default function FlowGraph({ flows, inEdit, graphRef: ref, ...others }: F
                     onDragStart={(init, item): void => {
                         setOnDragItem(() => item)
                     }}
+                    direction='horizontal'
                 />
             </div>}
             <Graph
