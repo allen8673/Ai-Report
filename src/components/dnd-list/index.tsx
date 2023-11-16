@@ -40,13 +40,14 @@ const DndDroppable = <T extends { [key: string]: any }>({
     droppableId,
     type,
     children,
-    className
+    className,
+    direction,
 }: DndDroppableProps<T>): JSX.Element => {
     const [id] = useState<string>(droppableId || v4());
     return (
-        <Droppable key={id} droppableId={id} type={type || v4()}>
+        <Droppable key={id} droppableId={id} type={type || v4()} direction={direction}>
             {(provided: DroppableProvided): JSX.Element => (
-                <div id='dnd-droppable' className={className} ref={provided.innerRef}>
+                <div id='dnd-droppable' className={`${className} ${direction === 'horizontal' ? 'flex' : ''}`} ref={provided.innerRef}>
                     {children(items, provided)}
                     {provided.placeholder}
                 </div>
@@ -69,7 +70,7 @@ const RbDndItem = <T extends { [key: string]: any }>({
     return (
         <Element
             key={index}
-            className="dnd-item m-[7px]"
+            className="dnd-item"
             name={item?.id || ''}
             onClick={(): void => {
                 onClickItem?.(item);
@@ -109,6 +110,7 @@ export default function DndList<T extends { [key: string]: any }>({
     style,
     disableWholeDraghandle,
     disableChangeOrder,
+    direction,
 }: DndListProps<T>) {
     const [_items, setItems] = useState<T[]>(items || []);
     _items.map
@@ -129,7 +131,7 @@ export default function DndList<T extends { [key: string]: any }>({
 
     return <DndContext className={`w-full h-full ${className || ''}`} {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}>
         {(_items): JSX.Element => (
-            <DndDroppable className="p-std-min h-full" items={_items} droppableId={droppableId}>
+            <DndDroppable className="w-full h-full" items={_items} droppableId={droppableId} direction={direction}>
                 {(_items): React.JSX.Element[] =>
                     _items.map((item, index: number) => {
                         return (
