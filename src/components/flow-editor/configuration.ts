@@ -1,4 +1,4 @@
-import { IconDefinition, faUpload, faDownload, faBrain, faCloudUpload } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition, faUpload, faDownload, faBrain, faCloudUpload, faCloud, faFileArrowUp, faComment, faCloudDownload } from '@fortawesome/free-solid-svg-icons'
 import { Edge, MarkerType } from 'reactflow';
 
 import { IFlowBase } from '@/interface/workflow';
@@ -29,14 +29,30 @@ export const REPORT_ITEMS: IFlowBase[] = [
     },
 ]
 
+interface IconInfo {
+    icon: IconDefinition;
+    label?: string;
+}
+
 export const flowInfoMap: {
     [type: string]: {
         icon: IconDefinition;
-        actIcon?: IconDefinition,
-        editIcon?: IconDefinition
+        actIcon?: IconInfo,
+        editIcon?: IconInfo
     }
 } = {
-    'file-upload': { icon: faUpload, actIcon: faCloudUpload },
-    'prompt': { icon: faBrain, },
-    'file-download': { icon: faDownload, }
+    'file-upload': {
+        icon: faUpload,
+        actIcon: { icon: faCloudUpload, label: 'the file has uploaded.' },
+        editIcon: { icon: faFileArrowUp, label: 'upload your files.' }
+    },
+    'prompt': {
+        icon: faBrain,
+        actIcon: { icon: faCloud, label: 'the promt is setted.' },
+        editIcon: { icon: faComment, label: 'set the prompt.' }
+    },
+    'file-download': {
+        icon: faDownload,
+        actIcon: { icon: faCloudDownload, label: 'there are filed can be download' },
+    }
 }

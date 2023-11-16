@@ -1,5 +1,6 @@
-import { IconDefinition, faCheck, faCloud, faExclamation, faGear, faQuestion, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faCheck, faExclamation, faQuestion, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Tooltip } from 'primereact/tooltip';
 import React, { ReactNode } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 
@@ -44,29 +45,34 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
 function TurboNodeInstance(elm: NodeProps<IFlow>) {
     const { id, data, } = elm;
     const { running } = data || {}
-    const { icon } = flowInfoMap[data.type] || {}
+    const { icon, editIcon, actIcon } = flowInfoMap[data.type] || {}
     const { inEdit, clickOnSetting } = useFlowGrapContext();
 
     return (
         <>
+            <Tooltip target={'.tip-icon'} mouseTrack position='left' />
             {inEdit ?
-                <div className={`cloud icon gradient ${!!data.promt || !!data.file ? 'text-light' : 'text-light-weak'} hover:text-light cursor-default`}>
-                    <div className='bg-deep-weak flex-center'>
-                        <FontAwesomeIcon
-                            className='h-[16px] w-[16px] flex-center '
-                            icon={faGear}
-                            onClick={() => { clickOnSetting?.(data) }}
-                        />
-                    </div>
-                </div> :
-                <div className={`cloud icon gradient ${!!data.promt || !!data.file ? 'text-light' : 'text-light-weak'}`}>
-                    <div className='bg-deep-weak flex-center'>
-                        <FontAwesomeIcon
-                            className='h-[16px] w-[16px] flex-center '
-                            icon={faCloud}
-                        />
-                    </div>
-                </div>
+                (!!editIcon ?
+                    <div className={`tip-icon icon gradient ${!!data.promt || !!data.file ? 'text-light' : 'text-light-weak'} hover:text-light cursor-default`}
+                        data-pr-tooltip={editIcon.label}>
+                        <div className='bg-deep-weak flex-center'>
+                            <FontAwesomeIcon
+                                className='h-[16px] w-[16px] flex-center '
+                                icon={editIcon.icon}
+                                onClick={() => { clickOnSetting?.(data) }}
+                            />
+                        </div>
+                    </div> : <></>) :
+                (!!actIcon ?
+                    <div className={`tip-icon icon gradient ${!!data.promt || !!data.file ? 'text-light' : 'text-light-weak'}`}
+                        data-pr-tooltip={!!data.promt || !!data.file ? actIcon.label : ''}>
+                        <div className='bg-deep-weak flex-center'>
+                            <FontAwesomeIcon
+                                className='h-[16px] w-[16px] flex-center '
+                                icon={actIcon.icon}
+                            />
+                        </div>
+                    </div> : <></>)
             }
             {getStatusIcon(data.status)}
             <div className={`middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] ${running ? "running" : ''}`} >

@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
+import { Tooltip } from "primereact/tooltip";
 import { useEffect, useState } from "react";
 import { Connection, Edge, Node } from 'reactflow'
 import { v4 } from "uuid";
@@ -89,6 +90,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
             rounded-std 
             bg-opacity-50 
             bg-deep-weak`} >
+                <Tooltip target={'.report-item'} position='top' />
                 <DndList
                     className="rounded-std"
                     items={REPORT_ITEMS}
