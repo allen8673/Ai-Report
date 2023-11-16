@@ -11,14 +11,14 @@ export const mock_projects: IWorkflow[] = [
                 id: 'f-1',
                 name: 'upload stix',
                 type: 'file-upload',
-                position: { x: 100, y: 200 },
+                position: { x: 100, y: 400 },
                 forwards: ['f-2', 'f-4'],
             },
             {
                 id: 'f-2',
                 name: 'analysis ip',
                 type: 'prompt',
-                position: { x: 600, y: 300 },
+                position: { x: 600, y: 500 },
                 forwards: ['f-5']
 
             },
@@ -26,14 +26,14 @@ export const mock_projects: IWorkflow[] = [
                 id: 'f-4',
                 name: 'analysis add.',
                 type: 'prompt',
-                position: { x: 600, y: 100 },
+                position: { x: 600, y: 300 },
                 forwards: ['f-5']
             },
             {
                 id: 'f-5',
                 name: 'Done',
                 type: 'file-download',
-                position: { x: 1100, y: 200 },
+                position: { x: 1100, y: 400 },
             }]
     },
     {
