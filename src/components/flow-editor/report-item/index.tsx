@@ -1,7 +1,6 @@
 
 import { faQuestion } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Tooltip } from 'primereact/tooltip';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
 import { flowInfoMap } from '../configuration';
@@ -31,7 +30,7 @@ export default function ReportItem({ name, type }: ReportItemProps) {
 
     return (
         <>
-            <Tooltip target={'.report-item'} />
+
             <div
                 className={className}
                 role="presentation" data-pr-tooltip={name}>
