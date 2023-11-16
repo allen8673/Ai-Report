@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { FileUpload } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Tooltip } from "primereact/tooltip";
@@ -64,7 +65,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
         const nodes = _.map<IFlow, Node<IFlow>>(flows, flow => {
             const { id, position, forwards } = flow;
             _.forEach(forwards, fw => {
-                edges.push({ id: `${flow.id}-${fw}`, source: flow.id, target: fw, deletable: inEdit, type: 'smoothstep' })
+                edges.push({ id: `${flow.id}-${fw}`, source: flow.id, target: fw, deletable: inEdit })
             })
             return ({ id, position, type: 'turbo', data: flow, selectable: inEdit })
         });
@@ -75,7 +76,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
 
     useEffect(() => {
         graphRef.current.setNodes(n => ({ ...n, selectable: inEdit, selected: false }));
-        graphRef.current.setEdges(e => ({ ...e, deletable: inEdit, selected: false, type: 'smoothstep' }));
+        graphRef.current.setEdges(e => ({ ...e, deletable: inEdit, selected: false, }));
     }, [inEdit]);
 
     return <FlowGrapContext.Provider value={{ inEdit, clickOnSetting }}>
@@ -174,21 +175,18 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
             </Modal>
             <Modal
                 title="Upload your files"
-                onOk={setPromt}
-                onCancel={closeModal}
+                onOk={() => setOpenModal(undefined)}
+                okLabel="Close"
                 visible={openModal?.type === 'file-upload'}
             >
-                {/* <Form defaultValues={openModal} onLoad={form => setForm(form)}>{
-                    (Item) =>
-                        <>
-                            <Item name='name' label="Name" >
-                                <InputText />
-                            </Item>
-                            <Item name='promt' label="Promt" >
-                                <InputTextarea className="w-full min-h-[100px]" />
-                            </Item>
-                        </>
-                }</Form> */}
+                <FileUpload name="upload" url={''}
+                    mode='advanced'
+                    multiple
+                    accept="*"
+                    maxFileSize={1000000}
+                    emptyTemplate={<p className="m-0">Drag and drop files to here to upload.</p>}
+                    itemTemplate={<></>}
+                />
             </Modal>
         </div>
 

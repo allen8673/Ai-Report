@@ -4,7 +4,7 @@ import { Edge, MarkerType } from 'reactflow';
 import { IFlowBase } from '@/interface/workflow';
 
 export const EDGE_DEF_SETTING: Partial<Edge> = {
-    type: 'turbo',
+    type: 'smoothstep',
     animated: true,
     style: { strokeWidth: 2 },
     markerEnd: { type: MarkerType.ArrowClosed, color: '#2a8af6' },
