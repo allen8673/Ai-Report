@@ -45,7 +45,7 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
 function TurboNodeInstance(elm: NodeProps<IFlow>) {
     const { id, data, } = elm;
     const { running } = data || {}
-    const { icon, editIcon, actIcon } = flowInfoMap[data.type] || {}
+    const { nodeType, icon, editIcon, actIcon } = flowInfoMap[data.type] || {}
     const { inEdit, clickOnSetting } = useFlowGrapContext();
     const iconHighlight = !!data.promt || !!data.file || !!data.report
 
@@ -89,7 +89,7 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                     </div>
                 </div>
             </div >
-            <Handle
+            {nodeType !== 'start' && <Handle
                 className='turbo-handle'
                 type="target"
                 position={Position.Left}
@@ -98,14 +98,14 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                     alert('haha')
                 }}
                 isConnectable={inEdit}
-            />
-            <Handle
+            />}
+            {nodeType !== 'end' && <Handle
                 className='turbo-handle'
                 type="source"
                 position={Position.Right}
                 id={`src-${id}`}
                 isConnectable={inEdit}
-            />
+            />}
         </>
     );
 }

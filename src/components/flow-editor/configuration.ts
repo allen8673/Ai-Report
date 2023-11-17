@@ -19,12 +19,12 @@ export const REPORT_ITEMS: IFlowBase[] = [
     },
     {
         id: 'file-upload',
-        name: 'File Upload',
+        name: 'Upload',
         type: 'file-upload'
     },
     {
         id: 'file-download',
-        name: 'File Download',
+        name: 'Done',
         type: 'file-download'
     },
 ]
@@ -37,12 +37,14 @@ export interface IconInfo {
 
 export const flowInfoMap: {
     [type: string]: {
+        nodeType: '' | 'start' | 'end',
         icon: IconDefinition;
         actIcon?: IconInfo,
         editIcon?: IconInfo
     }
 } = {
     'file-upload': {
+        nodeType: 'start',
         icon: faUpload,
         actIcon: {
             icon: faCloudUpload,
@@ -55,6 +57,7 @@ export const flowInfoMap: {
         }
     },
     'prompt': {
+        nodeType: '',
         icon: faBrain,
         actIcon: {
             icon: faCloud,
@@ -67,6 +70,7 @@ export const flowInfoMap: {
         }
     },
     'file-download': {
+        nodeType: 'end',
         icon: faDownload,
         actIcon: {
             icon: faCloudDownload,
