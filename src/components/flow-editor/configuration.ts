@@ -48,7 +48,7 @@ export const flowInfoMap: {
         icon: faUpload,
         actIcon: {
             icon: faCloudUpload,
-            label: 'the file has uploaded.'
+            label: 'the files has uploaded.'
         },
         editIcon: {
             icon: faFileArrowUp,
@@ -61,7 +61,7 @@ export const flowInfoMap: {
         icon: faBrain,
         actIcon: {
             icon: faCloud,
-            label: 'the promt is setted.'
+            label: 'the prompt is set up.'
         },
         editIcon: {
             icon: faComment,
