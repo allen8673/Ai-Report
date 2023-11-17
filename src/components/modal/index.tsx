@@ -37,7 +37,7 @@ export default function Modal(props: React.PropsWithChildren<ModalProps>) {
         onHide={() => { }}
         closable={false}
         footer={footer ||
-            <div>
+            <div className="flex justify-center">
                 {!!onCancel && <Button label={cancelLabel || 'Cancel'} severity='secondary' onClick={onCancel} />}
                 {!!onOk && <Button label={okLabel || 'OK'} onClick={onOk} />}
             </div>}

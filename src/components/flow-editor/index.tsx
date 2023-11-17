@@ -197,7 +197,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
                 okLabel="Close"
                 visible={openModal?.type === 'file-download'}
                 contentClassName="flex"
-                footer={<div>
+                footer={<div className="flex justify-center">
                     {<Button label='Download' severity='secondary' onClick={() => {
                         // download
                     }} />}

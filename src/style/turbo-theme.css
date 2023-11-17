@@ -83,3 +83,31 @@
 .react-flow__attribution a {
     @apply text-turbo-deep !important;
 }
+
+.p-dialog {
+
+    & .p-dialog-header,
+    .p-dialog-content,
+    .p-dialog-footer {
+        @apply bg-deep;
+        @apply text-light;
+    }
+}
+
+.p-fileupload {
+
+    & .p-fileupload-buttonbar,
+    .p-fileupload-content {
+        @apply text-light;
+        @apply bg-deep;
+        @apply border-[2px] border-light-weak
+    }
+}
+
+.p-fieldset {
+    & .p-fieldset-legend {
+        @apply text-light;
+        @apply bg-deep-weak;
+        @apply border-[2px] border-light-weak
+    }
+}
