@@ -1,4 +1,6 @@
 import _ from "lodash";
+import { Button } from "primereact/button";
+import { Fieldset } from "primereact/fieldset";
 import { FileUpload } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -24,6 +26,7 @@ import ReportItem from "./report-item";
 import { IFlow, IFlowBase } from "@/interface/workflow";
 
 import './graph-assets/turbo-elements.css';
+import './flow-editor.css';
 
 interface FlowGraphProps extends Omit<GraphProps<IFlow>,
     'initialNodes' |
@@ -80,7 +83,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
     }, [inEdit]);
 
     return <FlowGrapContext.Provider value={{ inEdit, clickOnSetting }}>
-        <div className="h-full w-full relative">
+        <div className="flow-editor h-full w-full relative">
             {inEdit && <div className={`absolute 
             z-20 
             top-[22px] 
@@ -188,8 +191,24 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
                     itemTemplate={<></>}
                 />
             </Modal>
+            <Modal
+                className="preview-doc-modal"
+                onOk={() => setOpenModal(undefined)}
+                okLabel="Close"
+                visible={openModal?.type === 'file-download'}
+                contentClassName="flex"
+                footer={<div>
+                    {<Button label='Download doc' severity='secondary' onClick={() => {
+                        // download
+                    }} />}
+                    {<Button label='Close' onClick={() => setOpenModal(undefined)} />}
+                </div>}
+            >
+                <Fieldset legend="Preview your files" className="w-full" >
+                    {openModal?.report || ''}
+                </Fieldset>
+            </Modal>
         </div>
-
     </FlowGrapContext.Provider>
 }
 

@@ -29,9 +29,10 @@ export const REPORT_ITEMS: IFlowBase[] = [
     },
 ]
 
-interface IconInfo {
+export interface IconInfo {
     icon: IconDefinition;
     label?: string;
+    interactable?: boolean;
 }
 
 export const flowInfoMap: {
@@ -43,16 +44,34 @@ export const flowInfoMap: {
 } = {
     'file-upload': {
         icon: faUpload,
-        actIcon: { icon: faCloudUpload, label: 'the file has uploaded.' },
-        editIcon: { icon: faFileArrowUp, label: 'upload your files.' }
+        actIcon: {
+            icon: faCloudUpload,
+            label: 'the file has uploaded.'
+        },
+        editIcon: {
+            icon: faFileArrowUp,
+            label: 'upload your files.',
+            interactable: true
+        }
     },
     'prompt': {
         icon: faBrain,
-        actIcon: { icon: faCloud, label: 'the promt is setted.' },
-        editIcon: { icon: faComment, label: 'set the prompt.' }
+        actIcon: {
+            icon: faCloud,
+            label: 'the promt is setted.'
+        },
+        editIcon: {
+            icon: faComment,
+            label: 'set the prompt.',
+            interactable: true
+        }
     },
     'file-download': {
         icon: faDownload,
-        actIcon: { icon: faCloudDownload, label: 'there are filed can be download' },
+        actIcon: {
+            icon: faCloudDownload,
+            label: 'there are filed can be download',
+            interactable: true
+        },
     }
 }

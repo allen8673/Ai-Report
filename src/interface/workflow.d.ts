@@ -22,6 +22,7 @@ export interface IFlowBase {
 export interface IFlow extends IFlowBase {
     promt?: string;
     file?: any;
+    report?: any;
     forwards?: string[];
     position: XYPosition;
     running?: boolean;
