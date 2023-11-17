@@ -4,7 +4,7 @@ import { Tooltip } from 'primereact/tooltip';
 import React, { ReactNode } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 
-import { flowInfoMap } from "../configuration";
+import { IconInfo, flowInfoMap } from "../configuration";
 import { useFlowGrapContext } from '../context';
 
 import { FlowStatus, IFlow } from '@/interface/workflow';
@@ -45,35 +45,36 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
 function TurboNodeInstance(elm: NodeProps<IFlow>) {
     const { id, data, } = elm;
     const { running } = data || {}
-    const { icon, editIcon, actIcon } = flowInfoMap[data.type] || {}
+    const { nodeType, icon, editIcon, actIcon } = flowInfoMap[data.type] || {}
     const { inEdit, clickOnSetting } = useFlowGrapContext();
+    const iconHighlight = !!data.promt || !!data.file || !!data.report
+
+    const _clickOnSetting = (icon: IconInfo): void => {
+        if (!icon.interactable || (!inEdit && !iconHighlight)) return;
+        clickOnSetting?.(data);
+    }
+
+    const iconInfo = inEdit ? editIcon : actIcon;
 
     return (
         <>
             <Tooltip target={'.tip-icon'} mouseTrack position='left' />
-            {inEdit ?
-                (!!editIcon ?
-                    <div className={`tip-icon icon gradient ${!!data.promt || !!data.file ? 'text-light' : 'text-light-weak'} hover:text-light cursor-default`}
-                        data-pr-tooltip={editIcon.label}>
-                        <div className='bg-deep-weak flex-center'>
-                            <FontAwesomeIcon
-                                className='h-[16px] w-[16px] flex-center '
-                                icon={editIcon.icon}
-                                onClick={() => { clickOnSetting?.(data) }}
-                            />
-                        </div>
-                    </div> : <></>) :
-                (!!actIcon ?
-                    <div className={`tip-icon icon gradient ${!!data.promt || !!data.file ? 'text-light' : 'text-light-weak'}`}
-                        data-pr-tooltip={!!data.promt || !!data.file ? actIcon.label : ''}>
-                        <div className='bg-deep-weak flex-center'>
-                            <FontAwesomeIcon
-                                className='h-[16px] w-[16px] flex-center '
-                                icon={actIcon.icon}
-                            />
-                        </div>
-                    </div> : <></>)
-            }
+            {!!iconInfo &&
+                <div className={`tip-icon icon gradient cursor-default
+                    ${iconHighlight ? 'text-light' : 'text-light-weak'} 
+                    ${(inEdit && iconInfo.interactable) ? `hover:text-light ` : ''}
+                    `}
+                    data-pr-tooltip={(inEdit || iconHighlight) ? iconInfo.label : ''}>
+                    <div className='bg-deep-weak flex-center'
+                        role='presentation'
+                        onClick={() => _clickOnSetting(iconInfo)}
+                    >
+                        <FontAwesomeIcon
+                            className='h-[16px] w-[16px] flex-center '
+                            icon={iconInfo.icon}
+                        />
+                    </div>
+                </div >}
             {getStatusIcon(data.status)}
             <div className={`middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] ${running ? "running" : ''}`} >
                 <div className={`inner rounded-std-sm bg-deep-weak`}>
@@ -88,7 +89,7 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                     </div>
                 </div>
             </div >
-            <Handle
+            {nodeType !== 'start' && <Handle
                 className='turbo-handle'
                 type="target"
                 position={Position.Left}
@@ -97,14 +98,14 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                     alert('haha')
                 }}
                 isConnectable={inEdit}
-            />
-            <Handle
+            />}
+            {nodeType !== 'end' && <Handle
                 className='turbo-handle'
                 type="source"
                 position={Position.Right}
                 id={`src-${id}`}
                 isConnectable={inEdit}
-            />
+            />}
         </>
     );
 }

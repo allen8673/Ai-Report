@@ -9,7 +9,7 @@ export const mock_projects: IWorkflow[] = [
         flows: [
             {
                 id: 'f-1',
-                name: 'upload stix',
+                name: 'Upload',
                 type: 'file-upload',
                 position: { x: 100, y: 400 },
                 forwards: ['f-2', 'f-4'],

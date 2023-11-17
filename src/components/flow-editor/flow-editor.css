@@ -1,0 +1,9 @@
+.preview-doc-modal {
+    & .p-fieldset {
+        @apply flex;
+    }
+
+    & .p-fieldset .p-toggleable-content {
+        @apply shrink grow overflow-auto
+    }
+}

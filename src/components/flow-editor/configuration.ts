@@ -19,40 +19,63 @@ export const REPORT_ITEMS: IFlowBase[] = [
     },
     {
         id: 'file-upload',
-        name: 'File Upload',
+        name: 'Upload',
         type: 'file-upload'
     },
     {
         id: 'file-download',
-        name: 'File Download',
+        name: 'Done',
         type: 'file-download'
     },
 ]
 
-interface IconInfo {
+export interface IconInfo {
     icon: IconDefinition;
     label?: string;
+    interactable?: boolean;
 }
 
 export const flowInfoMap: {
     [type: string]: {
+        nodeType: '' | 'start' | 'end',
         icon: IconDefinition;
         actIcon?: IconInfo,
         editIcon?: IconInfo
     }
 } = {
     'file-upload': {
+        nodeType: 'start',
         icon: faUpload,
-        actIcon: { icon: faCloudUpload, label: 'the file has uploaded.' },
-        editIcon: { icon: faFileArrowUp, label: 'upload your files.' }
+        actIcon: {
+            icon: faCloudUpload,
+            label: 'the file has uploaded.'
+        },
+        editIcon: {
+            icon: faFileArrowUp,
+            label: 'upload your files.',
+            interactable: true
+        }
     },
     'prompt': {
+        nodeType: '',
         icon: faBrain,
-        actIcon: { icon: faCloud, label: 'the promt is setted.' },
-        editIcon: { icon: faComment, label: 'set the prompt.' }
+        actIcon: {
+            icon: faCloud,
+            label: 'the promt is setted.'
+        },
+        editIcon: {
+            icon: faComment,
+            label: 'set the prompt.',
+            interactable: true
+        }
     },
     'file-download': {
+        nodeType: 'end',
         icon: faDownload,
-        actIcon: { icon: faCloudDownload, label: 'there are filed can be download' },
+        actIcon: {
+            icon: faCloudDownload,
+            label: 'there are filed can be download',
+            interactable: true
+        },
     }
 }
