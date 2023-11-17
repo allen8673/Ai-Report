@@ -204,7 +204,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
                     {<Button label='Close' onClick={() => setOpenModal(undefined)} />}
                 </div>}
             >
-                <Fieldset legend="Preview your files" className="w-full" >
+                <Fieldset legend="Preview your report" className="w-full" >
                     {openModal?.report || ''}
                 </Fieldset>
             </Modal>
