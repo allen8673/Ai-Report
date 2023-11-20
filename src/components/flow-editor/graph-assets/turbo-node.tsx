@@ -55,12 +55,13 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
     }
 
     const iconInfo = inEdit ? editIcon : actIcon;
+    const openable = inEdit || iconHighlight;
 
     return (
         <>
             <Tooltip target={'.tip-icon'} mouseTrack position='left' />
             {!!iconInfo &&
-                <div className={`tip-icon icon gradient cursor-default
+                <div className={`tip-icon icon gradient ${openable ? "cursor-pointer" : ''}
                     ${iconHighlight ? 'text-light' : 'text-light-weak'} 
                     ${(inEdit && iconInfo.interactable) ? `hover:text-light ` : ''}
                     `}
