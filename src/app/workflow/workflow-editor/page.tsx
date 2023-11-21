@@ -2,6 +2,7 @@
 import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import _ from "lodash";
+import { useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
@@ -12,26 +13,28 @@ import TitlePane from "@/components/title-pane";
 import { FlowStatus, IEditWorkflow, IFlow, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
 import { mock_templates, mock_workflows } from "@/mock-data/mock";
+import { coverSearchParamsToObj } from "@/untils/urlHelper";
 
 type EditMode = 'add' | 'normal'
 
-export default function Page({ searchParams }: { searchParams: IEditWorkflow }) {
-
+export default function Page() {
+    const searchParams = useSearchParams()
     const [workflow, setWorkflow] = useState<IWorkflow>();
     const { graphRef } = useGraphRef<IFlow, any>();
     const [inEdit, setInEdit] = useState<boolean>()
     const { showMessage } = useLayoutContext();
 
     useEffect(() => {
-        const mode: EditMode = !!searchParams.id ? 'normal' : 'add';
+        const obj = coverSearchParamsToObj<IEditWorkflow>(searchParams);
+        const mode: EditMode = !!obj.id ? 'normal' : 'add';
         setInEdit(mode === 'add');
         if (mode === 'normal') {
-            setWorkflow(_.find(mock_workflows, ['id', searchParams.id]))
+            setWorkflow(_.find(mock_workflows, ['id', obj.id]))
         } else {
             const id = v4();
-            const temps = searchParams.template?.split(',') || [];
+            const temps = obj.template?.split(',') || [];
             const flows: IFlow[] = temps.length > 0 ? _.find(mock_templates, ['id', temps[0]])?.flows || [] : [];
-            setWorkflow({ id, name: searchParams.name || '', flows, rootNdeId: '' })
+            setWorkflow({ id, name: obj.name || '', flows, rootNdeId: '' })
         }
     }, [])
 
