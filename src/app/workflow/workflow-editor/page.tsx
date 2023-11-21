@@ -11,24 +11,27 @@ import { useGraphRef } from "@/components/graph/helper";
 import TitlePane from "@/components/title-pane";
 import { FlowStatus, IEditWorkflow, IFlow, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
-import { mock_projects } from "@/mock-data/mock";
+import { mock_templates, mock_workflows } from "@/mock-data/mock";
 
 type EditMode = 'add' | 'normal'
 
 export default function Page({ searchParams }: { searchParams: IEditWorkflow }) {
 
-    const mode: EditMode = !!searchParams.id ? 'normal' : 'add'
     const [workflow, setWorkflow] = useState<IWorkflow>();
     const { graphRef } = useGraphRef<IFlow, any>();
-    const [inEdit, setInEdit] = useState<boolean>(mode === 'add')
+    const [inEdit, setInEdit] = useState<boolean>()
     const { showMessage } = useLayoutContext();
 
     useEffect(() => {
+        const mode: EditMode = !!searchParams.id ? 'normal' : 'add';
+        setInEdit(mode === 'add');
         if (mode === 'normal') {
-            setWorkflow(_.find(mock_projects, ['id', searchParams.id]))
+            setWorkflow(_.find(mock_workflows, ['id', searchParams.id]))
         } else {
             const id = v4();
-            setWorkflow({ id, name: searchParams.name || '', flows: [], rootNdeId: '' })
+            const temps = searchParams.template?.split(',') || [];
+            const flows: IFlow[] = temps.length > 0 ? _.find(mock_templates, ['id', temps[0]])?.flows || [] : [];
+            setWorkflow({ id, name: searchParams.name || '', flows, rootNdeId: '' })
         }
     }, [])
 

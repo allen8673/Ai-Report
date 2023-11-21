@@ -7,11 +7,11 @@ import Table from '@/components/table';
 import { Column } from '@/components/table/table';
 import TitlePane from '@/components/title-pane';
 import { ITemplate } from '@/interface/workflow';
-import { mock_template } from "@/mock-data/mock";
+import { mock_templates } from "@/mock-data/mock";
 
 export default function Page() {
 
-    const templates = mock_template;
+    const templates = mock_templates;
 
     const columns: Column<ITemplate>[] = [
         { key: 'id', title: 'ID' },

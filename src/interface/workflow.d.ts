@@ -3,7 +3,7 @@ import { XYPosition } from "reactflow";
 export interface IEditWorkflow {
     id?: string;
     name?: string;
-    template?: string[];
+    template?: string;
 }
 
 export interface IWorkflow {
