@@ -1,9 +1,18 @@
 import { XYPosition } from "reactflow";
 
+export interface IAddWorkflow {
+    id: string;
+    name: string;
+    template?: string[];
+}
+
 export interface IWorkflow {
     id: string;
     name: string;
-    flows: IFlow[]
+    template: string;
+    rootNdeId: string;
+    flows: IFlow[];
+    // updater: string;
 }
 
 export interface ITemplate {

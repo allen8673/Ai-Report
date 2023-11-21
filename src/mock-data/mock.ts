@@ -6,6 +6,7 @@ export const mock_projects: IWorkflow[] = [
     {
         id: 'p-1',
         name: 'project 1',
+        rootNdeId: 'f-1',
         flows: [
             {
                 id: 'f-1',
@@ -39,6 +40,7 @@ export const mock_projects: IWorkflow[] = [
     {
         id: 'p-2',
         name: 'project 2',
+        rootNdeId: 'f-1',
         flows: []
     }
 ]
