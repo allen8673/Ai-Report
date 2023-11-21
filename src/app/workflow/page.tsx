@@ -3,20 +3,36 @@ import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import { MultiSelect } from "primereact/multiselect";
+import { SelectItem } from "primereact/selectitem";
+import { useState } from 'react'
 
+import Form from "@/components/form";
+import { FormInstance } from "@/components/form/form";
+import Modal from "@/components/modal";
 import Table from "@/components/table";
 import { Column } from "@/components/table/table";
 import TitlePane from "@/components/title-pane";
-import { IWorkflow } from "@/interface/workflow";
+import { IEditWorkflow, IWorkflow } from "@/interface/workflow";
 import { mock_projects } from "@/mock-data/mock";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
+import { coverToQueryString } from "@/untils/urlHelper";
 
 export default function Page() {
 
     const workflows = mock_projects
 
+    const [addNewFlow, setAddNewFlow] = useState<boolean>();
+    const [form, setForm] = useState<FormInstance<IEditWorkflow>>()
+
     const router = useRouter();
     const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
+
+    const templateOpts: SelectItem[] = [
+        { label: 'haha', value: '123' },
+        { label: 'qq', value: '456' },
+    ]
     const columns: Column<IWorkflow>[] = [
         { key: 'id', title: 'ID' },
         { key: 'name', title: 'Name' }
@@ -30,8 +46,9 @@ export default function Page() {
                     severity="success"
                     label='Add New Workflow'
                     tooltipOptions={{ position: 'left' }}
-                    onClick={() => router.push(editorUrl)
-                    }
+                    onClick={() => {
+                        setAddNewFlow(pre => !pre)
+                    }}
                 />
             }
         />
@@ -40,8 +57,39 @@ export default function Page() {
             first={0}
             totalRecords={5}
             onRowClick={() => {
-                router.push(editorUrl)
+                router.push(`${editorUrl}`);
             }}
         />
-    </div>
+        <Modal visible={addNewFlow}
+            onOk={() => {
+                form?.submit()
+                    .then(data => {
+                        router.push(`${editorUrl}${coverToQueryString(data)}`);
+                    }).catch(() => {
+                        // 
+                    });
+            }}
+            onCancel={() => {
+                setAddNewFlow(false)
+            }}>
+            <Form
+                onLoad={(form: FormInstance<IEditWorkflow>) => setForm(form)}
+                onDestroyed={() => {
+                    setForm(undefined)
+                }}
+            >
+                {
+                    Item => (
+                        <>
+                            <Item name={'name'} label="Workflow Name" rules={{ required: 'Please give a name to for workflow!', }}>
+                                <InputText />
+                            </Item>
+                            <Item name={'template'} label="Apply Template">
+                                <MultiSelect options={templateOpts} />
+                            </Item>
+                        </>
+                    )
+                }</Form>
+        </Modal>
+    </div >
 }
