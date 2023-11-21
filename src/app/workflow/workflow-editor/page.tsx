@@ -3,21 +3,34 @@ import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave } from "@for
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import _ from "lodash";
 import { Button } from 'primereact/button';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { v4 } from "uuid";
 
 import FlowGraph from "@/components/flow-editor";
 import { useGraphRef } from "@/components/graph/helper";
 import TitlePane from "@/components/title-pane";
-import { FlowStatus, IFlow, IWorkflow } from "@/interface/workflow";
+import { FlowStatus, IEditWorkflow, IFlow, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
 import { mock_projects } from "@/mock-data/mock";
 
-export default function Page() {
+type EditMode = 'add' | 'normal'
 
-    const [workflow, setWorkflow] = useState<IWorkflow>(mock_projects[0]);
+export default function Page({ searchParams }: { searchParams: IEditWorkflow }) {
+
+    const mode: EditMode = !!searchParams.id ? 'normal' : 'add'
+    const [workflow, setWorkflow] = useState<IWorkflow>();
     const { graphRef } = useGraphRef<IFlow, any>();
-    const [inEdit, setInEdit] = useState<boolean>()
+    const [inEdit, setInEdit] = useState<boolean>(mode === 'add')
     const { showMessage } = useLayoutContext();
+
+    useEffect(() => {
+        if (mode === 'normal') {
+            setWorkflow(_.find(mock_projects, ['id', searchParams.id]))
+        } else {
+            const id = v4();
+            setWorkflow({ id, name: searchParams.name || '', flows: [], rootNdeId: '' })
+        }
+    }, [])
 
     const mock_run = (forwards: string[]): void => {
         let next: string[] = [];
@@ -66,7 +79,7 @@ export default function Page() {
 
     return <div className="flex h-full flex-row gap-std items-stretch">
         <div className="shrink grow flex flex-col gap-std">
-            <TitlePane title={workflow.name} postContent={
+            <TitlePane title={workflow?.name || 'New Workfow'} postContent={
                 <>
                     <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
                         severity='info'
@@ -94,7 +107,7 @@ export default function Page() {
                                     const flows: IFlow[] = _.map(graphRef.current?.getNodes() || [], n => ({
                                         ...n.data, position: n.position
                                     }));
-                                    setWorkflow(pre => ({ ...pre, flows }))
+                                    setWorkflow(pre => !!pre ? ({ ...pre, flows }) : pre)
                                     setInEdit(false)
                                 }}
                             />
@@ -109,7 +122,7 @@ export default function Page() {
                                         return { ...pre, data: { ...pre.data, status: 'none', running: false } }
                                     });
                                     await new Promise(resolve => setTimeout(resolve, 500));
-                                    mock_run(['f-1'])
+                                    if (!!workflow?.rootNdeId) mock_run([workflow?.rootNdeId])
                                 }}
                             />
                             <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}
@@ -124,7 +137,7 @@ export default function Page() {
             />
             <FlowGraph
                 className="rounded-std bg-deep"
-                flows={workflow.flows}
+                flows={workflow?.flows || []}
                 graphRef={graphRef}
                 hideMiniMap
                 inEdit={inEdit}

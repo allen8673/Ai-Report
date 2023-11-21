@@ -13,8 +13,8 @@ export const EDGE_DEF_SETTING: Partial<Edge> = {
 
 export const REPORT_ITEMS: IFlowBase[] = [
     {
-        id: 'custom-promt',
-        name: 'Custom Promt',
+        id: 'custom-prompt',
+        name: 'Custom Prompt',
         type: 'prompt'
     },
     {

@@ -50,14 +50,13 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
     const { graphRef } = useGraphRef<IFlow, any>(ref);
     const [openModal, setOpenModal] = useState<IFlow>();
 
-
     const clickOnSetting = (flow: IFlow) => {
         setOpenModal(flow)
     }
-    const setPromt = () => {
+    const setPrompt = () => {
         const val = form?.getValues();
         if (!val) return
-        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, promt: val.promt, name: val.name } }))
+        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, prompt: val.prompt, name: val.name } }))
         setOpenModal(undefined);
     }
 
@@ -154,13 +153,14 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
                     graphRef.current?.addNode({ id, position, data: { ...onDragItem, id, position, forwards: [] }, type: 'turbo' });
                     setOnDragItem(() => undefined);
                 }}
+                fitView
                 {...others}
             >
                 <TurboEdgeAsset />
             </Graph>
             <Modal
-                title="Set the promt"
-                onOk={setPromt}
+                title="Set the prompt"
+                onOk={setPrompt}
                 onCancel={closeModal}
                 visible={openModal?.type === 'prompt'}
             >
@@ -173,7 +173,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
                                 <Item name='name' label="Name" >
                                     <InputText />
                                 </Item>
-                                <Item name='promt' label="Promt" >
+                                <Item name='prompt' label="Prompt" >
                                     <InputTextarea className="w-full min-h-[100px]" />
                                 </Item>
                             </>

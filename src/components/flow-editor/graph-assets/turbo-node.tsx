@@ -47,7 +47,7 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
     const { running } = data || {}
     const { nodeType, icon, editIcon, actIcon } = flowInfoMap[data.type] || {}
     const { inEdit, clickOnSetting } = useFlowGrapContext();
-    const iconHighlight = !!data.promt || !!data.file || !!data.report
+    const iconHighlight = !!data.prompt || !!data.file || !!data.report
 
     const _clickOnSetting = (icon: IconInfo): void => {
         if (!icon.interactable || (!inEdit && !iconHighlight)) return;

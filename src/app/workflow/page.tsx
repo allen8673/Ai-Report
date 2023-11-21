@@ -56,8 +56,9 @@ export default function Page() {
             paginator rows={10}
             first={0}
             totalRecords={5}
-            onRowClick={() => {
-                router.push(`${editorUrl}`);
+            onRowClick={({ data }) => {
+                const { id } = data
+                router.push(`${editorUrl}${coverToQueryString({ id })}`);
             }}
         />
         <Modal visible={addNewFlow}
@@ -81,7 +82,7 @@ export default function Page() {
                 {
                     Item => (
                         <>
-                            <Item name={'name'} label="Workflow Name" rules={{ required: 'Please give a name to for workflow!', }}>
+                            <Item name={'name'} label="Workflow Name" rules={{ required: 'Please give a name to workflow!', }}>
                                 <InputText />
                             </Item>
                             <Item name={'template'} label="Apply Template">
