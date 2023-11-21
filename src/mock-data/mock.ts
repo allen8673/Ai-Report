@@ -2,7 +2,7 @@
 import { ITemplate, IWorkflow } from "@/interface/workflow";
 
 
-export const mock_projects: IWorkflow[] = [
+export const mock_workflows: IWorkflow[] = [
     {
         "id": "wf-3",
         "name": "demo workflow",

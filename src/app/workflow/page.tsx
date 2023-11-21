@@ -15,13 +15,13 @@ import Table from "@/components/table";
 import { Column } from "@/components/table/table";
 import TitlePane from "@/components/title-pane";
 import { IEditWorkflow, IWorkflow } from "@/interface/workflow";
-import { mock_projects } from "@/mock-data/mock";
+import { mock_workflows } from "@/mock-data/mock";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 import { coverToQueryString } from "@/untils/urlHelper";
 
 export default function Page() {
 
-    const workflows = mock_projects
+    const workflows = mock_workflows
 
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<IEditWorkflow>>()
