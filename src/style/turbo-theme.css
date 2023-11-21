@@ -26,8 +26,6 @@
             @apply rounded-std border-light-weak border-[1px];
         }
     }
-
-
 }
 
 .react-flow__handle.source {
@@ -51,7 +49,7 @@
         }
 
         &:last-child {
-            border-bottom: 1px solid #95679e;
+            @apply border-turbo-deep border-[1px] border-solid;
             border-radius: 0 0 5px 5px;
         }
 

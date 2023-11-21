@@ -3,7 +3,7 @@
 export function TurboEdgeAsset() {
     return <svg>
         <defs>
-            <linearGradient id="edge-gradient" gradientUnits="userSpaceOnUse">
+            <linearGradient id="edge-gradient" gradientUnits="userSpaceOnUse" spreadMethod='reflect'>
                 <stop offset="0%" stopColor="#ae53ba" />
                 <stop offset="100%" stopColor="#2a8af6" />
             </linearGradient>

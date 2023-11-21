@@ -1,9 +1,17 @@
 import { XYPosition } from "reactflow";
 
+export interface IEditWorkflow {
+    id?: string;
+    name?: string;
+    template?: string[];
+}
+
 export interface IWorkflow {
     id: string;
     name: string;
-    flows: IFlow[]
+    rootNdeId: string;
+    flows: IFlow[];
+    // updater: string;
 }
 
 export interface ITemplate {
@@ -20,7 +28,7 @@ export interface IFlowBase {
     name: string;
 }
 export interface IFlow extends IFlowBase {
-    promt?: string;
+    prompt?: string;
     file?: any;
     report?: any;
     forwards?: string[];

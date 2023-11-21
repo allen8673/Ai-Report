@@ -43,9 +43,9 @@ const config: Config = {
         },
         turbo: {
           deep: {
-            DEFAULT: '#95679e',
-            strong: '#D14EFF',
-            weak: '##824EF0'
+            DEFAULT: '#BA4AFF',
+            strong: '#A226EF',
+            weak: '#95679e'
           },
           light: '#2a8af6',
         },
