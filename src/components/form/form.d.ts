@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { ReactNode } from "react";
 import {
     ControllerFieldState,
     ControllerRenderProps,
@@ -7,13 +7,25 @@ import {
     PathValue,
     RegisterOptions,
     UseFormReturn,
-    UseFormStateReturn
+    UseFormStateReturn,
+    DefaultValues
 } from "react-hook-form";
 
-
+import { FormInstance, FormItemProps, FormValue, GetItemProps } from "./form";
 
 export type FormValue = Record<string, any>;
-export type FormCoreInstance<T extends FormValue> = UseFormReturn<T, T, any>
+export type FormCoreInstance<T extends FormValue> = UseFormReturn<T, T, any>;
+
+export interface FormProps<T extends Record<string, any>> {
+    form?: FormInstance<T>;
+    defaultValues?: DefaultValues<T>;
+    children: (formItem: (props: FormItemProps<T>) => React.JSX.Element) => ReactNode;
+    onLoad?: (formInstance: FormInstance<T>) => void;
+    onDestroyed?: () => void
+    className?: string;
+    itemClassName?: string;
+}
+
 export interface FormInstance<T extends FormValue> {
     getValues: () => T;
     setValue: (name: Path<T>, value: PathValue<T, Path<T>>, options?: Partial<{ shouldValidate: boolean; shouldDirty: boolean; shouldTouch: boolean; }>) => void

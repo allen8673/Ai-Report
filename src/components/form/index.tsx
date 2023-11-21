@@ -1,8 +1,8 @@
 import { classNames } from "primereact/utils";
-import React, { ReactNode, useEffect } from "react";
-import { Controller, DefaultValues, Path, } from "react-hook-form";
+import React, { useEffect } from "react";
+import { Controller, Path, } from "react-hook-form";
 
-import { FormInstance, FormItemProps, FormValue, GetItemProps } from "./form";
+import { FormItemProps, FormProps, FormValue, GetItemProps } from "./form";
 import { useForm } from "./helper";
 
 function GetItem<T extends FormValue>({ formCore, className }: GetItemProps<T>) {
@@ -33,15 +33,7 @@ function GetItem<T extends FormValue>({ formCore, className }: GetItemProps<T>) 
     }
 }
 
-export interface FormProps<T extends Record<string, any>> {
-    form?: FormInstance<T>;
-    defaultValues?: DefaultValues<T>;
-    children: (formItem: (props: FormItemProps<T>) => React.JSX.Element) => ReactNode;
-    onLoad?: (formInstance: FormInstance<T>) => void;
-    onDestroyed?: () => void
-    className?: string;
-    itemClassName?: string;
-}
+
 
 export default function Form<T extends Record<string, any>>(props: FormProps<T>) {
     const {
