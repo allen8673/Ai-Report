@@ -140,10 +140,141 @@ export const mock_workflows: IWorkflow[] = [
     },
 ]
 
-export const mock_template: ITemplate[] = [
+export const mock_templates: ITemplate[] = [
     {
         id: 'temp-1',
-        name: 'Template 1',
-        flows: []
+        name: 'Base Template',
+        "flows": [
+            {
+                "id": "e693af84-ab03-4e05-8a9a-60fac88745b9",
+                "name": "Done",
+                "type": "file-download",
+                "position": {
+                    "x": 570,
+                    "y": 390
+                },
+                "forwards": []
+            },
+            {
+                "id": "22793a60-abf4-4dbe-b9d7-058b27c1b618",
+                "name": "your prompt",
+                "type": "prompt",
+                "position": {
+                    "x": 150,
+                    "y": 390
+                },
+                "forwards": [
+                    "e693af84-ab03-4e05-8a9a-60fac88745b9"
+                ],
+                "prompt": "Hi AI, {PLZ INPUT YOUR PROMT}, then give me an analysis result!"
+            },
+            {
+                "id": "897c920d-4d52-46a3-bbab-56595de1763e",
+                "name": "Upload",
+                "type": "file-upload",
+                "position": {
+                    "x": -240,
+                    "y": 390
+                },
+                "forwards": [
+                    "22793a60-abf4-4dbe-b9d7-058b27c1b618"
+                ]
+            }
+        ],
+    },
+    {
+        id: 'temp-2',
+        name: 'Analyze Attack Events ',
+        flows: [
+            {
+                "id": "d712ac25-0cab-489f-8260-691fd474b581",
+                "name": "defense advice",
+                "type": "prompt",
+                "position": {
+                    "x": 930,
+                    "y": 390
+                },
+                "forwards": [
+                    "e693af84-ab03-4e05-8a9a-60fac88745b9"
+                ],
+                "prompt": "Hi AI, plz based on the {EVENT IDs} give me some suggestions to defend "
+            },
+            {
+                "id": "105f51b6-9b23-436f-acb6-9cb649984d80",
+                "name": "attack time",
+                "type": "prompt",
+                "position": {
+                    "x": 530,
+                    "y": 590
+                },
+                "forwards": [
+                    "d712ac25-0cab-489f-8260-691fd474b581"
+                ],
+                "prompt": "Hi AI, plz based on the {ALL | SPECIAL CONDITIONS} give me the last {NUMBER} time"
+            },
+            {
+                "id": "62273699-0512-4f55-a75f-6c54d79dc308",
+                "name": "attack times",
+                "type": "prompt",
+                "position": {
+                    "x": 530,
+                    "y": 390
+                },
+                "forwards": [
+                    "d712ac25-0cab-489f-8260-691fd474b581"
+                ],
+                "prompt": "Hi AI, plz base on {EVEND ID} find {ALL | SPECIAL CONDITIONS} attack source, and count the attack times"
+            },
+            {
+                "id": "ee3b482c-5591-4820-8488-0ab0661cbcc8",
+                "name": "the attack source",
+                "type": "prompt",
+                "position": {
+                    "x": 510,
+                    "y": 220
+                },
+                "forwards": [
+                    "d712ac25-0cab-489f-8260-691fd474b581"
+                ],
+                "prompt": "Hi AI, plz give me the attack source in {ALL | SPECIAL EVENT IDs}."
+            },
+            {
+                "id": "e693af84-ab03-4e05-8a9a-60fac88745b9",
+                "name": "Done",
+                "type": "file-download",
+                "position": {
+                    "x": 1290,
+                    "y": 390
+                },
+                "forwards": []
+            },
+            {
+                "id": "22793a60-abf4-4dbe-b9d7-058b27c1b618",
+                "name": "IP prompt",
+                "type": "prompt",
+                "position": {
+                    "x": 90,
+                    "y": 390
+                },
+                "forwards": [
+                    "ee3b482c-5591-4820-8488-0ab0661cbcc8",
+                    "62273699-0512-4f55-a75f-6c54d79dc308",
+                    "105f51b6-9b23-436f-acb6-9cb649984d80"
+                ],
+                "prompt": "Hi AI, plz list all attack events regarding {THE IPs}."
+            },
+            {
+                "id": "897c920d-4d52-46a3-bbab-56595de1763e",
+                "name": "Upload",
+                "type": "file-upload",
+                "position": {
+                    "x": -270,
+                    "y": 390
+                },
+                "forwards": [
+                    "22793a60-abf4-4dbe-b9d7-058b27c1b618"
+                ]
+            }
+        ]
     }
 ]

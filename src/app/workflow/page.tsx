@@ -1,12 +1,13 @@
 'use client'
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import _ from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { MultiSelect } from "primereact/multiselect";
 import { SelectItem } from "primereact/selectitem";
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
@@ -14,8 +15,8 @@ import Modal from "@/components/modal";
 import Table from "@/components/table";
 import { Column } from "@/components/table/table";
 import TitlePane from "@/components/title-pane";
-import { IEditWorkflow, IWorkflow } from "@/interface/workflow";
-import { mock_workflows } from "@/mock-data/mock";
+import { IEditWorkflow, ITemplate, IWorkflow } from "@/interface/workflow";
+import { mock_templates, mock_workflows } from "@/mock-data/mock";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 import { coverToQueryString } from "@/untils/urlHelper";
 
@@ -25,14 +26,16 @@ export default function Page() {
 
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<IEditWorkflow>>()
+    const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([])
 
     const router = useRouter();
     const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
 
-    const templateOpts: SelectItem[] = [
-        { label: 'haha', value: '123' },
-        { label: 'qq', value: '456' },
-    ]
+    useEffect(() => {
+        const opts = _.map<ITemplate, SelectItem>(mock_templates, t => ({ label: t.name, value: t.id }))
+        setTemplateOpts(opts)
+    }, [])
+
     const columns: Column<IWorkflow>[] = [
         { key: 'id', title: 'ID' },
         { key: 'name', title: 'Name' }
@@ -64,8 +67,8 @@ export default function Page() {
         <Modal visible={addNewFlow}
             onOk={() => {
                 form?.submit()
-                    .then(data => {
-                        router.push(`${editorUrl}${coverToQueryString(data)}`);
+                    .then(({ name, template }) => {
+                        router.push(`${editorUrl}${coverToQueryString({ name, template: _.join(template || [], ',') })}`);
                     }).catch(() => {
                         // 
                     });
