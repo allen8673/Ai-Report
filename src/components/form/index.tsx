@@ -62,7 +62,7 @@ export default function Form<T extends Record<string, any>>(props: FormProps<T>)
         return onDestroyed
     }, [])
 
-    return <form className={`zd-form ${className}`}>
+    return <form className={`zd-form text-deep ${className}`}>
         {children(itemElem)}
     </form>
 }
