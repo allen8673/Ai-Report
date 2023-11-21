@@ -51,6 +51,7 @@ export default function Form<T extends Record<string, any>>(props: FormProps<T>)
         onLoad,
         className,
         itemClassName,
+        onDestroyed
     } = props;
 
     const { form: formInstance } = useForm<T>(form, defaultValues);
@@ -58,7 +59,7 @@ export default function Form<T extends Record<string, any>>(props: FormProps<T>)
     const itemElem = GetItem({ formCore: formInstance.formCore, className: itemClassName });
     useEffect(() => {
         onLoad?.(formInstance);
-        return
+        return onDestroyed
     }, [])
 
     return <form className={`zd-form ${className}`}>

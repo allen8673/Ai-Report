@@ -164,17 +164,20 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
                 onCancel={closeModal}
                 visible={openModal?.type === 'prompt'}
             >
-                <Form defaultValues={openModal} onLoad={form => setForm(form)}>{
-                    (Item) =>
-                        <>
-                            <Item name='name' label="Name" >
-                                <InputText />
-                            </Item>
-                            <Item name='promt' label="Promt" >
-                                <InputTextarea className="w-full min-h-[100px]" />
-                            </Item>
-                        </>
-                }</Form>
+                <Form
+                    defaultValues={openModal}
+                    onLoad={form => setForm(form)}
+                    onDestroyed={() => setForm(undefined)}>{
+                        (Item) =>
+                            <>
+                                <Item name='name' label="Name" >
+                                    <InputText />
+                                </Item>
+                                <Item name='promt' label="Promt" >
+                                    <InputTextarea className="w-full min-h-[100px]" />
+                                </Item>
+                            </>
+                    }</Form>
             </Modal>
             <Modal
                 title="Upload your files"
