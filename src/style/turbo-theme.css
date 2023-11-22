@@ -3,33 +3,53 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer components {
-    .zd-table {
-        @apply flex flex-col justify-between gap-std-sm;
+/* width */
+::-webkit-scrollbar {
+    width: 9px;
+}
 
-        & .p-datatable-table {
-            @apply rounded-std overflow-hidden;
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+    border-radius: 10px;
+}
 
-            & th {
-                @apply text-light bg-deep;
-                @apply border-light-weak;
-            }
+/* Handle */
+::-webkit-scrollbar-thumb {
+    @apply bg-turbo-deep-weak;
+    border-radius: 10px;
+}
 
-            & td {
-                @apply text-light bg-deep-weak;
-                @apply border-light-weak;
-            }
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-turbo-deep;
+}
+
+.zd-table {
+    @apply flex flex-col justify-between gap-std-sm;
+
+    & .p-datatable-table {
+        @apply rounded-std overflow-hidden;
+
+        & th {
+            @apply text-light bg-deep;
+            @apply border-light-weak;
         }
 
-        & .p-paginator {
-            @apply bg-deep;
-            @apply rounded-std border-light-weak border-[1px];
+        & td {
+            @apply text-light bg-deep-weak;
+            @apply border-light-weak;
         }
+    }
+
+    & .p-paginator {
+        @apply bg-deep;
+        @apply rounded-std border-light-weak border-[1px];
     }
 }
 
 .react-flow__handle.source {
-    @apply bg-turbo;
+    @apply bg-turbo-gradient;
     right: -20px;
 }
 
@@ -108,4 +128,9 @@
         @apply bg-deep-weak;
         @apply border-[2px] border-light-weak
     }
+}
+
+.p-splitter {
+    @apply rounded-std border-deep;
+    @apply bg-deep;
 }

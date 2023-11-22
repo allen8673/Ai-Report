@@ -12,10 +12,10 @@ const config: Config = {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'turbo': 'conic-gradient(from -160deg at 50% 50%, #e92a67 0deg, #a853ba 120deg, #2a8af6 240deg, #e92a67 360deg)',
-        'turbo-shadow': '10px 0 15px rgba(42, 138, 246, 0.3), -10px 0 15px rgba(233, 42, 103, 0.3)',
-        'turbo-selected': '0px 0 40px rgba(42, 138, 246, 0.7), -0px 0 40px rgba(233, 42, 103, 0.3)',
-        'turbo-running': 'conic-gradient(from -160deg at 50% 50%, #e92a67 0deg, #a853ba 120deg, #2a8af6 240deg, rgba(42, 138, 246, 0) 360deg)',
+        'turbo-gradient': 'conic-gradient(from -160deg at 50% 50%, #e92a67 0deg, #a853ba 120deg, #2a8af6 240deg, #e92a67 360deg)',
+        'turbo-gradient-shadow': '10px 0 15px rgba(42, 138, 246, 0.3), -10px 0 15px rgba(233, 42, 103, 0.3)',
+        'turbo-gradient-selected': '0px 0 40px rgba(42, 138, 246, 0.7), -0px 0 40px rgba(233, 42, 103, 0.3)',
+        'turbo-gradient-running': 'conic-gradient(from -160deg at 50% 50%, #e92a67 0deg, #a853ba 120deg, #2a8af6 240deg, rgba(42, 138, 246, 0) 360deg)',
       },
       keyframes: {
         spinner: {
@@ -47,7 +47,10 @@ const config: Config = {
             strong: '#A226EF',
             weak: '#95679e'
           },
-          light: '#2a8af6',
+          light: {
+            DEFAULT: '#2a8af6',
+            weak: '#0a3e76'
+          },
         },
         success: {
           light: 'rgba(16, 185, 129, 0.4)',
