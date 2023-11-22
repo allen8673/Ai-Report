@@ -24,7 +24,7 @@ export default function Page() {
         {
             format: (row) => (
                 <FontAwesomeIcon
-                    className='w-[20px] h-[20px] p-[9px] border-solid border-[1px] border-light rounded-std bg-light-weak'
+                    className='w-[19px] h-[19px] p-[9px] border-solid border-[1px] border-light rounded-std bg-light-weak'
                     onClick={e => {
                         e.stopPropagation();
                         alert(`${row.name} (${row.id}) will be deleted`)
@@ -32,7 +32,7 @@ export default function Page() {
 
                     icon={faTrash} />
             ),
-            style: { width: 100 }
+            style: { width: 100, padding: '0px 7px' }
         }
     ];
     const [selection, setSelection] = useState<ITemplate>();
@@ -58,7 +58,7 @@ export default function Page() {
                 </>}
         />
         <Splitter className='h-full' style={{ height: '300px' }} layout="vertical">
-            <SplitterPanel className="" size={60}>
+            <SplitterPanel className="px-[7px] " size={60}>
                 <FlowGraph
                     className="rounded-std bg-deep"
                     flows={selection?.flows || []}
@@ -73,16 +73,13 @@ export default function Page() {
                     }}
                 />
             </SplitterPanel>
-            <SplitterPanel className="overflow-auto" size={40}>
+            <SplitterPanel className="overflow-auto px-[7px]" size={40}>
                 <Table className='h-full w-full' data={templates} columns={columns}
                     paginator rows={10}
                     first={0}
                     totalRecords={5}
                     onSelectionChange={e => {
                         setSelection(e.value)
-                    }}
-                    onBlur={() => {
-                        setSelection(undefined)
                     }}
                     selection={selection}
                 />

@@ -135,6 +135,10 @@
 }
 
 .p-splitter {
-    @apply rounded-std border-deep;
-    @apply bg-deep;
+    @apply rounded-std border-deep-strong;
+    @apply bg-deep-strong;
+
+    & .p-splitter-gutter {
+        @apply my-[12px]
+    }
 }

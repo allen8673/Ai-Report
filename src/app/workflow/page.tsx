@@ -55,7 +55,7 @@ export default function Page() {
                 />
             }
         />
-        <Table className='' data={workflows} columns={columns}
+        <Table className='h-full' data={workflows} columns={columns}
             paginator rows={10}
             first={0}
             totalRecords={5}

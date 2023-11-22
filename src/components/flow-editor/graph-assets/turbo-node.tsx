@@ -80,8 +80,8 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
             <div className={`middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] ${running ? "running" : ''}`} >
                 <div className={`inner rounded-std-sm bg-deep-weak`}>
                     <div className={`py-[16px] px-[20px]`}>
-                        <div className={`flex rounded-std-sm text-light`}>
-                            <FontAwesomeIcon className='h-[20px] w-[20px] mr-[8px] mt-[2px]' icon={icon} color={'white'} />
+                        <div className={`flex items-center rounded-std-sm text-light`}>
+                            <FontAwesomeIcon className='h-[30px] w-[30px] mr-[8px] mt-[2px]' icon={icon} color={'white'} />
                             <div>
                                 <div className="text-[20px] mb-[2px] leading-1">{data.name}</div>
                                 <div className="text-[16px] text-light-weak">{data.type}</div>
