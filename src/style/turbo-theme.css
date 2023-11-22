@@ -25,7 +25,7 @@
     @apply bg-turbo-deep;
 }
 
-.zd-table {
+.p-datatable {
     @apply flex flex-col justify-between gap-std-sm;
 
     & .p-datatable-table {
@@ -36,7 +36,7 @@
             @apply border-light-weak;
         }
 
-        & td {
+        & tr {
             @apply text-light bg-deep-weak;
             @apply border-light-weak;
         }
@@ -46,6 +46,10 @@
         @apply bg-deep;
         @apply rounded-std border-light-weak border-[1px];
     }
+}
+
+.p-highlight {
+    @apply bg-turbo-deep-weak text-light !important
 }
 
 .react-flow__handle.source {
