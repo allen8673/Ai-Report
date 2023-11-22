@@ -9,7 +9,6 @@ import SideMenu from './side-menu';
 
 import 'primereact/resources/themes/saga-purple/theme.css';
 // import 'primereact/resources/themes/lara-dark-purple/theme.css';
-import './turbo-layout.css'
 
 export default function TurboLayout({
     children,
@@ -19,7 +18,7 @@ export default function TurboLayout({
     const toast = useRef<Toast>(null);
 
     const showMessage = (msg: string | ShowMessage): void => {
-        const className = 'turbo-toast-message'
+        const className = 'toast-message'
         typeof msg === 'string' ? toast.current?.show({
             severity: 'success',
             detail: msg,

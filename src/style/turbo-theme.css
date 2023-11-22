@@ -39,7 +39,13 @@
         & tr {
             @apply text-light bg-deep-weak;
             @apply border-light-weak;
+
+            &:hover {
+                @apply bg-turbo-deep-weak bg-opacity-50;
+            }
+
         }
+
     }
 
     & .p-paginator {
@@ -49,7 +55,7 @@
 }
 
 .p-highlight {
-    @apply bg-turbo-deep-weak text-light !important
+    @apply bg-turbo-deep-weak text-light !important;
 }
 
 .react-flow__handle.source {
