@@ -30,6 +30,7 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
         initialEdges,
         readonly,
         hideMiniMap,
+        hideCtrls,
         graphRef,
         edgeEditable,
         normalizeNode,
@@ -360,7 +361,7 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
         >
             {children}
             {!hideMiniMap && <MiniMap nodeBorderRadius={2} />}
-            <Controls />
+            {!hideCtrls && <Controls />}
             <Background gap={16} />
         </ReactFlow>
     </div>
