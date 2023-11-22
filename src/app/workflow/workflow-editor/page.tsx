@@ -1,9 +1,10 @@
 'use client'
-import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import _ from "lodash";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
+import { confirmDialog } from "primereact/confirmdialog";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
 
@@ -13,6 +14,7 @@ import TitlePane from "@/components/title-pane";
 import { FlowStatus, IEditWorkflow, IFlow, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
 import { mock_templates, mock_workflows } from "@/mock-data/mock";
+import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 import { coverSearchParamsToObj } from "@/untils/urlHelper";
 
 type EditMode = 'add' | 'normal'
@@ -23,6 +25,8 @@ export default function Page() {
     const { graphRef } = useGraphRef<IFlow, any>();
     const [inEdit, setInEdit] = useState<boolean>()
     const { showMessage } = useLayoutContext();
+    const router = useRouter();
+    const wfUrl = getFullUrl(RouterInfo.WORKFLOW);
 
     useEffect(() => {
         const obj = coverSearchParamsToObj<IEditWorkflow>(searchParams);
@@ -87,15 +91,26 @@ export default function Page() {
         <div className="shrink grow flex flex-col gap-std">
             <TitlePane title={workflow?.name || 'New Workfow'} postContent={
                 <>
-                    <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
-                        severity='info'
-                        tooltip="Save as template"
-                        tooltipOptions={{ position: 'bottom' }}
-                        onClick={() => {
-                        }}
-                    />
                     {inEdit ?
                         <>
+                            <Button icon={<FontAwesomeIcon icon={faTrash} />}
+                                severity='danger'
+                                tooltip="Remove the workflow"
+                                tooltipOptions={{ position: 'bottom' }}
+                                onClick={async () => {
+                                    confirmDialog({
+                                        message: `Do you want to delete ${workflow?.name || 'this workflow'}?`,
+                                        header: `Delete Workflow`,
+                                        icon: 'pi pi-info-circle',
+                                        acceptClassName: 'p-button-danger',
+                                        accept: async () => {
+                                            // TODO: Call API to delete this workflow
+                                            _.remove(mock_workflows, ['id', workflow?.id || ''])
+                                            router.push(wfUrl)
+                                        },
+                                    });
+                                }}
+                            />
                             <Button icon={<FontAwesomeIcon icon={faCancel} />}
                                 severity='secondary'
                                 tooltip="Cancel"
@@ -105,7 +120,6 @@ export default function Page() {
                                     setInEdit(false)
                                 }}
                             />
-
                             <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faSave} />}
                                 label="Save"
                                 tooltipOptions={{ position: 'bottom' }}
@@ -113,12 +127,21 @@ export default function Page() {
                                     const flows: IFlow[] = _.map(graphRef.current?.getNodes() || [], n => ({
                                         ...n.data, position: n.position
                                     }));
+                                    // TODO: Call API to save the edit result
                                     setWorkflow(pre => !!pre ? ({ ...pre, flows }) : pre)
                                     setInEdit(false)
                                 }}
                             />
                         </> :
                         <>
+                            <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
+                                severity='info'
+                                tooltip="Save as template"
+                                tooltipOptions={{ position: 'bottom' }}
+                                onClick={() => {
+
+                                }}
+                            />
                             <Button icon={<FontAwesomeIcon icon={faPlayCircle} />}
                                 severity='success'
                                 tooltip="Run Flow"
