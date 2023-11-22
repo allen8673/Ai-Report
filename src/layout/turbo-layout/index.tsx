@@ -1,4 +1,5 @@
 'use client'
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
 
@@ -39,6 +40,7 @@ export default function TurboLayout({
         <LayoutContext.Provider value={{ showMessage }}>
             <div className="turbo-layout flex items-stretch bg-deep-strong h-screen p-[21px] gap-std">
                 <Toast className='border-0' ref={toast} position='top-center' />
+                <ConfirmDialog />
                 <SideMenu />
                 <main className='main-view grow shrink'>
                     {children}
