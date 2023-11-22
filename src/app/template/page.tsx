@@ -58,12 +58,13 @@ export default function Page() {
                 </>}
         />
         <Splitter className='h-full' style={{ height: '300px' }} layout="vertical">
-            <SplitterPanel className="px-[7px] " size={60}>
+            <SplitterPanel className="px-[7px] " size={40}>
                 <FlowGraph
                     className="rounded-std bg-deep"
                     flows={selection?.flows || []}
                     graphRef={graphRef}
                     hideMiniMap
+                    hideCtrls
                     fitView
                     fitViewOptions={{ duration: 1000 }}
                     onNodesChange={(changes) => {
@@ -73,7 +74,7 @@ export default function Page() {
                     }}
                 />
             </SplitterPanel>
-            <SplitterPanel className="overflow-auto px-[7px]" size={40}>
+            <SplitterPanel className="overflow-auto px-[7px]" size={60}>
                 <Table className='h-full w-full' data={templates} columns={columns}
                     paginator rows={10}
                     first={0}
