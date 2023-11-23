@@ -102,7 +102,7 @@ export const mock_workflows: IWorkflow[] = [
 
 export const mock_templates: ITemplate[] = [
     {
-        id: 'temp-1',
+        id: 'dde9c1d8-15eb-45b1-9cc5-f5c8a12df64d',
         name: 'Base Template',
         "flows": [
             {
@@ -143,7 +143,7 @@ export const mock_templates: ITemplate[] = [
         ],
     },
     {
-        id: 'temp-2',
+        id: '067d661d-125f-41bf-853f-11b373b2e4be',
         name: 'Analyze Attack Events ',
         flows: [
             {

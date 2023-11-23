@@ -1,6 +1,6 @@
 
 import _ from 'lodash';
-import { Column as Col_comp, } from 'primereact/column';
+import { Column, } from 'primereact/column';
 import { DataTable, } from 'primereact/datatable';
 
 import { TableProps } from './table';
@@ -17,14 +17,15 @@ export default function Table<T extends Record<string, any>>({ className, column
         {_.map(columns, ({ key, title, format, ...c }, idx) => {
             const col_key = (key as string) || idx
             return (
-                <Col_comp
+                <Column
                     key={`${table_key}-col-${col_key}`}
                     field={key as string}
                     header={title}
                     body={format}
+                    className='ellipsis'
                     {...c}
                 />
             )
         })}
-    </DataTable>
+    </DataTable >
 }
