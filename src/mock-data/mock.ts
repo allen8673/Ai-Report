@@ -4,7 +4,7 @@ import { ITemplate, IWorkflow } from "@/interface/workflow";
 
 export const mock_workflows: IWorkflow[] = [
     {
-        "id": "wf-3",
+        "id": "d521066f-7f61-4be0-a9b9-a4517edfc825",
         "name": "demo workflow",
         "rootNdeId": "e7bce421-054c-45f6-b663-c8816f75df67",
         "flows": [
@@ -98,46 +98,6 @@ export const mock_workflows: IWorkflow[] = [
             },
         ]
     },
-    {
-        id: 'p-1',
-        name: 'project 1',
-        rootNdeId: 'f-1',
-        flows: [
-            {
-                id: 'f-1',
-                name: 'Upload',
-                type: 'file-upload',
-                position: { x: 100, y: 400 },
-                forwards: ['f-2', 'f-4'],
-            },
-            {
-                id: 'f-2',
-                name: 'analysis ip',
-                type: 'prompt',
-                position: { x: 600, y: 500 },
-                forwards: ['f-5']
-
-            },
-            {
-                id: 'f-4',
-                name: 'analysis add.',
-                type: 'prompt',
-                position: { x: 600, y: 300 },
-                forwards: ['f-5']
-            },
-            {
-                id: 'f-5',
-                name: 'Done',
-                type: 'file-download',
-                position: { x: 1100, y: 400 },
-            }]
-    },
-    {
-        id: 'p-2',
-        name: 'project 2',
-        rootNdeId: 'f-1',
-        flows: []
-    },
 ]
 
 export const mock_templates: ITemplate[] = [
@@ -146,38 +106,38 @@ export const mock_templates: ITemplate[] = [
         name: 'Base Template',
         "flows": [
             {
-                "id": "e693af84-ab03-4e05-8a9a-60fac88745b9",
+                "id": "fafc2d39-2abf-4d47-994d-013b5151ad4c",
                 "name": "Done",
                 "type": "file-download",
                 "position": {
-                    "x": 570,
-                    "y": 390
+                    "x": 800,
+                    "y": 0
                 },
                 "forwards": []
             },
             {
-                "id": "22793a60-abf4-4dbe-b9d7-058b27c1b618",
+                "id": "97f3de08-4f1b-45a5-a549-38e57e376483",
                 "name": "your prompt",
                 "type": "prompt",
                 "position": {
-                    "x": 150,
-                    "y": 390
+                    "x": 400,
+                    "y": 0
                 },
                 "forwards": [
-                    "e693af84-ab03-4e05-8a9a-60fac88745b9"
+                    "fafc2d39-2abf-4d47-994d-013b5151ad4c"
                 ],
                 "prompt": "Hi AI, {PLZ INPUT YOUR PROMT}, then give me an analysis result!"
             },
             {
-                "id": "897c920d-4d52-46a3-bbab-56595de1763e",
+                "id": "52273db9-9caa-484c-947e-878d570bbfbe",
                 "name": "Upload",
                 "type": "file-upload",
                 "position": {
-                    "x": -240,
-                    "y": 390
+                    "x": 0,
+                    "y": 0
                 },
                 "forwards": [
-                    "22793a60-abf4-4dbe-b9d7-058b27c1b618"
+                    "97f3de08-4f1b-45a5-a549-38e57e376483"
                 ]
             }
         ],
@@ -187,92 +147,92 @@ export const mock_templates: ITemplate[] = [
         name: 'Analyze Attack Events ',
         flows: [
             {
-                "id": "d712ac25-0cab-489f-8260-691fd474b581",
+                "id": "336ba94b-9315-40c3-a9fa-5cf668d50182",
                 "name": "defense advice",
                 "type": "prompt",
                 "position": {
-                    "x": 930,
-                    "y": 390
+                    "x": 1200,
+                    "y": 0
                 },
                 "forwards": [
-                    "e693af84-ab03-4e05-8a9a-60fac88745b9"
+                    "72f17e4e-7e55-4bd0-a988-0f7c43893238"
                 ],
                 "prompt": "Hi AI, plz based on the {EVENT IDs} give me some suggestions to defend "
             },
             {
-                "id": "105f51b6-9b23-436f-acb6-9cb649984d80",
+                "id": "f3d851da-3900-4d5f-8e9d-290794740c3c",
                 "name": "attack time",
                 "type": "prompt",
                 "position": {
-                    "x": 530,
-                    "y": 590
+                    "x": 800,
+                    "y": 300
                 },
                 "forwards": [
-                    "d712ac25-0cab-489f-8260-691fd474b581"
+                    "336ba94b-9315-40c3-a9fa-5cf668d50182"
                 ],
                 "prompt": "Hi AI, plz based on the {ALL | SPECIAL CONDITIONS} give me the last {NUMBER} time"
             },
             {
-                "id": "62273699-0512-4f55-a75f-6c54d79dc308",
+                "id": "b4f73c61-e5ae-402d-8dc9-88eb3f7f265b",
                 "name": "attack times",
                 "type": "prompt",
                 "position": {
-                    "x": 530,
-                    "y": 390
+                    "x": 800,
+                    "y": 150
                 },
                 "forwards": [
-                    "d712ac25-0cab-489f-8260-691fd474b581"
+                    "336ba94b-9315-40c3-a9fa-5cf668d50182"
                 ],
                 "prompt": "Hi AI, plz base on {EVEND ID} find {ALL | SPECIAL CONDITIONS} attack source, and count the attack times"
             },
             {
-                "id": "ee3b482c-5591-4820-8488-0ab0661cbcc8",
+                "id": "77fc586a-4ce7-4e57-9398-73750d91fdfe",
                 "name": "the attack source",
                 "type": "prompt",
                 "position": {
-                    "x": 510,
-                    "y": 220
+                    "x": 800,
+                    "y": 0
                 },
                 "forwards": [
-                    "d712ac25-0cab-489f-8260-691fd474b581"
+                    "336ba94b-9315-40c3-a9fa-5cf668d50182"
                 ],
                 "prompt": "Hi AI, plz give me the attack source in {ALL | SPECIAL EVENT IDs}."
             },
             {
-                "id": "e693af84-ab03-4e05-8a9a-60fac88745b9",
+                "id": "72f17e4e-7e55-4bd0-a988-0f7c43893238",
                 "name": "Done",
                 "type": "file-download",
                 "position": {
-                    "x": 1290,
-                    "y": 390
+                    "x": 1600,
+                    "y": 0
                 },
                 "forwards": []
             },
             {
-                "id": "22793a60-abf4-4dbe-b9d7-058b27c1b618",
+                "id": "e369cd2b-6e2f-472e-aeef-97147b4d2782",
                 "name": "IP prompt",
                 "type": "prompt",
                 "position": {
-                    "x": 90,
-                    "y": 390
+                    "x": 400,
+                    "y": 0
                 },
                 "forwards": [
-                    "ee3b482c-5591-4820-8488-0ab0661cbcc8",
-                    "62273699-0512-4f55-a75f-6c54d79dc308",
-                    "105f51b6-9b23-436f-acb6-9cb649984d80"
+                    "77fc586a-4ce7-4e57-9398-73750d91fdfe",
+                    "b4f73c61-e5ae-402d-8dc9-88eb3f7f265b",
+                    "f3d851da-3900-4d5f-8e9d-290794740c3c"
                 ],
                 "prompt": "Hi AI, plz list all attack events regarding {THE IPs}."
             },
             {
-                "id": "897c920d-4d52-46a3-bbab-56595de1763e",
+                "id": "6dc25c53-7615-47f5-a3f8-9c25b565e915",
                 "name": "Upload",
                 "type": "file-upload",
                 "position": {
-                    "x": -270,
-                    "y": 390
+                    "x": 0,
+                    "y": 0
                 },
                 "forwards": [
-                    "22793a60-abf4-4dbe-b9d7-058b27c1b618"
+                    "e369cd2b-6e2f-472e-aeef-97147b4d2782"
                 ]
             }
         ]
