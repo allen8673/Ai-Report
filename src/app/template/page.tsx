@@ -3,7 +3,7 @@ import { faAdd, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from 'primereact/button';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import FlowGraph from '@/components/flow-editor';
 import { useGraphRef } from '@/components/graph/helper';
@@ -36,11 +36,6 @@ export default function Page() {
         }
     ];
     const [selection, setSelection] = useState<ITemplate>();
-
-    useEffect(() => {
-        graphRef.current.reactFlowInstance?.fitView()
-    }, [selection])
-
 
     return <div className="flex h-full flex-col gap-std items-stretch text-light">
         <TitlePane

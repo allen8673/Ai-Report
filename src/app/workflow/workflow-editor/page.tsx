@@ -24,9 +24,11 @@ import { coverSearchParamsToObj } from "@/untils/urlHelper";
 
 type EditMode = 'add' | 'normal'
 
-
+const X_GAP = 430, Y_GAP = 150;
 export default function Page() {
-    const searchParams = useSearchParams()
+    const searchParams = useSearchParams();
+    const paramObj = coverSearchParamsToObj<IEditWorkflow>(searchParams);
+    const mode: EditMode = !!paramObj.id ? 'normal' : 'add';
     const [workflow, setWorkflow] = useState<IWorkflow>();
     const { graphRef } = useGraphRef<IFlow, any>();
     const [inEdit, setInEdit] = useState<boolean>();
@@ -38,21 +40,33 @@ export default function Page() {
     const wfUrl = getFullUrl(RouterInfo.WORKFLOW);
 
     useEffect(() => {
-        const obj = coverSearchParamsToObj<IEditWorkflow>(searchParams);
-        const mode: EditMode = !!obj.id ? 'normal' : 'add';
         setInEdit(mode === 'add');
-        if (mode === 'normal') {
-            setWorkflow(_.find(mock_workflows, ['id', obj.id]))
-        } else {
-            const id = v4();
-            const temps = obj.template?.split(',') || [];
-            const flows: IFlow[] = temps.length > 0 ? _.find(mock_templates, ['id', temps[0]])?.flows || [] : [];
-            setWorkflow({ id, name: obj.name || '', flows, rootNdeId: '' })
-        }
+        mode === 'add' ? prepareNewWorkflow(paramObj) : fetchWorkflow(paramObj.id || '')
     }, []);
 
+    const fetchWorkflow = (id: string) => {
+        // TODO: call API to fetch the workflow
+        setWorkflow(_.find(mock_workflows, ['id', id]));
+    }
+
+    const prepareNewWorkflow = (paramObj: IEditWorkflow): void => {
+        const id = v4();
+        const templateIds = paramObj.template?.split(',') || [];
+        // TODO: call API to fetch the tempplates by ids.
+        const templates = _.filter(mock_templates, t => _.includes(templateIds, t.id));
+        // initialize the workflow by templates
+        const flows: IFlow[] = templates.reduce<IFlow[]>((f, temp) => {
+            const start_y = (_.max(_.map(f, i => i?.position?.y || 0)) || 0) + Y_GAP;
+            const result = temp.flows.map<IFlow>(({ position, ...i }) => ({ ...i, position: { y: start_y + position.y, x: position.x } }))
+            return f.concat(result);
+        }, []);
+
+        const rootNdeId: string[] = _.filter(flows, ['type', 'file-upload']).map(i => i.id)
+
+        setWorkflow({ id, name: paramObj.name || '', flows, rootNdeId })
+    }
+
     const getNewPosition = (nodes: IFlow[], x = 0, y = 0): Record<string, XYPosition> => {
-        const X_GAP = 430, Y_GAP = 150;
         return nodes
             .sort((a, b) => (a.position.y < b.position.y ? -1 : 1))
             .reduce<Record<string, XYPosition>>((result, node) => {
@@ -190,8 +204,19 @@ export default function Page() {
                                     const flows: IFlow[] = _.map(graphRef.current?.getNodes() || [], n => ({
                                         ...n.data, position: n.position
                                     }));
+
                                     // TODO: Call API to save the edit result
-                                    setWorkflow(pre => !!pre ? ({ ...pre, flows }) : pre)
+                                    setWorkflow(pre => {
+                                        const result = !!pre ? ({ ...pre, flows }) : pre
+                                        if (!result) return result;
+
+                                        if (mode === 'add') {
+                                            mock_workflows.push(result)
+                                        }
+
+                                        return result
+                                    });
+
                                     setInEdit(false)
                                 }}
                             />
@@ -214,7 +239,7 @@ export default function Page() {
                                         return { ...pre, data: { ...pre.data, status: 'none', running: false } }
                                     });
                                     await new Promise(resolve => setTimeout(resolve, 500));
-                                    if (!!workflow?.rootNdeId) mock_run([workflow?.rootNdeId])
+                                    if (!!workflow?.rootNdeId) mock_run(workflow?.rootNdeId)
                                 }}
                             />
                             <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}

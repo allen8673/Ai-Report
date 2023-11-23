@@ -6,7 +6,7 @@ export const mock_workflows: IWorkflow[] = [
     {
         "id": "d521066f-7f61-4be0-a9b9-a4517edfc825",
         "name": "demo workflow",
-        "rootNdeId": "e7bce421-054c-45f6-b663-c8816f75df67",
+        "rootNdeId": ["e7bce421-054c-45f6-b663-c8816f75df67"],
         "flows": [
             {
                 "id": "e7bce421-054c-45f6-b663-c8816f75df67",
