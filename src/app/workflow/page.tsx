@@ -37,7 +37,7 @@ export default function Page() {
     }, [])
 
     const columns: Column<IWorkflow>[] = [
-        { key: 'id', title: 'ID' },
+        { key: 'id', title: 'ID', style: { width: '25%' } },
         { key: 'name', title: 'Name' }
     ]
 
@@ -55,7 +55,7 @@ export default function Page() {
                 />
             }
         />
-        <Table className='' data={workflows} columns={columns}
+        <Table className='h-full' data={workflows} columns={columns}
             paginator rows={10}
             first={0}
             totalRecords={5}

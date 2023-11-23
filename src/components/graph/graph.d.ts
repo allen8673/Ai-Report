@@ -26,6 +26,7 @@ export interface GraphProps<NData, EData = any, NNormal = NData, ENormal = EData
     initialEdges?: Edge<EData>[];
     readonly?: boolean;
     hideMiniMap?: boolean;
+    hideCtrls?: boolean;
     graphRef?: React.Ref<GraphInstance<NData, EData>>;
     edgeEditable?: boolean;
     onLoad?: (rfi?: ReactFlowInstance) => void;

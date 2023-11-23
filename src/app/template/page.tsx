@@ -3,7 +3,7 @@ import { faAdd, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from 'primereact/button';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import FlowGraph from '@/components/flow-editor';
 import { useGraphRef } from '@/components/graph/helper';
@@ -19,12 +19,12 @@ export default function Page() {
 
     const { graphRef } = useGraphRef<IFlow, any>();
     const columns: Column<ITemplate>[] = [
-        { key: 'id', title: 'ID' },
+        { key: 'id', title: 'ID', style: { width: '25%' } },
         { key: 'name', title: 'Name' },
         {
             format: (row) => (
                 <FontAwesomeIcon
-                    className='w-[20px] h-[20px] p-[9px] border-solid border-[1px] border-light rounded-std bg-light-weak'
+                    className='w-[19px] h-[19px] p-[9px] border-solid border-[1px] border-light rounded-std bg-light-weak'
                     onClick={e => {
                         e.stopPropagation();
                         alert(`${row.name} (${row.id}) will be deleted`)
@@ -32,15 +32,10 @@ export default function Page() {
 
                     icon={faTrash} />
             ),
-            style: { width: 100 }
+            style: { width: 100, padding: '0px 7px' }
         }
     ];
     const [selection, setSelection] = useState<ITemplate>();
-
-    useEffect(() => {
-        graphRef.current.reactFlowInstance?.fitView()
-    }, [selection])
-
 
     return <div className="flex h-full flex-col gap-std items-stretch text-light">
         <TitlePane
@@ -58,12 +53,13 @@ export default function Page() {
                 </>}
         />
         <Splitter className='h-full' style={{ height: '300px' }} layout="vertical">
-            <SplitterPanel className="" size={60}>
+            <SplitterPanel className="px-[7px] " size={40}>
                 <FlowGraph
                     className="rounded-std bg-deep"
                     flows={selection?.flows || []}
                     graphRef={graphRef}
                     hideMiniMap
+                    hideCtrls
                     fitView
                     fitViewOptions={{ duration: 1000 }}
                     onNodesChange={(changes) => {
@@ -73,16 +69,13 @@ export default function Page() {
                     }}
                 />
             </SplitterPanel>
-            <SplitterPanel className="overflow-auto" size={40}>
+            <SplitterPanel className="overflow-auto px-[7px]" size={60}>
                 <Table className='h-full w-full' data={templates} columns={columns}
                     paginator rows={10}
                     first={0}
                     totalRecords={5}
                     onSelectionChange={e => {
                         setSelection(e.value)
-                    }}
-                    onBlur={() => {
-                        setSelection(undefined)
                     }}
                     selection={selection}
                 />

@@ -32,3 +32,11 @@ body {
     transform: translate(-50%, -50%) rotate(-360deg);
   }
 }
+
+.toast-message {
+  @apply border-0 border-x-[6px]
+}
+
+.ellipsis {
+  @apply text-ellipsis overflow-hidden whitespace-nowrap;
+}

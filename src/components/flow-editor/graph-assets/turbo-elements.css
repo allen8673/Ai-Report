@@ -1,106 +1,91 @@
 @tailwind components;
 
-@layer components {
-    .react-flow__node-turbo {
+.react-flow__node-turbo {
 
-        & .wrapper {
-            overflow: hidden;
-            display: flex;
-            padding: 1px;
-            position: relative;
+    & .wrapper {
+        box-shadow: theme('backgroundImage.turbo-gradient-shadow');
+    }
+
+    &.selected .wrapper {
+        box-shadow: theme('backgroundImage.turbo-gradient-selected');
+    }
+
+    & .gradient:before {
+        content: '';
+        position: absolute;
+        padding-bottom: calc(100% * 1.41421356237);
+        width: calc(100% * 1.41421356237);
+        background: theme('backgroundImage.turbo-gradient');
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 100%;
+    }
+
+    & .icon {
+        border-radius: 100%;
+        width: 30px;
+        height: 30px;
+        padding: 2px;
+        position: absolute;
+        display: flex;
+        transform-origin: center center;
+        overflow: hidden;
+        box-shadow: theme('backgroundImage.turbo-gradient-shadow');
+        z-index: 1;
+
+        & div {
             flex-grow: 1;
-            box-shadow: theme('backgroundImage.turbo-gradient-shadow');
-        }
-
-        &.selected .wrapper {
-            box-shadow: theme('backgroundImage.turbo-gradient-selected');
-        }
-
-        & .gradient:before {
-            content: '';
-            position: absolute;
-            padding-bottom: calc(100% * 1.41421356237);
-            width: calc(100% * 1.41421356237);
-            background: theme('backgroundImage.turbo-gradient');
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
             border-radius: 100%;
-        }
-
-        & .inner {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            flex-grow: 1;
             position: relative;
-        }
-
-        & .icon {
-            border-radius: 100%;
-            width: 30px;
-            height: 30px;
-            padding: 2px;
-            position: absolute;
-            display: flex;
-            transform-origin: center center;
-            overflow: hidden;
-            box-shadow: theme('backgroundImage.turbo-gradient-shadow');
-            z-index: 1;
-
-            & div {
-                flex-grow: 1;
-                border-radius: 100%;
-                position: relative;
-            }
-        }
-
-        & .tip-icon {
-            right: 0;
-            top: 0;
-            transform: translate(50%, -50%);
-        }
-
-        & .status {
-            right: 0;
-            bottom: 0;
-            /* width: 20px; */
-            /* height: 20px; */
-            padding: 2px;
-            transform: translate(50%, 50%);
-        }
-
-        & .running.wrapper.gradient:before {
-            content: '';
-            background: theme('backgroundImage.turbo-gradient-running');
-            animation: spinner 4s linear infinite;
-            transform: translate(-50%, -50%) rotate(0deg);
-            z-index: -1;
         }
     }
 
+    & .tip-icon {
+        right: 0;
+        top: 0;
+        transform: translate(50%, -50%);
+    }
 
-    .turbo-handle {
-        height: 16px !important;
-        width: 16px !important;
-        opacity: 0.75;
-        border: none !important;
-        box-shadow: theme('backgroundImage.turbo-gradient-shadow');
+    & .status {
+        right: 0;
+        bottom: 0;
+        /* width: 20px; */
+        /* height: 20px; */
+        padding: 2px;
+        transform: translate(50%, 50%);
+    }
 
-        &::before {
-            content: '';
-            position: absolute;
-            padding-bottom: 10px;
-            width: 10px;
-            background: black;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 100%;
-        }
+    & .running.wrapper.gradient:before {
+        content: '';
+        background: theme('backgroundImage.turbo-gradient-running');
+        animation: spinner 4s linear infinite;
+        transform: translate(-50%, -50%) rotate(0deg);
+        z-index: -1;
+    }
+}
 
-        &:hover {
-            opacity: 1;
-        }
+
+.turbo-handle {
+    height: 16px !important;
+    width: 16px !important;
+    opacity: 0.75;
+    border: none !important;
+    box-shadow: theme('backgroundImage.turbo-gradient-shadow');
+
+    &::before {
+        content: '';
+        position: absolute;
+        padding-bottom: 10px;
+        width: 10px;
+        background: black;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 100%;
+    }
+
+    &:hover {
+        opacity: 1;
     }
 }

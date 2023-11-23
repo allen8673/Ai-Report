@@ -9,7 +9,7 @@ export interface IEditWorkflow {
 export interface IWorkflow {
     id: string;
     name: string;
-    rootNdeId: string;
+    rootNdeId: string[];
     flows: IFlow[];
     // updater: string;
 }

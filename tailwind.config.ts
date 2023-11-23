@@ -66,7 +66,7 @@ const config: Config = {
           light: 'rgba(234, 179, 8, 0.4)',
           DEFAULT: 'rgba(161, 98, 7, 1)',
           deep: 'rgba(113, 63, 18, 0.4)',
-        }
+        },
       },
       spacing: {
         std: '20px',

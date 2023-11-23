@@ -1,4 +1,5 @@
 'use client'
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
 
@@ -8,7 +9,6 @@ import SideMenu from './side-menu';
 
 import 'primereact/resources/themes/saga-purple/theme.css';
 // import 'primereact/resources/themes/lara-dark-purple/theme.css';
-import './turbo-layout.css'
 
 export default function TurboLayout({
     children,
@@ -18,7 +18,7 @@ export default function TurboLayout({
     const toast = useRef<Toast>(null);
 
     const showMessage = (msg: string | ShowMessage): void => {
-        const className = 'turbo-toast-message'
+        const className = 'toast-message'
         typeof msg === 'string' ? toast.current?.show({
             severity: 'success',
             detail: msg,
@@ -39,6 +39,7 @@ export default function TurboLayout({
         <LayoutContext.Provider value={{ showMessage }}>
             <div className="turbo-layout flex items-stretch bg-deep-strong h-screen p-[21px] gap-std">
                 <Toast className='border-0' ref={toast} position='top-center' />
+                <ConfirmDialog />
                 <SideMenu />
                 <main className='main-view grow shrink'>
                     {children}
