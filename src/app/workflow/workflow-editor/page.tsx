@@ -5,13 +5,17 @@ import _ from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
+import { InputText } from "primereact/inputtext";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
 
 import FlowGraph from "@/components/flow-editor";
+import Form from "@/components/form";
+import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
+import Modal from "@/components/modal";
 import TitlePane from "@/components/title-pane";
-import { FlowStatus, IEditWorkflow, IFlow, IWorkflow } from "@/interface/workflow";
+import { FlowStatus, IEditWorkflow, IFlow, ITemplate, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
 import { mock_templates, mock_workflows } from "@/mock-data/mock";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
@@ -19,11 +23,15 @@ import { coverSearchParamsToObj } from "@/untils/urlHelper";
 
 type EditMode = 'add' | 'normal'
 
+
 export default function Page() {
     const searchParams = useSearchParams()
     const [workflow, setWorkflow] = useState<IWorkflow>();
     const { graphRef } = useGraphRef<IFlow, any>();
-    const [inEdit, setInEdit] = useState<boolean>()
+    const [inEdit, setInEdit] = useState<boolean>();
+    const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
+    const [form, setForm] = useState<FormInstance<ITemplate>>()
+
     const { showMessage } = useLayoutContext();
     const router = useRouter();
     const wfUrl = getFullUrl(RouterInfo.WORKFLOW);
@@ -40,7 +48,36 @@ export default function Page() {
             const flows: IFlow[] = temps.length > 0 ? _.find(mock_templates, ['id', temps[0]])?.flows || [] : [];
             setWorkflow({ id, name: obj.name || '', flows, rootNdeId: '' })
         }
-    }, [])
+    }, []);
+
+
+
+    const saveNewTemplate = ({ name }: ITemplate) => {
+
+        const old_nodes = (workflow?.flows || [])
+        // assign new ids to nodes, and reset the node position
+        const id_trans: Record<string, string> =
+            old_nodes.reduce<Record<string, string>>((result, cur) => {
+                result[cur.id] = v4();
+                return result
+            }, {});
+
+        // assign new ids to nodes, and reset the node position
+        const nodes = old_nodes.reduce<IFlow[]>((result, cur) => {
+            result.push({
+                ...cur,
+                id: (id_trans[cur.id] || ''),
+                forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || []
+            })
+            return result;
+        }, [])
+
+        const template: ITemplate = { id: v4(), name, flows: nodes }
+        //TODO: call API to save the template
+        mock_templates.push(template)
+
+
+    }
 
     const mock_run = (forwards: string[]): void => {
         let next: string[] = [];
@@ -139,7 +176,7 @@ export default function Page() {
                                 tooltip="Save as template"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={() => {
-
+                                    setOpenTemplateModal(true)
                                 }}
                             />
                             <Button icon={<FontAwesomeIcon icon={faPlayCircle} />}
@@ -171,7 +208,35 @@ export default function Page() {
                 hideMiniMap
                 inEdit={inEdit}
             />
+            <Modal
+                title='Save as Template'
+                visible={openTemplateModal}
+                onOk={() => {
+                    form?.submit()
+                        .then(saveNewTemplate)
+                        .catch(() => {
+                            // 
+                        });
+                }}
+                onCancel={() => {
+                    setOpenTemplateModal(false)
+                }}>
+                <Form
+                    onLoad={(form: FormInstance<ITemplate>) => setForm(form)}
+                    onDestroyed={() => {
+                        setForm(undefined)
+                    }}
+                >
+                    {
+                        Item => (
+                            <>
+                                <Item name={'name'} label="Template Name" rules={{ required: 'Please give a template name!' }}>
+                                    <InputText />
+                                </Item>
+                            </>
+                        )
+                    }</Form>
+            </Modal>
         </div>
     </div>
-
 }

@@ -42,7 +42,7 @@ export default function Modal(props: React.PropsWithChildren<ModalProps>) {
                 {!!onOk && <Button label={okLabel || 'OK'} onClick={onOk} />}
             </div>}
         visible={visible}
-        style={{ width: '50vw' }}
+        className="w-4"
         modal
         onMaskClick={cancelByMask ? onCancel : undefined}
         {...others}
