@@ -7,6 +7,7 @@ import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
 import { InputText } from "primereact/inputtext";
 import { useEffect, useState } from "react";
+import { XYPosition } from "reactflow";
 import { v4 } from "uuid";
 
 import FlowGraph from "@/components/flow-editor";
@@ -50,33 +51,58 @@ export default function Page() {
         }
     }, []);
 
+    const getNewPosition = (nodes: IFlow[], x = 0, y = 0): Record<string, XYPosition> => {
+        const X_GAP = 400, Y_GAP = 200;
+        return nodes
+            .sort((a, b) => (a.position.y < b.position.y ? -1 : 1))
+            .reduce<Record<string, XYPosition>>((result, node) => {
+                const forwars_nodes = _.filter(workflow?.flows, n => _.includes(node.forwards, n.id))
+                const merge = _.mergeWith(
+                    result,
+                    getNewPosition(forwars_nodes, x + X_GAP, y),
+                    (obj, src) => {
+                        return { x: _.max([(obj || src).x, src.x || 0]), y: _.min([(obj || src).y, src.y]) }
+                    }
+                );
 
+                result = {
+                    ...merge,
+                    [node.id]: { x, y }
+                }
+                y += Y_GAP;
+
+                return result;
+            }, {})
+    }
 
     const saveNewTemplate = ({ name }: ITemplate) => {
 
         const old_nodes = (workflow?.flows || [])
-        // assign new ids to nodes, and reset the node position
+        // assign new ids to nodes
         const id_trans: Record<string, string> =
             old_nodes.reduce<Record<string, string>>((result, cur) => {
                 result[cur.id] = v4();
                 return result
             }, {});
 
+        // calculate new position for all nodes
+        const startNodes = _.filter(old_nodes, n => { return n.type === 'file-upload' })
+        const position = getNewPosition(startNodes);
         // assign new ids to nodes, and reset the node position
         const nodes = old_nodes.reduce<IFlow[]>((result, cur) => {
             result.push({
                 ...cur,
                 id: (id_trans[cur.id] || ''),
-                forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || []
+                forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || [],
+                position: position[cur.id]
             })
             return result;
-        }, [])
+        }, []);
 
         const template: ITemplate = { id: v4(), name, flows: nodes }
         //TODO: call API to save the template
-        mock_templates.push(template)
-
-
+        mock_templates.push(template);
+        setOpenTemplateModal(false)
     }
 
     const mock_run = (forwards: string[]): void => {
