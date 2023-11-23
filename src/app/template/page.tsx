@@ -1,9 +1,11 @@
 'use client'
 import { faAdd, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import _ from 'lodash';
 import { Button } from 'primereact/button';
+import { confirmDialog } from 'primereact/confirmdialog';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import FlowGraph from '@/components/flow-editor';
 import { useGraphRef } from '@/components/graph/helper';
@@ -15,7 +17,8 @@ import { mock_templates } from "@/mock-data/mock";
 
 export default function Page() {
 
-    const templates: ITemplate[] = mock_templates;
+    const [templates, setTemplates] = useState<ITemplate[]>([]);
+    const [selection, setSelection] = useState<ITemplate>();
 
     const { graphRef } = useGraphRef<IFlow, any>();
     const columns: Column<ITemplate>[] = [
@@ -25,17 +28,30 @@ export default function Page() {
             format: (row) => (
                 <FontAwesomeIcon
                     className='w-[19px] h-[19px] p-[9px] border-solid border-[1px] border-light rounded-std bg-light-weak'
-                    onClick={e => {
+                    onClick={async (e) => {
                         e.stopPropagation();
-                        alert(`${row.name} (${row.id}) will be deleted`)
+                        confirmDialog({
+                            message: `Do you want to delete ${row?.name || 'this template'}?`,
+                            header: `Delete Workflow`,
+                            icon: 'pi pi-info-circle',
+                            acceptClassName: 'p-button-danger',
+                            accept: () => {
+                                // TODO: Call API to delete template
+                                _.remove(mock_templates, ['id', row?.id || '']);
+                                setTemplates([...mock_templates]);
+                                setSelection(pre => pre?.id === row.id ? undefined : pre)
+                            },
+                        });
                     }}
-
                     icon={faTrash} />
             ),
             style: { width: 100, padding: '0px 7px' }
         }
     ];
-    const [selection, setSelection] = useState<ITemplate>();
+
+    useEffect(() => {
+        setTemplates(mock_templates)
+    }, [])
 
     return <div className="flex h-full flex-col gap-std items-stretch text-light">
         <TitlePane
@@ -47,7 +63,7 @@ export default function Page() {
                         label='Add New Template'
                         tooltipOptions={{ position: 'left' }}
                         onClick={() => {
-
+                            //    
                         }}
                     />
                 </>}
@@ -70,12 +86,16 @@ export default function Page() {
                 />
             </SplitterPanel>
             <SplitterPanel className="overflow-auto px-[7px]" size={60}>
-                <Table className='h-full w-full' data={templates} columns={columns}
-                    paginator rows={10}
+                <Table className='h-full w-full'
+                    data={templates}
+
+                    columns={columns}
+                    paginator
+                    rows={10}
                     first={0}
                     totalRecords={5}
                     onSelectionChange={e => {
-                        setSelection(e.value)
+                        setSelection(e.value);
                     }}
                     selection={selection}
                 />
