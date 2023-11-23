@@ -60,6 +60,7 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
     return (
         <>
             <Tooltip target={'.tip-icon'} mouseTrack position='left' />
+            <Tooltip target={'.wf-name'} mouseTrack position='top' />
             {!!iconInfo &&
                 <div className={`tip-icon icon gradient ${openable ? "cursor-pointer" : ''}
                     ${iconHighlight ? 'text-light' : 'text-light-weak'} 
@@ -77,13 +78,23 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                     </div>
                 </div >}
             {getStatusIcon(data.status)}
-            <div className={`middle wrapper gradient rounded-std-sm flex-center flex-col gap-[5px] ${running ? "running" : ''}`} >
-                <div className={`inner rounded-std-sm bg-deep-weak`}>
-                    <div className={`py-[16px] px-[20px]`}>
+            <div className={`wrapper gradient
+            overflow-hidden
+            p-[1px]
+            relative
+            rounded-std-sm 
+            flex-center 
+            flex-col 
+            gap-[5px]
+            ${running ? "running" : ''}`} >
+                <div className={`inner relative flex rounded-std-sm bg-deep-weak`}>
+                    <div className={`py-[16px] px-[20px] min-w-[190px] max-w-[260px]`}>
                         <div className={`flex items-center rounded-std-sm text-light`}>
                             <FontAwesomeIcon className='h-[30px] w-[30px] mr-[8px] mt-[2px]' icon={icon} color={'white'} />
-                            <div>
-                                <div className="text-[20px] mb-[2px] leading-1">{data.name}</div>
+                            <div className='grow shrink overflow-hidden'>
+                                <div className="text-[20px] mb-[2px] leading-1 ellipsis wf-name"
+                                    data-pr-tooltip={data.name}
+                                >{data.name}</div>
                                 <div className="text-[16px] text-light-weak">{data.type}</div>
                             </div>
                         </div>

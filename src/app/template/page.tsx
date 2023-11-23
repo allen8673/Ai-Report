@@ -19,7 +19,7 @@ export default function Page() {
 
     const { graphRef } = useGraphRef<IFlow, any>();
     const columns: Column<ITemplate>[] = [
-        { key: 'id', title: 'ID' },
+        { key: 'id', title: 'ID', style: { width: '25%' } },
         { key: 'name', title: 'Name' },
         {
             format: (row) => (

@@ -52,7 +52,7 @@ export default function Page() {
     }, []);
 
     const getNewPosition = (nodes: IFlow[], x = 0, y = 0): Record<string, XYPosition> => {
-        const X_GAP = 400, Y_GAP = 150;
+        const X_GAP = 430, Y_GAP = 150;
         return nodes
             .sort((a, b) => (a.position.y < b.position.y ? -1 : 1))
             .reduce<Record<string, XYPosition>>((result, node) => {

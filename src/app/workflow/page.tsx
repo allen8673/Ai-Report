@@ -37,7 +37,7 @@ export default function Page() {
     }, [])
 
     const columns: Column<IWorkflow>[] = [
-        { key: 'id', title: 'ID' },
+        { key: 'id', title: 'ID', style: { width: '25%' } },
         { key: 'name', title: 'Name' }
     ]
 
