@@ -1,6 +1,7 @@
 'use client'
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 import _ from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
@@ -16,14 +17,13 @@ import Table from "@/components/table";
 import { Column } from "@/components/table/table";
 import TitlePane from "@/components/title-pane";
 import { IEditWorkflow, ITemplate, IWorkflow } from "@/interface/workflow";
-import { mock_templates, mock_workflows } from "@/mock-data/mock";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 import { coverToQueryString } from "@/untils/urlHelper";
 
 export default function Page() {
 
-    const workflows = mock_workflows
 
+    const [workflows, setWorkflow] = useState<IWorkflow[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<IEditWorkflow>>()
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([])
@@ -31,9 +31,20 @@ export default function Page() {
     const router = useRouter();
     const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
 
-    useEffect(() => {
-        const opts = _.map<ITemplate, SelectItem>(mock_templates, t => ({ label: t.name, value: t.id }))
+    const getTemplateOpts = async () => {
+        const res = await axios.get(`${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
+        const opts = _.map<ITemplate, SelectItem>(res.data || [], t => ({ label: t.name, value: t.id }))
         setTemplateOpts(opts)
+    }
+
+    const getWorkflows = async () => {
+        const rsp = await axios.get<IWorkflow[]>(`${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_WORKFLOW_API}`);
+        setWorkflow(rsp.data)
+    }
+
+    useEffect(() => {
+        getWorkflows()
+        getTemplateOpts()
     }, [])
 
     const columns: Column<IWorkflow>[] = [
