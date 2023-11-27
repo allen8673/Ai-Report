@@ -1,19 +1,25 @@
 import { XYPosition } from "reactflow";
 
+
 export interface IEditWorkflow {
     id?: string;
     name?: string;
     template?: string;
 }
 
+/**
+ * the interface for the diagram of AI report
+ */
 export interface IWorkflow {
     id: string;
     name: string;
     rootNdeId: string[];
     flows: IFlow[];
-    // updater: string;
 }
 
+/**
+ * the interface for the template
+ */
 export interface ITemplate {
     id: string;
     name: string;

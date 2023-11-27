@@ -8,7 +8,7 @@ import { mock_templates } from "@/mock-data/mock"
 export async function GET(request: NextRequest) {
     const id = request.nextUrl.searchParams.get('id');
     const data = id ? _.find(mock_templates, ['id', id]) : _.map(mock_templates, d => ({ id: d.id, name: d.name }))
-    return Response.json(data)
+    return Response.json(data || null)
 }
 
 export async function POST(request: NextRequest) {
