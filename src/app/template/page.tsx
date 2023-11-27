@@ -37,7 +37,7 @@ export default function Page() {
                             acceptClassName: 'p-button-danger',
                             accept: async () => {
                                 // TODO: Call API to delete template
-                                const rsp = await axios.delete<ApiResult>(`${process.env.NEXT_PUBLIC_API_HOST}${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${row?.id || ''}`,);
+                                const rsp = await axios.delete<ApiResult>(`${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${row?.id || ''}`,);
                                 if (rsp.data.status === 'failure') return;
                                 await fetchTemplates();
                                 setSelection(pre => pre?.id === row.id ? undefined : pre)
@@ -52,7 +52,7 @@ export default function Page() {
     ];
 
     const fetchTemplates = async () => {
-        const rsp = await axios.get(`${process.env.NEXT_PUBLIC_API_HOST}${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
+        const rsp = await axios.get(`${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
         setTemplates(rsp.data)
     }
 
@@ -101,7 +101,7 @@ export default function Page() {
                     first={0}
                     totalRecords={5}
                     onSelectionChange={async e => {
-                        const rsp = await axios.get(`${process.env.NEXT_PUBLIC_API_HOST}${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${e.value.id}`)
+                        const rsp = await axios.get(`${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${e.value.id}`)
                         setSelection(rsp.data);
                     }}
                     selection={selection}
