@@ -16,16 +16,21 @@ import Modal from "@/components/modal";
 import Table from "@/components/table";
 import { Column } from "@/components/table/table";
 import TitlePane from "@/components/title-pane";
-import { IEditWorkflow, ITemplate, IWorkflow } from "@/interface/workflow";
+import { ITemplate, IWorkflow } from "@/interface/workflow";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 import { coverToQueryString } from "@/untils/urlHelper";
 
-export default function Page() {
+interface FormData {
+    id?: string;
+    name?: string;
+    template?: string[];
+}
 
+export default function Page() {
 
     const [workflows, setWorkflow] = useState<IWorkflow[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
-    const [form, setForm] = useState<FormInstance<IEditWorkflow>>()
+    const [form, setForm] = useState<FormInstance<FormData>>()
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([])
 
     const router = useRouter();
@@ -79,7 +84,11 @@ export default function Page() {
             onOk={() => {
                 form?.submit()
                     .then(({ name, template }) => {
-                        router.push(`${editorUrl}${coverToQueryString({ name, template: _.join(template || [], ',') })}`);
+                        const queries: { [key: string]: string | undefined } = { name }
+                        if (!!template?.length) {
+                            queries.template = _.join(template || [], ',')
+                        }
+                        router.push(`${editorUrl}${coverToQueryString(queries)}`);
                     }).catch(() => {
                         // 
                     });
@@ -88,7 +97,7 @@ export default function Page() {
                 setAddNewFlow(false)
             }}>
             <Form
-                onLoad={(form: FormInstance<IEditWorkflow>) => setForm(form)}
+                onLoad={(form: FormInstance<FormData>) => setForm(form)}
                 onDestroyed={() => {
                     setForm(undefined)
                 }}
