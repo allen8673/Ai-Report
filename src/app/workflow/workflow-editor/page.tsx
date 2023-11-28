@@ -21,7 +21,7 @@ import { ApiResult } from "@/interface/api";
 import { FlowStatus, IEditWorkflow, IFlow, ITemplate, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
-import { coverSearchParamsToObj } from "@/untils/urlHelper";
+import { coverSearchParamsToObj } from "@/utils/url-helper";
 
 type EditMode = 'add' | 'normal'
 

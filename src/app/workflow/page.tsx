@@ -18,7 +18,7 @@ import { Column } from "@/components/table/table";
 import TitlePane from "@/components/title-pane";
 import { ITemplate, IWorkflow } from "@/interface/workflow";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
-import { coverToQueryString } from "@/untils/urlHelper";
+import { coverToQueryString } from "@/utils/url-helper";
 
 interface FormData {
     id?: string;
