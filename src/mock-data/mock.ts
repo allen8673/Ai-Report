@@ -104,6 +104,7 @@ export const mock_templates: ITemplate[] = [
     {
         id: 'dde9c1d8-15eb-45b1-9cc5-f5c8a12df64d',
         name: 'Base Template',
+        "rootNdeId": ["52273db9-9caa-484c-947e-878d570bbfbe"],
         "flows": [
             {
                 "id": "fafc2d39-2abf-4d47-994d-013b5151ad4c",
@@ -145,6 +146,7 @@ export const mock_templates: ITemplate[] = [
     {
         id: '067d661d-125f-41bf-853f-11b373b2e4be',
         name: 'Analyze Attack Events ',
+        "rootNdeId": ["6dc25c53-7615-47f5-a3f8-9c25b565e915"],
         flows: [
             {
                 "id": "336ba94b-9315-40c3-a9fa-5cf668d50182",

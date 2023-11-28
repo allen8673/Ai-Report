@@ -1,7 +1,6 @@
 'use client'
 import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
 import _ from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
@@ -11,6 +10,8 @@ import { useEffect, useState } from "react";
 import { XYPosition } from "reactflow";
 import { v4 } from "uuid";
 
+import apiCaller from "@/api-helpers/api-caller";
+import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowGraph from "@/components/flow-editor";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
@@ -21,7 +22,6 @@ import { ApiResult } from "@/interface/api";
 import { FlowStatus, IEditWorkflow, IFlow, ITemplate, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
-import { coverSearchParamsToObj } from "@/untils/urlHelper";
 
 type EditMode = 'add' | 'normal'
 
@@ -47,10 +47,7 @@ export default function Page() {
 
     const fetchWorkflow = async (id: string) => {
         // TODO: call API to fetch the workflow
-        const res =
-            await axios.get<IWorkflow>(
-                `${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${id}`
-            );
+        const res = await apiCaller.get(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${id}`)
         setWorkflow(res.data);
     }
 
@@ -61,9 +58,7 @@ export default function Page() {
         const templates: ITemplate[] = [];
         for (const temp_id of templateIds) {
             const rsp =
-                await axios.get<ITemplate>(
-                    `${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${temp_id}`
-                );
+                await apiCaller.get<ITemplate>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${temp_id}`);
             if (!!rsp.data) templates.push(rsp.data)
         }
 
@@ -126,11 +121,9 @@ export default function Page() {
             return result;
         }, []);
 
-        const template: ITemplate = { id: v4(), name, flows: nodes }
+        const template: ITemplate = { id: v4(), rootNdeId: [], name, flows: nodes }
         //TODO: call API to save the template
-        await axios.post(
-            `${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_WORKFLOW_API}`,
-            template);
+        await apiCaller.post(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, template);
         setOpenTemplateModal(false)
     }
 
@@ -197,7 +190,7 @@ export default function Page() {
                                         acceptClassName: 'p-button-danger',
                                         accept: async () => {
                                             // TODO: Call API to delete this workflow
-                                            const rsp = await axios.delete<ApiResult>(`${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${workflow?.id || ''}`,);
+                                            const rsp = await apiCaller.delete<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${workflow?.id || ''}`,);
                                             if (rsp.data.status === 'failure') return;
                                             router.push(wfUrl)
                                         },
@@ -226,15 +219,9 @@ export default function Page() {
                                         const result: (IWorkflow | undefined) = !!pre ? ({ ...pre, flows }) : pre
                                         if (!result) return result;
                                         if (mode === 'add') {
-                                            axios.post<ApiResult>(
-                                                `${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_WORKFLOW_API}`,
-                                                result
-                                            );
+                                            apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, result);
                                         } else {
-                                            axios.put<ApiResult>(
-                                                `${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_WORKFLOW_API}`,
-                                                result
-                                            );
+                                            apiCaller.put<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, result);
                                         }
                                         return result
                                     });

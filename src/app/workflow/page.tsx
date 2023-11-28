@@ -1,7 +1,6 @@
 'use client'
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
 import _ from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
@@ -10,6 +9,8 @@ import { MultiSelect } from "primereact/multiselect";
 import { SelectItem } from "primereact/selectitem";
 import { useEffect, useState } from 'react'
 
+import apiCaller from "@/api-helpers/api-caller";
+import { coverToQueryString } from "@/api-helpers/url-helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import Modal from "@/components/modal";
@@ -18,7 +19,6 @@ import { Column } from "@/components/table/table";
 import TitlePane from "@/components/title-pane";
 import { ITemplate, IWorkflow } from "@/interface/workflow";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
-import { coverToQueryString } from "@/untils/urlHelper";
 
 interface FormData {
     id?: string;
@@ -37,13 +37,13 @@ export default function Page() {
     const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
 
     const getTemplateOpts = async () => {
-        const res = await axios.get(`${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
+        const res = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
         const opts = _.map<ITemplate, SelectItem>(res.data || [], t => ({ label: t.name, value: t.id }))
         setTemplateOpts(opts)
     }
 
     const getWorkflows = async () => {
-        const rsp = await axios.get<IWorkflow[]>(`${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_WORKFLOW_API}`);
+        const rsp = await apiCaller.get<IWorkflow[]>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`);
         setWorkflow(rsp.data)
     }
 
