@@ -24,6 +24,7 @@ export interface ITemplate {
     id: string;
     name: string;
     flows: IFlow[]
+    rootNdeId: string[];
 }
 
 export type FlowTyep = 'prompt' | 'file-upload' | 'file-download';
