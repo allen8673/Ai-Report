@@ -1,12 +1,12 @@
 'use client'
 import { faAdd, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios'
 import { Button } from 'primereact/button';
 import { confirmDialog } from 'primereact/confirmdialog';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import { useEffect, useState } from 'react';
 
+import apiCaller from '@/api-helpers/api-caller';
 import FlowGraph from '@/components/flow-editor';
 import { useGraphRef } from '@/components/graph/helper';
 import Table from '@/components/table';
@@ -37,7 +37,7 @@ export default function Page() {
                             acceptClassName: 'p-button-danger',
                             accept: async () => {
                                 // TODO: Call API to delete template
-                                const rsp = await axios.delete<ApiResult>(`${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${row?.id || ''}`,);
+                                const rsp = await apiCaller.delete<ApiResult>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${row?.id || ''}`);
                                 if (rsp.data.status === 'failure') return;
                                 await fetchTemplates();
                                 setSelection(pre => pre?.id === row.id ? undefined : pre)
@@ -52,7 +52,7 @@ export default function Page() {
     ];
 
     const fetchTemplates = async () => {
-        const rsp = await axios.get(`${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
+        const rsp = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
         setTemplates(rsp.data)
     }
 
@@ -101,7 +101,7 @@ export default function Page() {
                     first={0}
                     totalRecords={5}
                     onSelectionChange={async e => {
-                        const rsp = await axios.get(`${(process.env.NEXT_PUBLIC_API_HOST || '')}${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${e.value.id}`)
+                        const rsp = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${e.value.id}`)
                         setSelection(rsp.data);
                     }}
                     selection={selection}
