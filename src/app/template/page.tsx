@@ -1,19 +1,19 @@
 'use client'
 import { faAdd, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import _ from 'lodash';
 import { Button } from 'primereact/button';
 import { confirmDialog } from 'primereact/confirmdialog';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import { useEffect, useState } from 'react';
 
+import apiCaller from '@/api-helpers/api-caller';
 import FlowGraph from '@/components/flow-editor';
 import { useGraphRef } from '@/components/graph/helper';
 import Table from '@/components/table';
 import { Column } from '@/components/table/table';
 import TitlePane from '@/components/title-pane';
+import { ApiResult } from '@/interface/api';
 import { IFlow, ITemplate } from '@/interface/workflow';
-import { mock_templates } from "@/mock-data/mock";
 
 export default function Page() {
 
@@ -35,11 +35,13 @@ export default function Page() {
                             header: `Delete Workflow`,
                             icon: 'pi pi-info-circle',
                             acceptClassName: 'p-button-danger',
-                            accept: () => {
+                            accept: async () => {
                                 // TODO: Call API to delete template
-                                _.remove(mock_templates, ['id', row?.id || '']);
-                                setTemplates([...mock_templates]);
+                                const rsp = await apiCaller.delete<ApiResult>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${row?.id || ''}`);
+                                if (rsp.data.status === 'failure') return;
+                                await fetchTemplates();
                                 setSelection(pre => pre?.id === row.id ? undefined : pre)
+
                             },
                         });
                     }}
@@ -49,8 +51,13 @@ export default function Page() {
         }
     ];
 
+    const fetchTemplates = async () => {
+        const rsp = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
+        setTemplates(rsp.data)
+    }
+
     useEffect(() => {
-        setTemplates(mock_templates)
+        fetchTemplates()
     }, [])
 
     return <div className="flex h-full flex-col gap-std items-stretch text-light">
@@ -88,14 +95,14 @@ export default function Page() {
             <SplitterPanel className="overflow-auto px-[7px]" size={60}>
                 <Table className='h-full w-full'
                     data={templates}
-
                     columns={columns}
                     paginator
                     rows={10}
                     first={0}
                     totalRecords={5}
-                    onSelectionChange={e => {
-                        setSelection(e.value);
+                    onSelectionChange={async e => {
+                        const rsp = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${e.value.id}`)
+                        setSelection(rsp.data);
                     }}
                     selection={selection}
                 />

@@ -10,17 +10,18 @@ import { useEffect, useState } from "react";
 import { XYPosition } from "reactflow";
 import { v4 } from "uuid";
 
+import apiCaller from "@/api-helpers/api-caller";
+import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowGraph from "@/components/flow-editor";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/title-pane";
+import { ApiResult } from "@/interface/api";
 import { FlowStatus, IEditWorkflow, IFlow, ITemplate, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
-import { mock_templates, mock_workflows } from "@/mock-data/mock";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
-import { coverSearchParamsToObj } from "@/untils/urlHelper";
 
 type EditMode = 'add' | 'normal'
 
@@ -44,16 +45,23 @@ export default function Page() {
         mode === 'add' ? prepareNewWorkflow(paramObj) : fetchWorkflow(paramObj.id || '')
     }, []);
 
-    const fetchWorkflow = (id: string) => {
+    const fetchWorkflow = async (id: string) => {
         // TODO: call API to fetch the workflow
-        setWorkflow(_.find(mock_workflows, ['id', id]));
+        const res = await apiCaller.get(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${id}`)
+        setWorkflow(res.data);
     }
 
-    const prepareNewWorkflow = (paramObj: IEditWorkflow): void => {
+    const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
         const id = v4();
         const templateIds = paramObj.template?.split(',') || [];
         // TODO: call API to fetch the tempplates by ids.
-        const templates = _.filter(mock_templates, t => _.includes(templateIds, t.id));
+        const templates: ITemplate[] = [];
+        for (const temp_id of templateIds) {
+            const rsp =
+                await apiCaller.get<ITemplate>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${temp_id}`);
+            if (!!rsp.data) templates.push(rsp.data)
+        }
+
         // initialize the workflow by templates
         const flows: IFlow[] = templates.reduce<IFlow[]>((f, temp) => {
             const start_y = (_.max(_.map(f, i => i?.position?.y || 0)) || 0) + Y_GAP;
@@ -89,7 +97,7 @@ export default function Page() {
             }, {})
     }
 
-    const saveNewTemplate = ({ name }: ITemplate) => {
+    const saveNewTemplate = async ({ name }: ITemplate) => {
 
         const old_nodes = (workflow?.flows || [])
         // assign new ids to nodes
@@ -113,9 +121,9 @@ export default function Page() {
             return result;
         }, []);
 
-        const template: ITemplate = { id: v4(), name, flows: nodes }
+        const template: ITemplate = { id: v4(), rootNdeId: [], name, flows: nodes }
         //TODO: call API to save the template
-        mock_templates.push(template);
+        await apiCaller.post(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, template);
         setOpenTemplateModal(false)
     }
 
@@ -182,7 +190,8 @@ export default function Page() {
                                         acceptClassName: 'p-button-danger',
                                         accept: async () => {
                                             // TODO: Call API to delete this workflow
-                                            _.remove(mock_workflows, ['id', workflow?.id || ''])
+                                            const rsp = await apiCaller.delete<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${workflow?.id || ''}`,);
+                                            if (rsp.data.status === 'failure') return;
                                             router.push(wfUrl)
                                         },
                                     });
@@ -207,13 +216,13 @@ export default function Page() {
 
                                     // TODO: Call API to save the edit result
                                     setWorkflow(pre => {
-                                        const result = !!pre ? ({ ...pre, flows }) : pre
+                                        const result: (IWorkflow | undefined) = !!pre ? ({ ...pre, flows }) : pre
                                         if (!result) return result;
-
                                         if (mode === 'add') {
-                                            mock_workflows.push(result)
+                                            apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, result);
+                                        } else {
+                                            apiCaller.put<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, result);
                                         }
-
                                         return result
                                     });
 

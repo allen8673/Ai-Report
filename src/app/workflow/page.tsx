@@ -9,31 +9,47 @@ import { MultiSelect } from "primereact/multiselect";
 import { SelectItem } from "primereact/selectitem";
 import { useEffect, useState } from 'react'
 
+import apiCaller from "@/api-helpers/api-caller";
+import { coverToQueryString } from "@/api-helpers/url-helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import Modal from "@/components/modal";
 import Table from "@/components/table";
 import { Column } from "@/components/table/table";
 import TitlePane from "@/components/title-pane";
-import { IEditWorkflow, ITemplate, IWorkflow } from "@/interface/workflow";
-import { mock_templates, mock_workflows } from "@/mock-data/mock";
+import { ITemplate, IWorkflow } from "@/interface/workflow";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
-import { coverToQueryString } from "@/untils/urlHelper";
+
+interface FormData {
+    id?: string;
+    name?: string;
+    template?: string[];
+}
 
 export default function Page() {
 
-    const workflows = mock_workflows
-
+    const [workflows, setWorkflow] = useState<IWorkflow[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
-    const [form, setForm] = useState<FormInstance<IEditWorkflow>>()
+    const [form, setForm] = useState<FormInstance<FormData>>()
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([])
 
     const router = useRouter();
     const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
 
-    useEffect(() => {
-        const opts = _.map<ITemplate, SelectItem>(mock_templates, t => ({ label: t.name, value: t.id }))
+    const getTemplateOpts = async () => {
+        const res = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
+        const opts = _.map<ITemplate, SelectItem>(res.data || [], t => ({ label: t.name, value: t.id }))
         setTemplateOpts(opts)
+    }
+
+    const getWorkflows = async () => {
+        const rsp = await apiCaller.get<IWorkflow[]>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`);
+        setWorkflow(rsp.data)
+    }
+
+    useEffect(() => {
+        getWorkflows()
+        getTemplateOpts()
     }, [])
 
     const columns: Column<IWorkflow>[] = [
@@ -68,7 +84,11 @@ export default function Page() {
             onOk={() => {
                 form?.submit()
                     .then(({ name, template }) => {
-                        router.push(`${editorUrl}${coverToQueryString({ name, template: _.join(template || [], ',') })}`);
+                        const queries: { [key: string]: string | undefined } = { name }
+                        if (!!template?.length) {
+                            queries.template = _.join(template || [], ',')
+                        }
+                        router.push(`${editorUrl}${coverToQueryString(queries)}`);
                     }).catch(() => {
                         // 
                     });
@@ -77,7 +97,7 @@ export default function Page() {
                 setAddNewFlow(false)
             }}>
             <Form
-                onLoad={(form: FormInstance<IEditWorkflow>) => setForm(form)}
+                onLoad={(form: FormInstance<FormData>) => setForm(form)}
                 onDestroyed={() => {
                     setForm(undefined)
                 }}
