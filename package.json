@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "env-cmd -f .env next build",
     "build:pm2": "env-cmd -f .env.pm2 next build",
     "start": "next start -p 8000",
     "lint": "next lint"

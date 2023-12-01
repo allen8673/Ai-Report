@@ -1,10 +1,10 @@
 import Axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 import _ from 'lodash';
 
-const API_PROTOCOL: string = process.env.NEXT_PUBLIC_API_PROTOCOL || window.location.protocol.replace(':', '');
+// const API_PROTOCOL: string = process.env.NEXT_PUBLIC_API_PROTOCOL || window.location.protocol.replace(':', '');
 const API_HOSTNAME: string = process.env.NEXT_PUBLIC_API_HOST || window.location.hostname;
 const API_PORT: string | undefined = process.env.NEXT_PUBLIC_API_PORT;
-const API_BASE_HOST: string = `${API_PROTOCOL}://${API_HOSTNAME}`;
+const API_BASE_HOST: string = API_HOSTNAME; //`${API_PROTOCOL}://${API_HOSTNAME}`;
 const API_BASE_URL: string = !!API_PORT ? `${API_BASE_HOST}:${API_PORT}/api` : `${API_BASE_HOST}/api`;
 
 /**
