@@ -286,6 +286,7 @@ export default function Page() {
                     onDestroyed={() => {
                         setForm(undefined)
                     }}
+                    onSubmit={saveNewTemplate}
                 >
                     {
                         Item => (
