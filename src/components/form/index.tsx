@@ -43,10 +43,12 @@ export default function Form<T extends Record<string, any>>(props: FormProps<T>)
         onLoad,
         className,
         itemClassName,
-        onDestroyed
+        onDestroyed,
+        onSubmit
     } = props;
 
     const { form: formInstance } = useForm<T>(form, defaultValues);
+    const { formCore, submit } = formInstance
 
     const itemElem = GetItem({ formCore: formInstance.formCore, className: itemClassName });
     useEffect(() => {
@@ -54,7 +56,11 @@ export default function Form<T extends Record<string, any>>(props: FormProps<T>)
         return onDestroyed
     }, [])
 
-    return <form className={`zd-form text-deep ${className}`}>
+    return <form className={`zd-form text-deep ${className}`}
+        onSubmit={formCore.handleSubmit(async () => {
+            const data = await submit();
+            await onSubmit?.(data);
+        })}>
         {children(itemElem)}
     </form>
 }

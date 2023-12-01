@@ -24,6 +24,7 @@ export interface FormProps<T extends Record<string, any>> {
     onDestroyed?: () => void
     className?: string;
     itemClassName?: string;
+    onSubmit?: (data: T) => void
 }
 
 export interface FormInstance<T extends FormValue> {
