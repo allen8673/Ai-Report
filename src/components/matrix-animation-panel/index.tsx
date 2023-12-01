@@ -37,13 +37,12 @@ export default function AatrixAnimationPanel({
         timer = setInterval(draw, 33);
     }
 
-    window.addEventListener('resize', setCanvasSize);
-
     useEffect(() => {
         if (!canvasRef.current) return;
         ctxRef.current = canvasRef.current.getContext('2d');
         setCanvasSize();
 
+        window.addEventListener('resize', setCanvasSize);
         return () => {
             window.removeEventListener('resize', setCanvasSize);
         };
