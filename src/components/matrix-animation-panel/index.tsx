@@ -18,24 +18,35 @@ export default function AatrixAnimationPanel({
     size = 30
 }: AatrixAnimationPanelProps) {
 
-    const alphabet = text.split('');
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const ctxRef = React.useRef<CanvasRenderingContext2D | null>(null)
-    // const ctxRef = canvasRef?.current?.getContext('2d');
-    const drops: number[] = []
+    const ctxRef = React.useRef<CanvasRenderingContext2D | null>(null);
+    const alphabet = text.split('');
+    const drops: number[] = [];
 
-    useEffect(() => {
+    let timer: NodeJS.Timeout | undefined;
 
+    const setCanvasSize = (): void => {
         if (!canvasRef.current) return;
+        if (!!timer) clearInterval(timer)
         canvasRef.current.width = window.innerWidth;
-        canvasRef.current.height = window.innerHeight
-        ctxRef.current = canvasRef.current.getContext('2d');
+        canvasRef.current.height = window.innerHeight;
         const columns = canvasRef.current.width / size;
         for (let x = 0; x < columns; x++) {
             drops[x] = 0;
         }
-        setInterval(draw, 33);
+        timer = setInterval(draw, 33);
+    }
 
+    window.addEventListener('resize', setCanvasSize);
+
+    useEffect(() => {
+        if (!canvasRef.current) return;
+        ctxRef.current = canvasRef.current.getContext('2d');
+        setCanvasSize();
+
+        return () => {
+            window.removeEventListener('resize', setCanvasSize);
+        };
     }, []);
 
     function draw() {
@@ -47,7 +58,6 @@ export default function AatrixAnimationPanel({
         ctx.font = `${size}px arial`;
 
         for (let i = 0; i < drops.length; i++) {
-            // const text = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
             const text = randomPermutaion ?
                 alphabet[Math.floor(Math.random() * alphabet.length)] :
                 alphabet[(drops[i] % alphabet.length)];

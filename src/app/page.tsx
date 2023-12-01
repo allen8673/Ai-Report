@@ -5,7 +5,7 @@ export default function Home() {
     <div className="flex-center w-full h-full text-light" >
       <h1 className={`
       position: absolute 
-      text-9xl 
+      text-7xl 
       text-turbo-deep-strong
       text-shadow-lg
       shadow-turbo-light
