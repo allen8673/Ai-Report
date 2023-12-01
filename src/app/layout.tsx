@@ -14,7 +14,7 @@ import '../style/globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Frontend Starter',
+  title: 'AI Report',
   description: 'the Frontend startkit',
 };
 
