@@ -1,4 +1,5 @@
-import type { Config } from 'tailwindcss';
+import type { Config, } from 'tailwindcss';
+import plugin from 'tailwindcss/plugin';
 
 const config: Config = {
   content: [
@@ -16,6 +17,11 @@ const config: Config = {
         'turbo-gradient-shadow': '10px 0 15px rgba(42, 138, 246, 0.3), -10px 0 15px rgba(233, 42, 103, 0.3)',
         'turbo-gradient-selected': '0px 0 40px rgba(42, 138, 246, 0.7), -0px 0 40px rgba(233, 42, 103, 0.3)',
         'turbo-gradient-running': 'conic-gradient(from -160deg at 50% 50%, #e92a67 0deg, #a853ba 120deg, #2a8af6 240deg, rgba(42, 138, 246, 0) 360deg)',
+      },
+      textShadow: {
+        sm: '0 1px 2px var(--tw-shadow-color)',
+        DEFAULT: '0 2px 4px var(--tw-shadow-color)',
+        lg: '10px 8px 16px var(--tw-shadow-color)',
       },
       keyframes: {
         spinner: {
@@ -75,6 +81,17 @@ const config: Config = {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function ({ matchUtilities, theme }) {
+      matchUtilities(
+        {
+          'text-shadow': (value) => ({
+            textShadow: value,
+          }),
+        },
+        { values: theme('textShadow') }
+      )
+    }),
+  ],
 };
 export default config;
