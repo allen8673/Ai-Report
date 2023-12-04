@@ -11,7 +11,7 @@ export const calculateDepth = (nodes: IFlow[], fullFlows: IFlow[], deep = 0): vo
     });
 }
 
-const X_GAP = 430, Y_GAP = 150;
+export const X_GAP = 430, Y_GAP = 150;
 export const getNewPosition = (nodes: IFlow[], flows: IFlow[] = [], x = 0, y = 0): Record<string, XYPosition> => {
     return nodes
         .sort((a, b) => (a.position.y < b.position.y ? -1 : 1))

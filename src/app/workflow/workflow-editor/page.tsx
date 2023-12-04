@@ -12,7 +12,7 @@ import { v4 } from "uuid";
 import apiCaller from "@/api-helpers/api-caller";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowGraph from "@/components/flow-editor";
-import { calculateDepth, getNewPosition } from "@/components/flow-editor/helper";
+import { Y_GAP, calculateDepth, getNewPosition } from "@/components/flow-editor/helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
