@@ -7,8 +7,8 @@ export default function Home() {
       position: absolute 
       text-7xl 
       text-turbo-deep-strong
-      text-shadow-lg
-      shadow-turbo-light
+      text-shadow-center
+      shadow-turbo-deep
       `}>Welcome AI Report</h1>
       <AatrixAnimationPanel
         text="NATIONAL INSTITUTE FOR CYBER SECURITY"

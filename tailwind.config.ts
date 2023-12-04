@@ -21,7 +21,8 @@ const config: Config = {
       textShadow: {
         sm: '0 1px 2px var(--tw-shadow-color)',
         DEFAULT: '0 2px 4px var(--tw-shadow-color)',
-        lg: '10px 8px 16px var(--tw-shadow-color)',
+        lg: '0px 4px 8px var(--tw-shadow-color)',
+        center: '0px 0px 10px var(--tw-shadow-color)',
       },
       keyframes: {
         spinner: {
