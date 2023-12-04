@@ -51,7 +51,7 @@ export default function AatrixAnimationPanel({
     function draw() {
         if (!ctxRef.current || !canvasRef.current) return;
         const ctx = ctxRef.current
-        ctx.fillStyle = "rgba(0,0,0,0.05)";
+        ctx.fillStyle = "rgba(0,0,0,0.1)";
         ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
         ctx.fillStyle = fontColor // "#0F0";
         ctx.font = `${size}px arial`;

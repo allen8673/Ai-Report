@@ -149,7 +149,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
                 }}
                 onMouseUp={(e, position) => {
                     if (!onDragItem || !position) return;
-                    const id = v4();
+                    const id = `tmp_${v4()}`;
                     graphRef.current?.addNode({ id, position, data: { ...onDragItem, id, position, forwards: [] }, type: 'turbo' });
                     setOnDragItem(() => undefined);
                 }}

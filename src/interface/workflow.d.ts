@@ -42,5 +42,6 @@ export interface IFlow extends IFlowBase {
     position: XYPosition;
     running?: boolean;
     status?: FlowStatus;
+    depth?: number;
 }
 
