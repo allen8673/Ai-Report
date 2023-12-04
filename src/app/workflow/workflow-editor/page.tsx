@@ -7,12 +7,12 @@ import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
 import { InputText } from "primereact/inputtext";
 import { useEffect, useState } from "react";
-import { XYPosition } from "reactflow";
 import { v4 } from "uuid";
 
 import apiCaller from "@/api-helpers/api-caller";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowGraph from "@/components/flow-editor";
+import { calculateDepth, getNewPosition } from "@/components/flow-editor/helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
@@ -25,7 +25,6 @@ import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
 type EditMode = 'add' | 'normal'
 
-const X_GAP = 430, Y_GAP = 150;
 export default function Page() {
     const searchParams = useSearchParams();
     const paramObj = coverSearchParamsToObj<IEditWorkflow>(searchParams);
@@ -74,29 +73,6 @@ export default function Page() {
         setWorkflow({ id, name: paramObj.name || '', flows, rootNdeId })
     }
 
-    const getNewPosition = (nodes: IFlow[], x = 0, y = 0): Record<string, XYPosition> => {
-        return nodes
-            .sort((a, b) => (a.position.y < b.position.y ? -1 : 1))
-            .reduce<Record<string, XYPosition>>((result, node) => {
-                const forwars_nodes = _.filter(workflow?.flows, n => _.includes(node.forwards, n.id))
-                const merge = _.mergeWith(
-                    result,
-                    getNewPosition(forwars_nodes, x + X_GAP, y),
-                    (obj, src) => {
-                        return { x: _.max([(obj || src).x, src.x || 0]), y: _.min([(obj || src).y, src.y]) }
-                    }
-                );
-
-                result = {
-                    ...merge,
-                    [node.id]: { x, y }
-                }
-                y += Y_GAP;
-
-                return result;
-            }, {})
-    }
-
     const saveNewTemplate = async ({ name }: ITemplate) => {
 
         const old_nodes = (workflow?.flows || [])
@@ -109,7 +85,7 @@ export default function Page() {
 
         // calculate new position for all nodes
         const startNodes = _.filter(old_nodes, n => { return n.type === 'file-upload' })
-        const position = getNewPosition(startNodes);
+        const position = getNewPosition(startNodes, old_nodes);
         // assign new ids to nodes, and reset the node position
         const nodes = old_nodes.reduce<IFlow[]>((result, cur) => {
             result.push({
@@ -121,12 +97,14 @@ export default function Page() {
             return result;
         }, []);
 
+        calculateDepth(nodes.filter(n => n.type === 'file-upload'), nodes);
         const template: ITemplate = {
             id: '', //v4(),
             rootNdeId: [],
             name,
             flows: nodes
         }
+
         //TODO: call API to save the template
         await apiCaller.post(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, template);
         setOpenTemplateModal(false)
@@ -218,11 +196,11 @@ export default function Page() {
                                     const flows: IFlow[] = _.map(graphRef.current?.getNodes() || [], n => ({
                                         ...n.data, position: n.position
                                     }));
-
                                     // TODO: Call API to save the edit result
                                     setWorkflow(pre => {
                                         const result: (IWorkflow | undefined) = !!pre ? ({ ...pre, flows }) : pre
                                         if (!result) return result;
+                                        calculateDepth(result.flows.filter(n => n.type === 'file-upload'), result.flows);
                                         if (mode === 'add') {
                                             apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, result);
                                         } else {
