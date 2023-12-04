@@ -52,7 +52,7 @@ export default function Page() {
     }
 
     const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
-        const id = v4();
+        const id = '';//v4();
         const templateIds = paramObj.template?.split(',') || [];
         // TODO: call API to fetch the tempplates by ids.
         const templates: ITemplate[] = [];
@@ -103,7 +103,7 @@ export default function Page() {
         // assign new ids to nodes
         const id_trans: Record<string, string> =
             old_nodes.reduce<Record<string, string>>((result, cur) => {
-                result[cur.id] = v4();
+                result[cur.id] = `tmp_${v4()}`;
                 return result
             }, {});
 
@@ -121,7 +121,12 @@ export default function Page() {
             return result;
         }, []);
 
-        const template: ITemplate = { id: v4(), rootNdeId: [], name, flows: nodes }
+        const template: ITemplate = {
+            id: '', //v4(),
+            rootNdeId: [],
+            name,
+            flows: nodes
+        }
         //TODO: call API to save the template
         await apiCaller.post(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, template);
         setOpenTemplateModal(false)
