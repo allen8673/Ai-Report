@@ -106,7 +106,7 @@ export default function Page() {
         }
 
         //TODO: call API to save the template
-        await apiCaller.post(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, template);
+        await apiCaller.post(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`, template);
         setOpenTemplateModal(false)
     }
 
