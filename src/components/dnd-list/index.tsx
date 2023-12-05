@@ -8,7 +8,10 @@ import { v4 } from 'uuid'
 
 import { DndContextProps, DndDroppableProps, DndItemProps, DndListProps } from "./dnd-list"
 
-const DndContext = <T extends { [key: string]: any }>({
+type GenericType = { [key: string]: any } | string;
+
+const DndContext = <T extends GenericType>({
+    id,
     items,
     className,
     style,
@@ -27,7 +30,7 @@ const DndContext = <T extends { [key: string]: any }>({
         onDragStart?.(initial, items[initial.source.index]);
     };
     return (
-        <div id="dnd-context" className={className} style={style} >
+        <div id={id || "dnd-context"} className={className} style={style} >
             <DragDropContext onDragEnd={dndOnDragEnd} onDragStart={dndOnDragStart}>
                 {children(items)}
             </DragDropContext>
@@ -35,7 +38,7 @@ const DndContext = <T extends { [key: string]: any }>({
     );
 };
 
-const DndDroppable = <T extends { [key: string]: any }>({
+const DndDroppable = <T extends GenericType>({
     items = [],
     droppableId,
     type,
@@ -56,7 +59,7 @@ const DndDroppable = <T extends { [key: string]: any }>({
     );
 };
 
-const RbDndItem = <T extends { [key: string]: any }>({
+const RbDndItem = <T extends { [key: string]: any } | string>({
     item,
     index,
     renderContent,
@@ -71,7 +74,7 @@ const RbDndItem = <T extends { [key: string]: any }>({
         <Element
             key={index}
             className="dnd-item"
-            name={item?.id || ''}
+            name={(typeof item === 'string' ? item : item?.id) || ''}
             onClick={(): void => {
                 onClickItem?.(item);
             }}
@@ -95,7 +98,8 @@ const RbDndItem = <T extends { [key: string]: any }>({
     );
 };
 
-export default function DndList<T extends { [key: string]: any }>({
+export default function DndList<T extends { [key: string]: any } | string>({
+    id,
     renderContent,
     items,
     className,
@@ -111,6 +115,7 @@ export default function DndList<T extends { [key: string]: any }>({
     disableWholeDraghandle,
     disableChangeOrder,
     direction,
+    onChange
 }: DndListProps<T>) {
     const [_items, setItems] = useState<T[]>(items || []);
     _items.map
@@ -119,6 +124,7 @@ export default function DndList<T extends { [key: string]: any }>({
             // default behavior is move the item according to dropdown position
             setItems((pre) => {
                 pre.splice(result?.destination?.index || 0, 0, pre.splice(result.source.index, 1)[0]);
+                onChange?.(pre);
                 return [...pre];
             });
         }
@@ -129,7 +135,7 @@ export default function DndList<T extends { [key: string]: any }>({
         setItems(items);
     }, [items]);
 
-    return <DndContext className={`w-full h-full ${className || ''}`} {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}>
+    return <DndContext id={id} className={`w-full h-full ${className || ''}`} {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}>
         {(_items): JSX.Element => (
             <DndDroppable className="w-full h-full" items={_items} droppableId={droppableId} direction={direction}>
                 {(_items): React.JSX.Element[] =>

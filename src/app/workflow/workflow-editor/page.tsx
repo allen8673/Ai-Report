@@ -272,7 +272,7 @@ export default function Page() {
                     onSubmit={saveNewTemplate}
                 >
                     {
-                        Item => (
+                        ({ Item }) => (
                             <>
                                 <Item name={'name'} label="Template Name" rules={{ required: 'Please give a template name!' }}>
                                     <InputText />

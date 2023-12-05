@@ -2,6 +2,7 @@ import { CSSProperties } from 'react';
 import { DroppableProvided, DraggableProvided, DropResult, DragStart, Direction } from 'react-beautiful-dnd';
 
 export interface DndContextProps<T> {
+    id?: string
     items: T[];
     onSelectItem?: any;
     className?: string;
@@ -38,6 +39,7 @@ export interface DndItemProps<T> {
 }
 
 export interface DndListProps<T> extends Omit<DndContextProps<T>, 'children' | 'items' | 'onDragEnd'> {
+    id?: string;
     items?: T[];
     droppableId?: string;
     isDragDisabled?: boolean;
@@ -50,4 +52,5 @@ export interface DndListProps<T> extends Omit<DndContextProps<T>, 'children' | '
     onMouseDownItem?: (item: T) => void;
     onDragEnd?: (result: DropResult, resultItems: T[]) => void;
     direction?: Direction
+    onChange?: (values: T[]) => void;
 }

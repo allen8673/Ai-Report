@@ -8,7 +8,11 @@ import {
     RegisterOptions,
     UseFormReturn,
     UseFormStateReturn,
-    DefaultValues
+    DefaultValues,
+    FieldArrayPath,
+    FieldArrayWithId,
+    UseFieldArrayReturn,
+    ArrayPath
 } from "react-hook-form";
 
 import { FormInstance, FormItemProps, FormValue, GetItemProps } from "./form";
@@ -19,11 +23,10 @@ export type FormCoreInstance<T extends FormValue> = UseFormReturn<T, T, any>;
 export interface FormProps<T extends Record<string, any>> {
     form?: FormInstance<T>;
     defaultValues?: DefaultValues<T>;
-    children: (formItem: (props: FormItemProps<T>) => React.JSX.Element) => ReactNode;
+    children: (props: { Item: (props: FormItemProps<T>) => React.JSX.Element; List: (props: FormListProps<T>) => React.JSX.Elemen }) => ReactNode;
     onLoad?: (formInstance: FormInstance<T>) => void;
     onDestroyed?: () => void
     className?: string;
-    itemClassName?: string;
     onSubmit?: (data: T) => void
 }
 
@@ -35,7 +38,6 @@ export interface FormInstance<T extends FormValue> {
 }
 export interface GetItemProps<T extends FormValue> {
     formCore: FormCoreInstance<T>;
-    className?: string;
 }
 
 export interface FormItemChildren<T extends FormValue> {
@@ -46,8 +48,22 @@ export interface FormItemChildren<T extends FormValue> {
 
 export interface FormItemProps<T extends FormValue> {
     name: Path<T>;
+    className?: string;
     children: React.ReactElement | ((props: FormItemChildren<T>) => React.ReactElement);
     label?: string;
     rules?: Omit<RegisterOptions<T, Path<T>>, "disabled" | "valueAsNumber" | "valueAsDate" | "setValueAs">;
     valuePropName?: string;
+    disableFlowLabel?: boolean;
+}
+
+export interface FormListChildren<T extends FormValue> {
+    fields: FieldArrayWithId<T, ArrayPath<T>, "id">[];
+
+}
+
+export interface FormListProps<T extends FormValue> {
+    name: FieldArrayPath<T>;
+    className?: string;
+    children: ((props: UseFieldArrayReturn<T, ArrayPath<T>, "id">) => React.ReactElement);
+    label?: string;
 }

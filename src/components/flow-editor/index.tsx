@@ -168,7 +168,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
                     defaultValues={openModal}
                     onLoad={form => setForm(form)}
                     onDestroyed={() => setForm(undefined)}>{
-                        (Item) =>
+                        ({ Item }) =>
                             <>
                                 <Item name='name' label="Name" >
                                     <InputText />
