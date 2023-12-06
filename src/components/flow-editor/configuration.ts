@@ -18,15 +18,20 @@ export const REPORT_ITEMS: IFlowBase[] = [
         type: 'prompt'
     },
     {
-        id: 'file-upload',
-        name: 'Upload',
-        type: 'file-upload'
+        id: 'template',
+        name: 'Template',
+        type: 'template'
     },
-    {
-        id: 'file-download',
-        name: 'Done',
-        type: 'file-download'
-    },
+    // {
+    //     id: 'file-upload',
+    //     name: 'Upload',
+    //     type: 'file-upload'
+    // },
+    // {
+    //     id: 'file-download',
+    //     name: 'Done',
+    //     type: 'file-download'
+    // },
 ]
 
 export interface IconInfo {
