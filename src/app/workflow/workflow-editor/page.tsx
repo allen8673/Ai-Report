@@ -1,7 +1,7 @@
 'use client'
 import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { debounce, filter, includes, map, range, some, uniq } from "lodash";
+import { cloneDeep, debounce, filter, find, includes, map, range, remove, some, uniq } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
@@ -68,8 +68,8 @@ export default function Page() {
 
     const fetchWorkflow = async (id: string) => {
         // TODO: call API to fetch the workflow
-        const res = await apiCaller.get(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${id}`)
-        setWorkflow(res.data);
+        const wf = await (await apiCaller.get(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${id}`)).data
+        setWorkflow(wf);
     }
 
     const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
@@ -175,6 +175,59 @@ export default function Page() {
     const saveNewTemplate = async ({ name }: ITemplate) => {
 
         const old_nodes = (workflow?.flows || [])
+        // assign new ids to nodes
+        const id_trans: Record<string, string> = getNewIdTrans(old_nodes)
+
+        // calculate new position for all nodes
+        const startNodes = filter(old_nodes, n => { return n.type === 'Input' })
+        const position = getNewPosition(startNodes, old_nodes);
+        // assign new ids to nodes, and reset the node position
+        const nodes = old_nodes.reduce<IFlow[]>((result, cur) => {
+            result.push({
+                ...cur,
+                id: (id_trans[cur.id] || ''),
+                forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || [],
+                position: position[cur.id]
+            })
+            return result;
+        }, []);
+
+        calculateDepth(nodes.filter(n => n.type === 'Input'), nodes);
+        const template: ITemplate = {
+            id: '', //v4(),
+            rootNdeId: [],
+            name,
+            flows: nodes
+        }
+
+        //TODO: call API to save the template
+        await apiCaller.post(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`, template);
+        setOpenTemplateModal(false)
+    }
+
+    const saveNewTemplate_withRefWF = async ({ name }: ITemplate) => {
+
+        const old_nodes = cloneDeep(workflow?.flows || []);
+
+        // get reference wfs
+        for (const ref_wf of filter(old_nodes, n => n.type === 'Workflow')) {
+            const wf = await (await apiCaller.get<IWorkflow>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${ref_wf.workflowId}`)).data;
+            if (!!wf) {
+                for (const src of filter(old_nodes, n => includes(n.forwards, ref_wf.id))) {
+                    if (!src.forwards) continue;
+                    remove(src.forwards, ref_wf.id);
+                    src.forwards.push(...(find(wf.flows, f => f.type === 'Input')?.forwards || []))
+                }
+                const wf_end = find(wf.flows, f => f.type === 'Output')
+                for (const tar of filter(wf.flows, n => includes(n.forwards, wf_end?.id || ''))) {
+                    tar.forwards = ref_wf.forwards
+                }
+                old_nodes.push(...wf.flows.filter(f => !includes(['Input', 'Output'], f.type)))
+                remove(old_nodes, ['id', ref_wf.id]);
+            }
+
+        }
+
         // assign new ids to nodes
         const id_trans: Record<string, string> = getNewIdTrans(old_nodes)
 
@@ -334,13 +387,13 @@ export default function Page() {
                                     }
 
                                     // TODO: will allow the reference wf save as template in step 2
-                                    if (some(workflow?.flows, (f => f.type === 'Workflow'))) {
-                                        showMessage({
-                                            message: `Cannot be saved as a template since we don't allow the workflow reference to be saved into a template.`,
-                                            type: 'error'
-                                        })
-                                        return
-                                    }
+                                    // if (some(workflow?.flows, (f => f.type === 'Workflow'))) {
+                                    //     showMessage({
+                                    //         message: `Cannot be saved as a template since we don't allow the workflow reference to be saved into a template.`,
+                                    //         type: 'error'
+                                    //     })
+                                    //     return
+                                    // }
                                     setOpenTemplateModal(true)
                                 }}
                             />
@@ -386,7 +439,7 @@ export default function Page() {
                 visible={openTemplateModal}
                 onOk={() => {
                     form?.submit()
-                        .then(saveNewTemplate)
+                        .then(saveNewTemplate_withRefWF)
                         .catch(() => {
                             // 
                         });
@@ -399,7 +452,7 @@ export default function Page() {
                     onDestroyed={() => {
                         setForm(undefined)
                     }}
-                    onSubmit={saveNewTemplate}
+                    onSubmit={saveNewTemplate_withRefWF}
                 >
                     {
                         ({ Item }) => (
