@@ -1,4 +1,4 @@
-import { IconDefinition, faUpload, faDownload, faBrain, faCloudUpload, faCloud, faFileArrowUp, faComment, faCloudDownload, faShapes } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition, faUpload, faDownload, faBrain, faCloudUpload, faCloud, faFileArrowUp, faComment, faCloudDownload, faShareNodes } from '@fortawesome/free-solid-svg-icons'
 import { Edge, MarkerType } from 'reactflow';
 
 import { FlowTyep, IFlowBase } from '@/interface/workflow';
@@ -19,7 +19,7 @@ export const REPORT_ITEMS: IFlowBase[] = [
     },
     {
         id: 'workflow',
-        name: 'Template',
+        name: 'Workflow',
         type: 'Workflow'
     },
     // {
@@ -42,15 +42,17 @@ export interface IconInfo {
 
 export const flowInfoMap: {
     [type in FlowTyep]: {
-        nodeType: '' | 'start' | 'end',
+        nodeType: '' | 'start' | 'end';
+        nodeName?: string;
         icon: IconDefinition;
-        actIcon?: IconInfo,
-        editIcon?: IconInfo
+        actIcon?: IconInfo;
+        editIcon?: IconInfo;
     }
 } = {
     'Input': {
         nodeType: 'start',
         icon: faUpload,
+        nodeName: 'Upload',
         actIcon: {
             icon: faCloudUpload,
             label: 'the files has uploaded.'
@@ -76,7 +78,7 @@ export const flowInfoMap: {
     },
     'Workflow': {
         nodeType: '',
-        icon: faShapes,
+        icon: faShareNodes,
         actIcon: {
             icon: faCloud,
             label: 'the prompt is set up.'
@@ -89,6 +91,7 @@ export const flowInfoMap: {
     },
     'Output': {
         nodeType: 'end',
+        nodeName: 'Done',
         icon: faDownload,
         actIcon: {
             icon: faCloudDownload,

@@ -12,6 +12,8 @@ import { v4 } from "uuid";
 import apiCaller from "@/api-helpers/api-caller";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowGraph from "@/components/flow-editor";
+import { flowInfoMap } from "@/components/flow-editor/configuration";
+import { IWorkflowMap } from "@/components/flow-editor/context";
 import { X_GAP, calculateDepth, getNewIdTrans, getNewPosition } from "@/components/flow-editor/helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
@@ -33,7 +35,7 @@ export default function Page() {
     const { graphRef } = useGraphRef<IFlow, any>();
     const [inEdit, setInEdit] = useState<boolean>();
     const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
-    const [templateMap, setTemplateMap] = useState<{ [id: string]: string }>({})
+    const [workflowMap, setWorkflowMap] = useState<IWorkflowMap>({})
     const [form, setForm] = useState<FormInstance<ITemplate>>()
 
     const { showMessage } = useLayoutContext();
@@ -55,10 +57,10 @@ export default function Page() {
     }
 
     const fetchTemplateData = async () => {
-        const temps = (await apiCaller.get<ITemplate[]>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`)).data;
+        const temps = (await apiCaller.get<IWorkflow[]>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`)).data;
         if (!temps) return;
 
-        setTemplateMap(temps.reduce<{ [id: string]: string }>((pre, temp) => {
+        setWorkflowMap(temps.reduce<{ [id: string]: string }>((pre, temp) => {
             pre[temp.id] = temp.name
             return pre;
         }, {}))
@@ -104,9 +106,17 @@ export default function Page() {
             const doneId = `tmp_${v4()}`
             const flows: IFlow[] = [
                 {
-                    id: doneId, type: 'Output', name: 'Done', position: { x: X_GAP * 3, y: 0 }
+                    id: doneId,
+                    type: 'Output',
+                    name: flowInfoMap['Output'].nodeName,
+                    position: { x: X_GAP * 3, y: 0 }
                 },
-                { id: rootId, type: 'Input', name: 'Upload', position: { x: 0, y: 0 } },
+                {
+                    id: rootId,
+                    type: 'Input',
+                    name: flowInfoMap['Input'].nodeName,
+                    position: { x: 0, y: 0 }
+                },
 
             ]
             setWorkflow({ id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
@@ -335,7 +345,7 @@ export default function Page() {
                 graphRef={graphRef}
                 hideMiniMap
                 inEdit={inEdit}
-                templateMap={templateMap}
+                workflowMap={workflowMap}
             />
             <Modal
                 title='Save as Template'

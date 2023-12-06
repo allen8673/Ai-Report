@@ -20,7 +20,7 @@ import { useGraphRef } from "../graph/helper";
 import Modal from "../modal";
 
 import { EDGE_DEF_SETTING, REPORT_ITEMS } from "./configuration";
-import { FlowGrapContext, ITemplateMap } from "./context";
+import { FlowGrapContext, IWorkflowMap } from "./context";
 import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import ReportItem from "./report-item";
@@ -41,12 +41,12 @@ interface FlowGraphProps extends Omit<GraphProps<IFlow>,
     'readonly'> {
     flows: IFlow[];
     inEdit?: boolean;
-    templateMap: ITemplateMap
+    workflowMap: IWorkflowMap
 }
 
 const UNREMOVABLE_TYPES: FlowTyep[] = ['Input', 'Output']
 
-export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templateMap, ...others }: FlowGraphProps) {
+export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workflowMap, ...others }: FlowGraphProps) {
 
     const [onDragItem, setOnDragItem] = useState<IFlowBase>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
@@ -101,7 +101,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templa
         graphRef.current.setEdges(e => ({ ...e, deletable: inEdit, selected: false, }));
     }, [inEdit]);
 
-    return <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, templateMap }}>
+    return <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, workflowMap }}>
         <div className="flow-editor h-full w-full relative">
             {inEdit && <div className={`absolute 
             z-20 
@@ -170,7 +170,13 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templa
                 onMouseUp={(e, position) => {
                     if (!onDragItem || !position) return;
                     const id = `tmp_${v4()}`;
-                    graphRef.current?.addNode({ id, position, data: { ...onDragItem, id, position, forwards: [] }, type: 'turbo' });
+                    graphRef.current?.addNode({
+                        id, position,
+                        data: {
+                            ...onDragItem,
+                            id, position, forwards: []
+                        }, type: 'turbo'
+                    });
                     setOnDragItem(() => undefined);
                 }}
                 fitView
@@ -245,8 +251,8 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templa
                     {
                         ({ Item }) =>
                         (<>
-                            <Item name='workflowId' label="Template" >
-                                <Dropdown options={map<ITemplateMap, SelectItem>(templateMap, (v, k) => ({ label: v, value: k }))} />
+                            <Item name='workflowId' label="Select a reference workflow" >
+                                <Dropdown options={map<IWorkflowMap, SelectItem>(workflowMap, (v, k) => ({ label: v, value: k }))} />
                             </Item>
                         </>)
                     }
