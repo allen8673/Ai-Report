@@ -44,7 +44,7 @@ interface FlowGraphProps extends Omit<GraphProps<IFlow>,
     templateMap: ITemplateMap
 }
 
-const UNREMOVABLE_TYPES: FlowTyep[] = ['file-upload', 'file-download']
+const UNREMOVABLE_TYPES: FlowTyep[] = ['Input', 'Output']
 
 export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templateMap, ...others }: FlowGraphProps) {
 
@@ -182,7 +182,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templa
                 title="Set the prompt"
                 onOk={setPrompt}
                 onCancel={closeModal}
-                visible={openModal?.type === 'prompt'}
+                visible={openModal?.type === 'Normal'}
             >
                 <Form
                     defaultValues={openModal}
@@ -204,7 +204,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templa
                 title="Upload your files"
                 onOk={() => setOpenModal(undefined)}
                 okLabel="Close"
-                visible={openModal?.type === 'file-upload'}
+                visible={openModal?.type === 'Input'}
             >
                 <FileUpload name="upload" url={''}
                     mode='advanced'
@@ -219,7 +219,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templa
                 className="preview-doc-modal"
                 onOk={() => setOpenModal(undefined)}
                 okLabel="Close"
-                visible={openModal?.type === 'file-download'}
+                visible={openModal?.type === 'Output'}
                 contentClassName="flex"
                 footer={<div className="flex justify-center">
                     {<Button label='Download' severity='secondary' onClick={() => {
@@ -233,21 +233,22 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templa
                 </Fieldset>
             </Modal>
             <Modal
-                title="Set Template"
+                title="Workflow Reference"
                 onOk={setTemplate}
                 onCancel={closeModal}
-                visible={openModal?.type === 'template'}
+                visible={openModal?.type === 'Workflow'}
             >
                 <Form
                     defaultValues={openModal}
                     onLoad={form => setTempForm(form)}
-                    onDestroyed={() => setTempForm(undefined)}>{
+                    onDestroyed={() => setTempForm(undefined)}>
+                    {
                         ({ Item }) =>
-                            <>
-                                <Item name='templateId' label="Template" >
-                                    <Dropdown options={map<ITemplateMap, SelectItem>(templateMap, (v, k) => ({ label: v, value: k }))} />
-                                </Item>
-                            </>
+                        (<>
+                            <Item name='templateId' label="Template" >
+                                <Dropdown options={map<ITemplateMap, SelectItem>(templateMap, (v, k) => ({ label: v, value: k }))} />
+                            </Item>
+                        </>)
                     }
                 </Form>
             </Modal>

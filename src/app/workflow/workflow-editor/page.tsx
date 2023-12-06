@@ -82,7 +82,7 @@ export default function Page() {
         const doneId = `tmp_${v4()}`
         let x = 0, idx = 0;
         const flows: IFlow[] = [
-            { id: rootId, type: 'file-upload', name: 'Upload', position: { x, y } }
+            { id: rootId, type: 'Input', name: 'Upload', position: { x, y } }
         ]
 
         for (const temp_id of templateIds) {
@@ -90,8 +90,7 @@ export default function Page() {
             x += X_GAP;
             flows.push({
                 id,
-                type: 'template',
-                // name: templateMap[temp_id],
+                type: 'Workflow',
                 templateId: temp_id,
                 position: { x, y }
             });
@@ -110,7 +109,7 @@ export default function Page() {
         flows.push(
             {
                 id: doneId,
-                type: 'file-download',
+                type: 'Output',
                 name: 'Done',
                 position: { x, y }
             }
@@ -135,7 +134,7 @@ export default function Page() {
             }, {});
 
         // calculate new position for all nodes
-        const startNodes = _.filter(old_nodes, n => { return n.type === 'file-upload' })
+        const startNodes = _.filter(old_nodes, n => { return n.type === 'Input' })
         const position = getNewPosition(startNodes, old_nodes);
         // assign new ids to nodes, and reset the node position
         const nodes = old_nodes.reduce<IFlow[]>((result, cur) => {
@@ -148,7 +147,7 @@ export default function Page() {
             return result;
         }, []);
 
-        calculateDepth(nodes.filter(n => n.type === 'file-upload'), nodes);
+        calculateDepth(nodes.filter(n => n.type === 'Input'), nodes);
         const template: ITemplate = {
             id: '', //v4(),
             rootNdeId: [],
@@ -179,7 +178,7 @@ export default function Page() {
                     if (pre.id == 'f-2') status = 'failure';
                     else if (pre.id == 'f-5') status = 'warning';
 
-                    if (pre.data.type === 'file-download') {
+                    if (pre.data.type === 'Output') {
                         report = <>{_.map(_.range(0, 30), () => (<p>
                             <p className="m-0">
                                 Next.js is a React framework for building full-stack web applications. You use React Components to build user interfaces, and Next.js for additional features and optimizations.
@@ -251,7 +250,7 @@ export default function Page() {
                                     setWorkflow(pre => {
                                         const result: (IWorkflow | undefined) = !!pre ? ({ ...pre, flows }) : pre
                                         if (!result) return result;
-                                        calculateDepth(result.flows.filter(n => n.type === 'file-upload'), result.flows);
+                                        calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
                                         if (mode === 'add') {
                                             apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, result);
                                         } else {

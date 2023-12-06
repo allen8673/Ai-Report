@@ -15,12 +15,12 @@ export const REPORT_ITEMS: IFlowBase[] = [
     {
         id: 'custom-prompt',
         name: 'Custom Prompt',
-        type: 'prompt'
+        type: 'Normal'
     },
     {
-        id: 'template',
+        id: 'workflow',
         name: 'Template',
-        type: 'template'
+        type: 'Workflow'
     },
     // {
     //     id: 'file-upload',

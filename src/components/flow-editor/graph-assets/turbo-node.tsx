@@ -94,7 +94,7 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                             <div className='grow shrink overflow-hidden'>
                                 <div className="text-[20px] mb-[2px] leading-1 ellipsis wf-name"
                                     data-pr-tooltip={data.name}
-                                >{data.type === 'template' ? templateMap[data.templateId || ''] : data.name}</div>
+                                >{data.type === 'Workflow' ? templateMap[data.templateId || ''] : data.name}</div>
                                 <div className="text-[16px] text-light-weak">{data.type}</div>
                             </div>
                         </div>
