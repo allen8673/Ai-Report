@@ -69,7 +69,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templa
     const setTemplate = () => {
         const val = tempForm?.getValues();
         if (!val) return
-        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, templateId: val.templateId } }))
+        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, workflowId: val.workflowId } }))
         setOpenModal(undefined);
     }
 
@@ -245,7 +245,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templa
                     {
                         ({ Item }) =>
                         (<>
-                            <Item name='templateId' label="Template" >
+                            <Item name='workflowId' label="Template" >
                                 <Dropdown options={map<ITemplateMap, SelectItem>(templateMap, (v, k) => ({ label: v, value: k }))} />
                             </Item>
                         </>)

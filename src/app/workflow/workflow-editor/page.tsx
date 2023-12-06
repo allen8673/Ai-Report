@@ -91,7 +91,7 @@ export default function Page() {
             flows.push({
                 id,
                 type: 'Workflow',
-                templateId: temp_id,
+                workflowId: temp_id,
                 position: { x, y }
             });
 

@@ -43,6 +43,6 @@ export interface IFlow extends IFlowBase {
     running?: boolean;
     status?: FlowStatus;
     depth?: number;
-    templateId?: string;
+    workflowId?: string;
 }
 
