@@ -98,6 +98,126 @@ export const mock_workflows: IWorkflow[] = [
             },
         ]
     },
+    {
+        "id": "46fa59de-1acc-4e7d-9149-7756f828e73a",
+        "name": "demo wf 2",
+        "flows": [
+            {
+                "id": "tmp_8b6f8eff-c5ce-4feb-bd64-71f09a7c7aa3",
+                "name": "Workflow",
+                "type": "Workflow",
+                "position": {
+                    "x": 1210,
+                    "y": -170
+                },
+                "forwards": [
+                    "tmp_c1087289-be9c-40c3-ac31-ba94aa6e1ba2"
+                ],
+                "workflowId": "d521066f-7f61-4be0-a9b9-a4517edfc825",
+                "depth": 3
+            },
+            {
+                "id": "tmp_374d7b62-3172-470c-94a0-472fd1a1cdf4",
+                "name": "defense advice",
+                "type": "Normal",
+                "position": {
+                    "x": 1200,
+                    "y": 0
+                },
+                "forwards": [
+                    "tmp_c1087289-be9c-40c3-ac31-ba94aa6e1ba2"
+                ],
+                "prompt": "Hi AI, plz based on the {EVENT IDs} give me some suggestions to defend ",
+                "depth": 3
+            },
+            {
+                "id": "tmp_189d36d7-4b4e-4d93-8f1c-b3e363d98137",
+                "name": "attack time",
+                "type": "Normal",
+                "position": {
+                    "x": 800,
+                    "y": 300
+                },
+                "forwards": [
+                    "tmp_374d7b62-3172-470c-94a0-472fd1a1cdf4"
+                ],
+                "prompt": "Hi AI, plz based on the {ALL | SPECIAL CONDITIONS} give me the last {NUMBER} time",
+                "depth": 2
+            },
+            {
+                "id": "tmp_4804e15f-556a-4a0d-9df7-6c8cf6750cef",
+                "name": "attack times",
+                "type": "Normal",
+                "position": {
+                    "x": 800,
+                    "y": 150
+                },
+                "forwards": [
+                    "tmp_374d7b62-3172-470c-94a0-472fd1a1cdf4"
+                ],
+                "prompt": "Hi AI, plz base on {EVEND ID} find {ALL | SPECIAL CONDITIONS} attack source, and count the attack times",
+                "depth": 2
+            },
+            {
+                "id": "tmp_5aaeb6e3-8ffe-4f38-a694-0632c134e044",
+                "name": "the attack source",
+                "type": "Normal",
+                "position": {
+                    "x": 800,
+                    "y": 0
+                },
+                "forwards": [
+                    "tmp_374d7b62-3172-470c-94a0-472fd1a1cdf4",
+                    "tmp_8b6f8eff-c5ce-4feb-bd64-71f09a7c7aa3"
+                ],
+                "prompt": "Hi AI, plz give me the attack source in {ALL | SPECIAL EVENT IDs}.",
+                "depth": 2
+            },
+            {
+                "id": "tmp_c1087289-be9c-40c3-ac31-ba94aa6e1ba2",
+                "name": "Done",
+                "type": "Output",
+                "position": {
+                    "x": 1600,
+                    "y": 0
+                },
+                "forwards": [],
+                "depth": 4
+            },
+            {
+                "id": "tmp_b9dc9fff-fe9a-4caa-b8c8-a66452a19e14",
+                "name": "IP prompt",
+                "type": "Normal",
+                "position": {
+                    "x": 400,
+                    "y": 0
+                },
+                "forwards": [
+                    "tmp_5aaeb6e3-8ffe-4f38-a694-0632c134e044",
+                    "tmp_4804e15f-556a-4a0d-9df7-6c8cf6750cef",
+                    "tmp_189d36d7-4b4e-4d93-8f1c-b3e363d98137"
+                ],
+                "prompt": "Hi AI, plz list all attack events regarding {THE IPs}.",
+                "depth": 1
+            },
+            {
+                "id": "tmp_20dd7c1a-3c41-4410-9cfc-2624042bda8e",
+                "name": "Upload",
+                "type": "Input",
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "forwards": [
+                    "tmp_b9dc9fff-fe9a-4caa-b8c8-a66452a19e14"
+                ],
+                "depth": 0
+            }
+        ],
+        "rootNdeId": [
+            "tmp_20dd7c1a-3c41-4410-9cfc-2624042bda8e"
+        ]
+    }
 ]
 
 export const mock_templates: ITemplate[] = [
