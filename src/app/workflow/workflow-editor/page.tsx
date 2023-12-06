@@ -1,7 +1,7 @@
 'use client'
 import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cloneDeep, debounce, filter, find, includes, map, range, remove, some, uniq } from "lodash";
+import { cloneDeep, debounce, filter, includes, map, range, remove, some, uniq } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
@@ -109,13 +109,15 @@ export default function Page() {
                     id: doneId,
                     type: 'Output',
                     name: flowInfoMap['Output'].nodeName,
-                    position: { x: X_GAP * 3, y: 0 }
+                    position: { x: X_GAP * 3, y: 0 },
+                    forwards: []
                 },
                 {
                     id: rootId,
                     type: 'Input',
                     name: flowInfoMap['Input'].nodeName,
-                    position: { x: 0, y: 0 }
+                    position: { x: 0, y: 0 },
+                    forwards: []
                 },
 
             ]
@@ -172,70 +174,15 @@ export default function Page() {
     // }
     //#endregion
 
-    // const saveNewTemplate = async ({ name }: ITemplate) => {
-
-    //     const old_nodes = (workflow?.flows || [])
-    //     // assign new ids to nodes
-    //     const id_trans: Record<string, string> = getNewIdTrans(old_nodes)
-
-    //     // calculate new position for all nodes
-    //     const startNodes = filter(old_nodes, n => { return n.type === 'Input' })
-    //     const position = getNewPosition(startNodes, old_nodes);
-    //     // assign new ids to nodes, and reset the node position
-    //     const nodes = old_nodes.reduce<IFlow[]>((result, cur) => {
-    //         result.push({
-    //             ...cur,
-    //             id: (id_trans[cur.id] || ''),
-    //             forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || [],
-    //             position: position[cur.id]
-    //         })
-    //         return result;
-    //     }, []);
-
-    //     calculateDepth(nodes.filter(n => n.type === 'Input'), nodes);
-    //     const template: ITemplate = {
-    //         id: '', //v4(),
-    //         rootNdeId: [],
-    //         name,
-    //         flows: nodes
-    //     }
-
-    //     //TODO: call API to save the template
-    //     await apiCaller.post(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`, template);
-    //     setOpenTemplateModal(false)
-    // }
-
-    const saveNewTemplate_withRefWF = async ({ name }: ITemplate) => {
-
-        const old_nodes = cloneDeep(workflow?.flows || []);
-
-        // get reference wfs
-        for (const ref_wf of filter(old_nodes, n => n.type === 'Workflow')) {
-            const wf = await (await apiCaller.get<IWorkflow>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${ref_wf.workflowId}`)).data;
-            if (!!wf) {
-                for (const src of filter(old_nodes, n => includes(n.forwards, ref_wf.id))) {
-                    if (!src.forwards) continue;
-                    remove(src.forwards, ref_wf.id);
-                    src.forwards.push(...(find(wf.flows, f => f.type === 'Input')?.forwards || []))
-                }
-                const wf_end = find(wf.flows, f => f.type === 'Output')
-                for (const tar of filter(wf.flows, n => includes(n.forwards, wf_end?.id || ''))) {
-                    tar.forwards = ref_wf.forwards
-                }
-                old_nodes.push(...wf.flows.filter(f => !includes(['Input', 'Output'], f.type)))
-                remove(old_nodes, ['id', ref_wf.id]);
-            }
-
-        }
-
+    const saveNewTemplate = async (nodes: IFlow[], name: string) => {
         // assign new ids to nodes
-        const id_trans: Record<string, string> = getNewIdTrans(old_nodes)
+        const id_trans: Record<string, string> = getNewIdTrans(nodes)
 
         // calculate new position for all nodes
-        const startNodes = filter(old_nodes, n => { return n.type === 'Input' })
-        const position = getNewPosition(startNodes, old_nodes);
+        const startNodes = filter(nodes, n => { return n.type === 'Input' })
+        const position = getNewPosition(startNodes, nodes);
         // assign new ids to nodes, and reset the node position
-        const nodes = old_nodes.reduce<IFlow[]>((result, cur) => {
+        const _nodes = nodes.reduce<IFlow[]>((result, cur) => {
             result.push({
                 ...cur,
                 id: (id_trans[cur.id] || ''),
@@ -245,17 +192,94 @@ export default function Page() {
             return result;
         }, []);
 
-        calculateDepth(nodes.filter(n => n.type === 'Input'), nodes);
+        calculateDepth(_nodes.filter(n => n.type === 'Input'), _nodes);
         const template: ITemplate = {
             id: '', //v4(),
             rootNdeId: [],
             name,
-            flows: nodes
+            flows: _nodes
         }
 
         //TODO: call API to save the template
         await apiCaller.post(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`, template);
         setOpenTemplateModal(false)
+    }
+
+    const expandRefWF = async (nodes: IFlow[]) => {
+        const _node = cloneDeep(nodes || []);
+        /**
+         * get all reference nodes from input nodes
+         */
+        const ref_wfs = filter(_node, n => n.type === 'Workflow')
+
+
+        /**
+         * get all workflows by reference nodes,
+         * and use the workflows instead of all reference nodes. 
+         */
+        for (const ref_wf of ref_wfs) {
+            const wf = await (await apiCaller.get<IWorkflow>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${ref_wf.workflowId}`)).data;
+            if (!wf) continue
+
+            /**
+             * first, expand the reference nodes in the workflow
+             */
+            const wf_flows = await expandRefWF(wf.flows);
+
+            /**
+             * get the workflow start node and end node.
+             * and remove the starrt node and end node from the flows of workflow
+             */
+            let wf_start: IFlow | undefined, wf_end: IFlow | undefined
+
+            for (const flow of wf_flows) {
+                if (!includes(['Input', 'Output'], flow.type)) continue;
+                if (flow.type === 'Input') wf_start = flow;
+                if (flow.type === 'Output') wf_end = flow;
+                remove(wf_flows, flow)
+            }
+
+            /**
+             * get all source nodes of reference node,
+             * and put all of forwards of workflow start node to all forwards of source nodes,
+             * to instead of reference node.
+             */
+            const sources = filter(_node, n => includes(n.forwards, ref_wf.id));
+            for (const src of sources) {
+                if (!src.forwards) continue;
+                remove(src.forwards, ref_wf.id);
+                src.forwards.push(...(wf_start?.forwards || []))
+            }
+
+            /**
+             * get all source nodes of workflow end node.
+             * also, put all of forwards of reference nodes to the forwards of workflow end node,
+             * to instead of reference node.
+             */
+            const wf_end_sources = filter(wf_flows, n => includes(n.forwards, wf_end?.id || ''));
+            for (const wf_end_src of wf_end_sources) {
+                wf_end_src.forwards = ref_wf.forwards
+            }
+
+            /**
+             * at the end, push the workflow to the node instead of reference node
+             */
+            _node.push(...wf_flows)
+            remove(_node, ['id', ref_wf.id]);
+        }
+
+        /**
+         * have to trans the node id before return
+         */
+        const id_trans: Record<string, string> = getNewIdTrans(_node);
+        return _node.reduce<IFlow[]>((result, cur) => {
+            result.push({
+                ...cur,
+                id: (id_trans[cur.id] || ''),
+                forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || [],
+            })
+            return result;
+        }, []);
     }
 
     const ifWorkflowIsCompleted = (nodes: IFlow[] = []): boolean => {
@@ -439,7 +463,10 @@ export default function Page() {
                 visible={openTemplateModal}
                 onOk={() => {
                     form?.submit()
-                        .then(saveNewTemplate_withRefWF)
+                        .then(async ({ name }) => {
+                            const nodes = await expandRefWF(workflow?.flows || [])
+                            await saveNewTemplate(nodes, name)
+                        })
                         .catch(() => {
                             // 
                         });
@@ -452,7 +479,10 @@ export default function Page() {
                     onDestroyed={() => {
                         setForm(undefined)
                     }}
-                    onSubmit={saveNewTemplate_withRefWF}
+                    onSubmit={async ({ name }) => {
+                        const nodes = await expandRefWF(workflow?.flows || []);
+                        await saveNewTemplate(nodes, name)
+                    }}
                 >
                     {
                         ({ Item }) => (

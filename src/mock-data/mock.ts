@@ -217,6 +217,67 @@ export const mock_workflows: IWorkflow[] = [
         "rootNdeId": [
             "tmp_20dd7c1a-3c41-4410-9cfc-2624042bda8e"
         ]
+    },
+    {
+        "id": "37yyy2-3172-470c-94a0-472fd1a1cdf4",
+        "name": "demo 3",
+        "flows": [
+            {
+                "id": "tmp_e4ec56d8-5416-427a-8827-f766f364cc25",
+                "name": "Workflow",
+                "type": "Workflow",
+                "position": {
+                    "x": 890,
+                    "y": -80
+                },
+                "forwards": [
+                    "tmp_2b2b8a36-eb42-4164-8f13-071806b8bce7"
+                ],
+                "workflowId": "46fa59de-1acc-4e7d-9149-7756f828e73a",
+                "depth": 2
+            },
+            {
+                "id": "tmp_53919e68-e5d5-43c4-bb61-c7cbaf4960b3",
+                "name": "Workflow",
+                "type": "Workflow",
+                "position": {
+                    "x": 370,
+                    "y": -20
+                },
+                "forwards": [
+                    "tmp_e4ec56d8-5416-427a-8827-f766f364cc25"
+                ],
+                "workflowId": "d521066f-7f61-4be0-a9b9-a4517edfc825",
+                "depth": 1
+            },
+            {
+                "id": "tmp_2b2b8a36-eb42-4164-8f13-071806b8bce7",
+                "type": "Output",
+                "name": "Done",
+                "position": {
+                    "x": 1290,
+                    "y": 0
+                },
+                "forwards": [],
+                "depth": 3
+            },
+            {
+                "id": "tmp_cfccecc2-8bf5-4e3a-9386-ca30f2ad5b49",
+                "type": "Input",
+                "name": "Upload",
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "forwards": [
+                    "tmp_53919e68-e5d5-43c4-bb61-c7cbaf4960b3"
+                ],
+                "depth": 0
+            }
+        ],
+        "rootNdeId": [
+            "tmp_cfccecc2-8bf5-4e3a-9386-ca30f2ad5b49"
+        ]
     }
 ]
 
