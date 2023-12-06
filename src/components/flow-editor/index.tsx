@@ -1,4 +1,4 @@
-import _ from "lodash";
+import _, { includes } from "lodash";
 import { Button } from "primereact/button";
 import { Fieldset } from "primereact/fieldset";
 import { FileUpload } from "primereact/fileupload";
@@ -18,12 +18,12 @@ import { useGraphRef } from "../graph/helper";
 import Modal from "../modal";
 
 import { EDGE_DEF_SETTING, REPORT_ITEMS } from "./configuration";
-import { FlowGrapContext } from "./context";
+import { FlowGrapContext, ITemplateMap } from "./context";
 import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import ReportItem from "./report-item";
 
-import { IFlow, IFlowBase } from "@/interface/workflow";
+import { FlowTyep, IFlow, IFlowBase } from "@/interface/workflow";
 
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
@@ -39,9 +39,12 @@ interface FlowGraphProps extends Omit<GraphProps<IFlow>,
     'readonly'> {
     flows: IFlow[];
     inEdit?: boolean;
+    templateMap: ITemplateMap
 }
 
-export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...others }: FlowGraphProps) {
+const UNREMOVABLE_TYPES: FlowTyep[] = ['file-upload', 'file-download']
+
+export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templateMap, ...others }: FlowGraphProps) {
 
     const [onDragItem, setOnDragItem] = useState<IFlowBase>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
@@ -69,7 +72,14 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
             _.forEach(forwards, fw => {
                 edges.push({ id: `${flow.id}-${fw}`, source: flow.id, target: fw, deletable: inEdit })
             })
-            return ({ id, position, type: 'turbo', data: flow, selectable: inEdit })
+            return ({
+                id,
+                position,
+                type: 'turbo',
+                data: flow,
+                selectable: inEdit,
+                deletable: !includes(UNREMOVABLE_TYPES, flow.type)
+            })
         });
         setInitialEdges(edges);
         setInitialNodes(nodes);
@@ -81,7 +91,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
         graphRef.current.setEdges(e => ({ ...e, deletable: inEdit, selected: false, }));
     }, [inEdit]);
 
-    return <FlowGrapContext.Provider value={{ inEdit, clickOnSetting }}>
+    return <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, templateMap }}>
         <div className="flow-editor h-full w-full relative">
             {inEdit && <div className={`absolute 
             z-20 
