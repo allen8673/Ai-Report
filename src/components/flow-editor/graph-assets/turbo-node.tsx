@@ -45,8 +45,8 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
 function TurboNodeInstance(elm: NodeProps<IFlow>) {
     const { id, data, } = elm;
     const { running } = data || {}
-    const { nodeType, icon, editIcon, actIcon } = flowInfoMap[data.type] || {}
-    const { inEdit, clickOnSetting, templateMap } = useFlowGrapContext();
+    const { nodeType, icon, editIcon, actIcon, nodeName } = flowInfoMap[data.type] || {}
+    const { inEdit, clickOnSetting, workflowMap } = useFlowGrapContext();
     const iconHighlight = !!data.prompt || !!data.file || !!data.report
 
     const _clickOnSetting = (icon: IconInfo): void => {
@@ -94,7 +94,10 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                             <div className='grow shrink overflow-hidden'>
                                 <div className="text-[20px] mb-[2px] leading-1 ellipsis wf-name"
                                     data-pr-tooltip={data.name}
-                                >{data.type === 'template' ? templateMap[data.templateId || ''] : data.name}</div>
+                                >
+                                    {(data.type === 'Workflow' ? workflowMap[data.workflowId || ''] : (nodeName || data.name))
+                                        || <span className='italic'>N / A</span>}
+                                </div>
                                 <div className="text-[16px] text-light-weak">{data.type}</div>
                             </div>
                         </div>

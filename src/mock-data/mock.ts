@@ -11,7 +11,7 @@ export const mock_workflows: IWorkflow[] = [
             {
                 "id": "e7bce421-054c-45f6-b663-c8816f75df67",
                 "name": "Upload",
-                "type": "file-upload",
+                "type": 'Input',
                 "position": {
                     "x": -80,
                     "y": 430
@@ -23,7 +23,7 @@ export const mock_workflows: IWorkflow[] = [
             {
                 "id": "7e61d0cb-999e-483e-8b8b-955d0fc4024d",
                 "name": "analyze the risks",
-                "type": "prompt",
+                "type": 'Normal',
                 "position": {
                     "x": 1140,
                     "y": 620
@@ -36,7 +36,7 @@ export const mock_workflows: IWorkflow[] = [
             {
                 "id": "02074628-240b-4bf8-ac8b-0a207154da1f",
                 "name": "analyze id",
-                "type": "prompt",
+                "type": 'Normal',
                 "position": {
                     "x": 1140,
                     "y": 280
@@ -49,7 +49,7 @@ export const mock_workflows: IWorkflow[] = [
             {
                 "id": "99331e93-0673-4d80-ae49-5e38e5638637",
                 "name": "list events",
-                "type": "prompt",
+                "type": 'Normal',
                 "position": {
                     "x": 680,
                     "y": 620
@@ -62,7 +62,7 @@ export const mock_workflows: IWorkflow[] = [
             {
                 "id": "cbff8f60-a777-47a2-88f7-ce516779adac",
                 "name": "give me some suggestions.",
-                "type": "prompt",
+                "type": 'Normal',
                 "position": {
                     "x": 680,
                     "y": 280
@@ -75,7 +75,7 @@ export const mock_workflows: IWorkflow[] = [
             {
                 "id": "dec48f6e-6d86-406d-ad8b-53d3a4efbb48",
                 "name": "roughly analyze the file ",
-                "type": "prompt",
+                "type": 'Normal',
                 "position": {
                     "x": 280,
                     "y": 430
@@ -89,7 +89,7 @@ export const mock_workflows: IWorkflow[] = [
             {
                 "id": "713a3ea2-3e9d-4c4c-9829-8b3d87165e4f",
                 "name": "Done",
-                "type": "file-download",
+                "type": 'Output',
                 "position": {
                     "x": 1630,
                     "y": 450
@@ -109,7 +109,7 @@ export const mock_templates: ITemplate[] = [
             {
                 "id": "fafc2d39-2abf-4d47-994d-013b5151ad4c",
                 "name": "Done",
-                "type": "file-download",
+                "type": 'Output',
                 "position": {
                     "x": 800,
                     "y": 0
@@ -119,7 +119,7 @@ export const mock_templates: ITemplate[] = [
             {
                 "id": "97f3de08-4f1b-45a5-a549-38e57e376483",
                 "name": "your prompt",
-                "type": "prompt",
+                "type": 'Normal',
                 "position": {
                     "x": 400,
                     "y": 0
@@ -132,7 +132,7 @@ export const mock_templates: ITemplate[] = [
             {
                 "id": "52273db9-9caa-484c-947e-878d570bbfbe",
                 "name": "Upload",
-                "type": "file-upload",
+                "type": 'Input',
                 "position": {
                     "x": 0,
                     "y": 0
@@ -151,7 +151,7 @@ export const mock_templates: ITemplate[] = [
             {
                 "id": "336ba94b-9315-40c3-a9fa-5cf668d50182",
                 "name": "defense advice",
-                "type": "prompt",
+                "type": 'Normal',
                 "position": {
                     "x": 1200,
                     "y": 0
@@ -164,7 +164,7 @@ export const mock_templates: ITemplate[] = [
             {
                 "id": "f3d851da-3900-4d5f-8e9d-290794740c3c",
                 "name": "attack time",
-                "type": "prompt",
+                "type": 'Normal',
                 "position": {
                     "x": 800,
                     "y": 300
@@ -177,7 +177,7 @@ export const mock_templates: ITemplate[] = [
             {
                 "id": "b4f73c61-e5ae-402d-8dc9-88eb3f7f265b",
                 "name": "attack times",
-                "type": "prompt",
+                "type": 'Normal',
                 "position": {
                     "x": 800,
                     "y": 150
@@ -190,7 +190,7 @@ export const mock_templates: ITemplate[] = [
             {
                 "id": "77fc586a-4ce7-4e57-9398-73750d91fdfe",
                 "name": "the attack source",
-                "type": "prompt",
+                "type": 'Normal',
                 "position": {
                     "x": 800,
                     "y": 0
@@ -203,7 +203,7 @@ export const mock_templates: ITemplate[] = [
             {
                 "id": "72f17e4e-7e55-4bd0-a988-0f7c43893238",
                 "name": "Done",
-                "type": "file-download",
+                "type": 'Output',
                 "position": {
                     "x": 1600,
                     "y": 0
@@ -213,7 +213,7 @@ export const mock_templates: ITemplate[] = [
             {
                 "id": "e369cd2b-6e2f-472e-aeef-97147b4d2782",
                 "name": "IP prompt",
-                "type": "prompt",
+                "type": 'Normal',
                 "position": {
                     "x": 400,
                     "y": 0
@@ -228,7 +228,7 @@ export const mock_templates: ITemplate[] = [
             {
                 "id": "6dc25c53-7615-47f5-a3f8-9c25b565e915",
                 "name": "Upload",
-                "type": "file-upload",
+                "type": 'Input',
                 "position": {
                     "x": 0,
                     "y": 0

@@ -1,7 +1,7 @@
-import { IconDefinition, faUpload, faDownload, faBrain, faCloudUpload, faCloud, faFileArrowUp, faComment, faCloudDownload, faShapes } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition, faUpload, faDownload, faBrain, faCloudUpload, faCloud, faFileArrowUp, faComment, faCloudDownload, faShareNodes } from '@fortawesome/free-solid-svg-icons'
 import { Edge, MarkerType } from 'reactflow';
 
-import { IFlowBase } from '@/interface/workflow';
+import { FlowTyep, IFlowBase } from '@/interface/workflow';
 
 export const EDGE_DEF_SETTING: Partial<Edge> = {
     // type: 'smoothstep',
@@ -15,12 +15,12 @@ export const REPORT_ITEMS: IFlowBase[] = [
     {
         id: 'custom-prompt',
         name: 'Custom Prompt',
-        type: 'prompt'
+        type: 'Normal'
     },
     {
-        id: 'template',
-        name: 'Template',
-        type: 'template'
+        id: 'workflow',
+        name: 'Workflow',
+        type: 'Workflow'
     },
     // {
     //     id: 'file-upload',
@@ -41,16 +41,18 @@ export interface IconInfo {
 }
 
 export const flowInfoMap: {
-    [type: string]: {
-        nodeType: '' | 'start' | 'end',
+    [type in FlowTyep]: {
+        nodeType: '' | 'start' | 'end';
+        nodeName?: string;
         icon: IconDefinition;
-        actIcon?: IconInfo,
-        editIcon?: IconInfo
+        actIcon?: IconInfo;
+        editIcon?: IconInfo;
     }
 } = {
-    'file-upload': {
+    'Input': {
         nodeType: 'start',
         icon: faUpload,
+        nodeName: 'Upload',
         actIcon: {
             icon: faCloudUpload,
             label: 'the files has uploaded.'
@@ -61,7 +63,7 @@ export const flowInfoMap: {
             interactable: true
         }
     },
-    'prompt': {
+    'Normal': {
         nodeType: '',
         icon: faBrain,
         actIcon: {
@@ -74,9 +76,9 @@ export const flowInfoMap: {
             interactable: true
         }
     },
-    'template': {
+    'Workflow': {
         nodeType: '',
-        icon: faShapes,
+        icon: faShareNodes,
         actIcon: {
             icon: faCloud,
             label: 'the prompt is set up.'
@@ -87,8 +89,9 @@ export const flowInfoMap: {
             interactable: true
         }
     },
-    'file-download': {
+    'Output': {
         nodeType: 'end',
+        nodeName: 'Done',
         icon: faDownload,
         actIcon: {
             icon: faCloudDownload,

@@ -1,5 +1,6 @@
 import { filter, includes, max, mergeWith, min } from "lodash";
 import { XYPosition } from "reactflow";
+import { v4 } from "uuid";
 
 import { IFlow } from "@/interface/workflow";
 
@@ -33,4 +34,16 @@ export const getNewPosition = (nodes: IFlow[], flows: IFlow[] = [], x = 0, y = 0
 
             return result;
         }, {})
+}
+
+/**
+ * assign new ids to nodes
+ * @param nodes 
+ * @returns 
+ */
+export const getNewIdTrans = (nodes: IFlow[]): Record<string, string> => {
+    return nodes.reduce<Record<string, string>>((result, cur) => {
+        result[cur.id] = `tmp_${v4()}`;
+        return result
+    }, {});
 }

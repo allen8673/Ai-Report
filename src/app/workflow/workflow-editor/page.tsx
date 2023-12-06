@@ -1,7 +1,7 @@
 'use client'
 import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import _ from "lodash";
+import { debounce, filter, includes, map, range, some, uniq } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
@@ -12,7 +12,9 @@ import { v4 } from "uuid";
 import apiCaller from "@/api-helpers/api-caller";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowGraph from "@/components/flow-editor";
-import { X_GAP, calculateDepth, getNewPosition } from "@/components/flow-editor/helper";
+import { flowInfoMap } from "@/components/flow-editor/configuration";
+import { IWorkflowMap } from "@/components/flow-editor/context";
+import { X_GAP, calculateDepth, getNewIdTrans, getNewPosition } from "@/components/flow-editor/helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
@@ -33,7 +35,7 @@ export default function Page() {
     const { graphRef } = useGraphRef<IFlow, any>();
     const [inEdit, setInEdit] = useState<boolean>();
     const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
-    const [templateMap, setTemplateMap] = useState<{ [id: string]: string }>({})
+    const [workflowMap, setWorkflowMap] = useState<IWorkflowMap>({})
     const [form, setForm] = useState<FormInstance<ITemplate>>()
 
     const { showMessage } = useLayoutContext();
@@ -55,10 +57,10 @@ export default function Page() {
     }
 
     const fetchTemplateData = async () => {
-        const temps = (await apiCaller.get<ITemplate[]>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`)).data;
+        const temps = (await apiCaller.get<IWorkflow[]>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`)).data;
         if (!temps) return;
 
-        setTemplateMap(temps.reduce<{ [id: string]: string }>((pre, temp) => {
+        setWorkflowMap(temps.reduce<{ [id: string]: string }>((pre, temp) => {
             pre[temp.id] = temp.name
             return pre;
         }, {}))
@@ -71,71 +73,113 @@ export default function Page() {
     }
 
     const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
-        const addId2Forwards = (_node: IFlow, id: string): void => {
-            _node.forwards = _node.forwards || [];
-            _node.forwards?.push(id);
-        }
+        const id = '';
+        const template: (ITemplate | undefined) =
+            (!!paramObj.template ?
+                (await apiCaller.get<ITemplate>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${paramObj.template}`)).data :
+                undefined);
 
-        const templateIds = paramObj.template?.split(',') || [];
-        const y = 0;
-        const rootId = `tmp_${v4()}`
-        const doneId = `tmp_${v4()}`
-        let x = 0, idx = 0;
-        const flows: IFlow[] = [
-            { id: rootId, type: 'file-upload', name: 'Upload', position: { x, y } }
-        ]
+        if (!!template) {
+            /**
+             * if the user assigns a template,
+             * then the graph directly uses it
+             */
+            const id_trans = getNewIdTrans(template.flows)
+            let rootId = ''
+            const flows: IFlow[] = template.flows.reduce<IFlow[]>((wf, tf) => {
+                if (tf.type === 'Input') rootId = id_trans[tf.id]
+                wf.push({
+                    ...tf,
+                    id: id_trans[tf.id],
+                    forwards: map(tf.forwards, f => id_trans[f])
+                })
+                return wf;
+            }, []);
+            setWorkflow({ id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
 
-        for (const temp_id of templateIds) {
-            const id = `tmp_${v4()}`
-            x += X_GAP;
-            flows.push({
-                id,
-                type: 'template',
-                // name: templateMap[temp_id],
-                templateId: temp_id,
-                position: { x, y }
-            });
-
-            addId2Forwards(flows[idx], id);
-            idx++;
-        }
-
-        if (!!idx) {
-            x += X_GAP;
-            addId2Forwards(flows[idx], doneId);
         } else {
-            x += X_GAP * 3;
+            /**
+             * if the user does not assign any template,
+             * then the graph will append the Input and Output nodes as initialization
+             */
+            const rootId = `tmp_${v4()}`
+            const doneId = `tmp_${v4()}`
+            const flows: IFlow[] = [
+                {
+                    id: doneId,
+                    type: 'Output',
+                    name: flowInfoMap['Output'].nodeName,
+                    position: { x: X_GAP * 3, y: 0 }
+                },
+                {
+                    id: rootId,
+                    type: 'Input',
+                    name: flowInfoMap['Input'].nodeName,
+                    position: { x: 0, y: 0 }
+                },
+
+            ]
+            setWorkflow({ id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
         }
-
-        flows.push(
-            {
-                id: doneId,
-                type: 'file-download',
-                name: 'Done',
-                position: { x, y }
-            }
-        );
-
-        setWorkflow({
-            id: '',
-            name: paramObj.name || '',
-            flows,
-            rootNdeId: [rootId]
-        })
     }
+
+    //#region old version of the logic to add new workflow 
+    // const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
+    //     const addId2Forwards = (_node: IFlow, id: string): void => {
+    //         _node.forwards = _node.forwards || [];
+    //         _node.forwards?.push(id);
+    //     }
+    //     const templateIds = paramObj.template?.split(',') || [];
+    //     const y = 0;
+    //     const rootId = `tmp_${v4()}`
+    //     const doneId = `tmp_${v4()}`
+    //     let x = 0, idx = 0;
+    //     const flows: IFlow[] = [
+    //         { id: rootId, type: 'Input', name: 'Upload', position: { x, y } }
+    //     ]
+    //     for (const temp_id of templateIds) {
+    //         const id = `tmp_${v4()}`
+    //         x += X_GAP;
+    //         flows.push({
+    //             id,
+    //             type: 'Workflow',
+    //             workflowId: temp_id,
+    //             position: { x, y }
+    //         });
+    //         addId2Forwards(flows[idx], id);
+    //         idx++;
+    //     }
+    //     if (!!idx) {
+    //         x += X_GAP;
+    //         addId2Forwards(flows[idx], doneId);
+    //     } else {
+    //         x += X_GAP * 3;
+    //     }
+    //     flows.push(
+    //         {
+    //             id: doneId,
+    //             type: 'Output',
+    //             name: 'Done',
+    //             position: { x, y }
+    //         }
+    //     );
+    //     setWorkflow({
+    //         id: '',
+    //         name: paramObj.name || '',
+    //         flows,
+    //         rootNdeId: [rootId]
+    //     })
+    // }
+    //#endregion
 
     const saveNewTemplate = async ({ name }: ITemplate) => {
 
         const old_nodes = (workflow?.flows || [])
         // assign new ids to nodes
-        const id_trans: Record<string, string> =
-            old_nodes.reduce<Record<string, string>>((result, cur) => {
-                result[cur.id] = `tmp_${v4()}`;
-                return result
-            }, {});
+        const id_trans: Record<string, string> = getNewIdTrans(old_nodes)
 
         // calculate new position for all nodes
-        const startNodes = _.filter(old_nodes, n => { return n.type === 'file-upload' })
+        const startNodes = filter(old_nodes, n => { return n.type === 'Input' })
         const position = getNewPosition(startNodes, old_nodes);
         // assign new ids to nodes, and reset the node position
         const nodes = old_nodes.reduce<IFlow[]>((result, cur) => {
@@ -148,7 +192,7 @@ export default function Page() {
             return result;
         }, []);
 
-        calculateDepth(nodes.filter(n => n.type === 'file-upload'), nodes);
+        calculateDepth(nodes.filter(n => n.type === 'Input'), nodes);
         const template: ITemplate = {
             id: '', //v4(),
             rootNdeId: [],
@@ -161,26 +205,37 @@ export default function Page() {
         setOpenTemplateModal(false)
     }
 
+    const ifWorkflowIsCompleted = (nodes: IFlow[] = []): boolean => {
+        for (const node of nodes) {
+            if (node.type === 'Output') {
+                if (!some(nodes, n => includes(n.forwards, node.id))) return false
+            } else {
+                if (!node.forwards?.length) return false;
+            }
+        }
+        return true
+    }
+
     const mock_run = (forwards: string[]): void => {
         let next: string[] = [];
         graphRef.current?.setNodes(pre => {
-            if (_.includes(forwards, pre.id)) {
-                next = _.uniq(next.concat(pre.data.forwards || []))
+            if (includes(forwards, pre.id)) {
+                next = uniq(next.concat(pre.data.forwards || []))
                 return { ...pre, data: { ...pre.data, running: true } }
             }
             return pre
         });
 
-        _.debounce(async () => {
+        debounce(async () => {
             graphRef.current?.setNodes(pre => {
-                if (_.includes(forwards, pre.id)) {
+                if (includes(forwards, pre.id)) {
                     let status: FlowStatus = 'success';
                     let report: any = undefined;
                     if (pre.id == 'f-2') status = 'failure';
                     else if (pre.id == 'f-5') status = 'warning';
 
-                    if (pre.data.type === 'file-download') {
-                        report = <>{_.map(_.range(0, 30), () => (<p>
+                    if (pre.data.type === 'Output') {
+                        report = <>{map(range(0, 30), () => (<p>
                             <p className="m-0">
                                 Next.js is a React framework for building full-stack web applications. You use React Components to build user interfaces, and Next.js for additional features and optimizations.
                             </p>
@@ -197,7 +252,7 @@ export default function Page() {
                 }
                 return pre
             });
-            _.debounce(() => {
+            debounce(() => {
                 if (!!next.length) mock_run(next);
                 else {
                     showMessage('workflow is done')
@@ -244,14 +299,14 @@ export default function Page() {
                                 label="Save"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
-                                    const flows: IFlow[] = _.map(graphRef.current?.getNodes() || [], n => ({
+                                    const flows: IFlow[] = map(graphRef.current?.getNodes() || [], n => ({
                                         ...n.data, position: n.position
                                     }));
                                     // TODO: Call API to save the edit result
                                     setWorkflow(pre => {
                                         const result: (IWorkflow | undefined) = !!pre ? ({ ...pre, flows }) : pre
                                         if (!result) return result;
-                                        calculateDepth(result.flows.filter(n => n.type === 'file-upload'), result.flows);
+                                        calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
                                         if (mode === 'add') {
                                             apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, result);
                                         } else {
@@ -270,6 +325,22 @@ export default function Page() {
                                 tooltip="Save as template"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={() => {
+                                    if (!ifWorkflowIsCompleted(workflow?.flows)) {
+                                        showMessage({
+                                            message: 'Cannot be saved as a template since the workflow is not completed.',
+                                            type: 'error'
+                                        })
+                                        return
+                                    }
+
+                                    // TODO: will allow the reference wf save as template in step 2
+                                    if (some(workflow?.flows, (f => f.type === 'Workflow'))) {
+                                        showMessage({
+                                            message: `Cannot be saved as a template since we don't allow the workflow reference to be saved into a template.`,
+                                            type: 'error'
+                                        })
+                                        return
+                                    }
                                     setOpenTemplateModal(true)
                                 }}
                             />
@@ -278,6 +349,13 @@ export default function Page() {
                                 tooltip="Run Flow"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
+                                    if (!ifWorkflowIsCompleted(workflow?.flows)) {
+                                        showMessage({
+                                            message: 'Cannot run the workflow since the workflow is not completed.',
+                                            type: 'error'
+                                        })
+                                        return
+                                    }
                                     graphRef.current?.setNodes(pre => {
                                         return { ...pre, data: { ...pre.data, status: 'none', running: false } }
                                     });
@@ -301,7 +379,7 @@ export default function Page() {
                 graphRef={graphRef}
                 hideMiniMap
                 inEdit={inEdit}
-                templateMap={templateMap}
+                workflowMap={workflowMap}
             />
             <Modal
                 title='Save as Template'
