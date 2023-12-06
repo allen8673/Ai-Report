@@ -172,38 +172,38 @@ export default function Page() {
     // }
     //#endregion
 
-    const saveNewTemplate = async ({ name }: ITemplate) => {
+    // const saveNewTemplate = async ({ name }: ITemplate) => {
 
-        const old_nodes = (workflow?.flows || [])
-        // assign new ids to nodes
-        const id_trans: Record<string, string> = getNewIdTrans(old_nodes)
+    //     const old_nodes = (workflow?.flows || [])
+    //     // assign new ids to nodes
+    //     const id_trans: Record<string, string> = getNewIdTrans(old_nodes)
 
-        // calculate new position for all nodes
-        const startNodes = filter(old_nodes, n => { return n.type === 'Input' })
-        const position = getNewPosition(startNodes, old_nodes);
-        // assign new ids to nodes, and reset the node position
-        const nodes = old_nodes.reduce<IFlow[]>((result, cur) => {
-            result.push({
-                ...cur,
-                id: (id_trans[cur.id] || ''),
-                forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || [],
-                position: position[cur.id]
-            })
-            return result;
-        }, []);
+    //     // calculate new position for all nodes
+    //     const startNodes = filter(old_nodes, n => { return n.type === 'Input' })
+    //     const position = getNewPosition(startNodes, old_nodes);
+    //     // assign new ids to nodes, and reset the node position
+    //     const nodes = old_nodes.reduce<IFlow[]>((result, cur) => {
+    //         result.push({
+    //             ...cur,
+    //             id: (id_trans[cur.id] || ''),
+    //             forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || [],
+    //             position: position[cur.id]
+    //         })
+    //         return result;
+    //     }, []);
 
-        calculateDepth(nodes.filter(n => n.type === 'Input'), nodes);
-        const template: ITemplate = {
-            id: '', //v4(),
-            rootNdeId: [],
-            name,
-            flows: nodes
-        }
+    //     calculateDepth(nodes.filter(n => n.type === 'Input'), nodes);
+    //     const template: ITemplate = {
+    //         id: '', //v4(),
+    //         rootNdeId: [],
+    //         name,
+    //         flows: nodes
+    //     }
 
-        //TODO: call API to save the template
-        await apiCaller.post(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`, template);
-        setOpenTemplateModal(false)
-    }
+    //     //TODO: call API to save the template
+    //     await apiCaller.post(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`, template);
+    //     setOpenTemplateModal(false)
+    // }
 
     const saveNewTemplate_withRefWF = async ({ name }: ITemplate) => {
 
