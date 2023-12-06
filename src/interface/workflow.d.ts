@@ -38,7 +38,7 @@ export interface IFlow extends IFlowBase {
     prompt?: string;
     file?: any;
     report?: any;
-    forwards?: string[];
+    forwards: string[];
     position: XYPosition;
     running?: boolean;
     status?: FlowStatus;
