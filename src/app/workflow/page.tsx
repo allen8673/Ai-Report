@@ -1,5 +1,5 @@
 'use client'
-import { faAdd, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { map } from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
@@ -11,7 +11,6 @@ import { useEffect, useState } from 'react'
 
 import apiCaller from "@/api-helpers/api-caller";
 import { coverToQueryString } from "@/api-helpers/url-helper";
-import DndList from "@/components/dnd-list";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import Modal from "@/components/modal";
@@ -24,7 +23,8 @@ import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 interface FormData {
     id?: string;
     name?: string;
-    template?: { value: string }[];
+    template?: string
+    // template?: { value: string }[];
 }
 
 export default function Page() {
@@ -85,10 +85,10 @@ export default function Page() {
             onOk={() => {
                 form?.submit()
                     .then(({ name, template }) => {
-                        const queries: { [key: string]: string | undefined } = { name }
-                        if (!!template?.length) {
-                            queries.template = template.map(t => t.value).join(',')
-                        }
+                        const queries: { [key: string]: string | undefined } = { name, template }
+                        // if (!!template?.length) {
+                        //     queries.template = template.map(t => t.value).join(',')
+                        // }
                         router.push(`${editorUrl}${coverToQueryString(queries)}`);
                     }).catch(() => {
                         // 
@@ -106,12 +106,16 @@ export default function Page() {
                 }}
             >
                 {
-                    ({ Item, List }) => (
+                    ({ Item }) => (
                         <>
                             <Item name={'name'} label="Workflow Name" rules={{ required: 'Please give a name to workflow!', }}>
                                 <InputText />
                             </Item>
-                            <List name='template' label="Template">{({ fields, append, remove, move }) => {
+                            <Item name={'template'} label="Template">
+                                <Dropdown options={templateOpts} />
+                            </Item>
+
+                            {/* <List name='template' label="Template">{({ fields, append, remove, move }) => {
                                 return <>
                                     <DndList
                                         items={fields}
@@ -146,7 +150,7 @@ export default function Page() {
                                     />
                                 </>
                             }}
-                            </List>
+                            </List> */}
                         </>
                     )
                 }</Form>

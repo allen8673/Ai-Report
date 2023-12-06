@@ -1,7 +1,7 @@
 import { IconDefinition, faUpload, faDownload, faBrain, faCloudUpload, faCloud, faFileArrowUp, faComment, faCloudDownload, faShapes } from '@fortawesome/free-solid-svg-icons'
 import { Edge, MarkerType } from 'reactflow';
 
-import { IFlowBase } from '@/interface/workflow';
+import { FlowTyep, IFlowBase } from '@/interface/workflow';
 
 export const EDGE_DEF_SETTING: Partial<Edge> = {
     // type: 'smoothstep',
@@ -41,14 +41,14 @@ export interface IconInfo {
 }
 
 export const flowInfoMap: {
-    [type: string]: {
+    [type in FlowTyep]: {
         nodeType: '' | 'start' | 'end',
         icon: IconDefinition;
         actIcon?: IconInfo,
         editIcon?: IconInfo
     }
 } = {
-    'file-upload': {
+    'Input': {
         nodeType: 'start',
         icon: faUpload,
         actIcon: {
@@ -61,7 +61,7 @@ export const flowInfoMap: {
             interactable: true
         }
     },
-    'prompt': {
+    'Normal': {
         nodeType: '',
         icon: faBrain,
         actIcon: {
@@ -74,7 +74,7 @@ export const flowInfoMap: {
             interactable: true
         }
     },
-    'template': {
+    'Workflow': {
         nodeType: '',
         icon: faShapes,
         actIcon: {
@@ -87,7 +87,7 @@ export const flowInfoMap: {
             interactable: true
         }
     },
-    'file-download': {
+    'Output': {
         nodeType: 'end',
         icon: faDownload,
         actIcon: {

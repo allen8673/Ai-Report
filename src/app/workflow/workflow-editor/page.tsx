@@ -12,7 +12,7 @@ import { v4 } from "uuid";
 import apiCaller from "@/api-helpers/api-caller";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowGraph from "@/components/flow-editor";
-import { X_GAP, calculateDepth, getNewPosition } from "@/components/flow-editor/helper";
+import { X_GAP, calculateDepth, getNewIdTrans, getNewPosition } from "@/components/flow-editor/helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
@@ -71,67 +71,102 @@ export default function Page() {
     }
 
     const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
-        const addId2Forwards = (_node: IFlow, id: string): void => {
-            _node.forwards = _node.forwards || [];
-            _node.forwards?.push(id);
-        }
+        const id = '';
+        const template: (ITemplate | undefined) =
+            (!!paramObj.template ?
+                (await apiCaller.get<ITemplate>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${paramObj.template}`)).data :
+                undefined);
 
-        const templateIds = paramObj.template?.split(',') || [];
-        const y = 0;
-        const rootId = `tmp_${v4()}`
-        const doneId = `tmp_${v4()}`
-        let x = 0, idx = 0;
-        const flows: IFlow[] = [
-            { id: rootId, type: 'Input', name: 'Upload', position: { x, y } }
-        ]
+        if (!!template) {
+            /**
+             * if the user assigns a template,
+             * then the graph directly uses it
+             */
+            const id_trans = getNewIdTrans(template.flows)
+            let rootId = ''
+            const flows: IFlow[] = template.flows.reduce<IFlow[]>((wf, tf) => {
+                if (tf.type === 'Input') rootId = id_trans[tf.id]
+                wf.push({
+                    ...tf,
+                    id: id_trans[tf.id],
+                    forwards: _.map(tf.forwards, f => id_trans[f])
+                })
+                return wf;
+            }, []);
+            setWorkflow({ id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
 
-        for (const temp_id of templateIds) {
-            const id = `tmp_${v4()}`
-            x += X_GAP;
-            flows.push({
-                id,
-                type: 'Workflow',
-                workflowId: temp_id,
-                position: { x, y }
-            });
-
-            addId2Forwards(flows[idx], id);
-            idx++;
-        }
-
-        if (!!idx) {
-            x += X_GAP;
-            addId2Forwards(flows[idx], doneId);
         } else {
-            x += X_GAP * 3;
+            /**
+             * if the user does not assign any template,
+             * then the graph will append the Input and Output nodes as initialization
+             */
+            const rootId = `tmp_${v4()}`
+            const doneId = `tmp_${v4()}`
+            const flows: IFlow[] = [
+                {
+                    id: doneId, type: 'Output', name: 'Done', position: { x: X_GAP * 3, y: 0 }
+                },
+                { id: rootId, type: 'Input', name: 'Upload', position: { x: 0, y: 0 } },
+
+            ]
+            setWorkflow({ id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
         }
-
-        flows.push(
-            {
-                id: doneId,
-                type: 'Output',
-                name: 'Done',
-                position: { x, y }
-            }
-        );
-
-        setWorkflow({
-            id: '',
-            name: paramObj.name || '',
-            flows,
-            rootNdeId: [rootId]
-        })
     }
+
+    //#region old version of the logic to add new workflow 
+    // const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
+    //     const addId2Forwards = (_node: IFlow, id: string): void => {
+    //         _node.forwards = _node.forwards || [];
+    //         _node.forwards?.push(id);
+    //     }
+    //     const templateIds = paramObj.template?.split(',') || [];
+    //     const y = 0;
+    //     const rootId = `tmp_${v4()}`
+    //     const doneId = `tmp_${v4()}`
+    //     let x = 0, idx = 0;
+    //     const flows: IFlow[] = [
+    //         { id: rootId, type: 'Input', name: 'Upload', position: { x, y } }
+    //     ]
+    //     for (const temp_id of templateIds) {
+    //         const id = `tmp_${v4()}`
+    //         x += X_GAP;
+    //         flows.push({
+    //             id,
+    //             type: 'Workflow',
+    //             workflowId: temp_id,
+    //             position: { x, y }
+    //         });
+    //         addId2Forwards(flows[idx], id);
+    //         idx++;
+    //     }
+    //     if (!!idx) {
+    //         x += X_GAP;
+    //         addId2Forwards(flows[idx], doneId);
+    //     } else {
+    //         x += X_GAP * 3;
+    //     }
+    //     flows.push(
+    //         {
+    //             id: doneId,
+    //             type: 'Output',
+    //             name: 'Done',
+    //             position: { x, y }
+    //         }
+    //     );
+    //     setWorkflow({
+    //         id: '',
+    //         name: paramObj.name || '',
+    //         flows,
+    //         rootNdeId: [rootId]
+    //     })
+    // }
+    //#endregion
 
     const saveNewTemplate = async ({ name }: ITemplate) => {
 
         const old_nodes = (workflow?.flows || [])
         // assign new ids to nodes
-        const id_trans: Record<string, string> =
-            old_nodes.reduce<Record<string, string>>((result, cur) => {
-                result[cur.id] = `tmp_${v4()}`;
-                return result
-            }, {});
+        const id_trans: Record<string, string> = getNewIdTrans(old_nodes)
 
         // calculate new position for all nodes
         const startNodes = _.filter(old_nodes, n => { return n.type === 'Input' })

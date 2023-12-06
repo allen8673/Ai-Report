@@ -1,5 +1,6 @@
 import _ from "lodash"
 import { NextRequest } from 'next/server'
+import { v4 } from "uuid";
 
 import { ApiResult } from "@/interface/api";
 import { ITemplate } from "@/interface/workflow";
@@ -14,12 +15,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     const data = await request.json() as (ITemplate | undefined);
     const result: ApiResult = { status: 'success' }
-    if (!data || !data?.id) {
+    if (!data) {
         result.status = 'failure';
         result.message = 'invalid data';
         return Response.json(result)
     }
-    mock_templates.push(data);
+    mock_templates.push({ ...data, id: v4() });
     // result.data = mock_templates
     return Response.json(result)
 }
