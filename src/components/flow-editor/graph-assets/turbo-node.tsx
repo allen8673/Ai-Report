@@ -46,7 +46,7 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
     const { id, data, } = elm;
     const { running } = data || {}
     const { nodeType, icon, editIcon, actIcon } = flowInfoMap[data.type] || {}
-    const { inEdit, clickOnSetting } = useFlowGrapContext();
+    const { inEdit, clickOnSetting, templateMap } = useFlowGrapContext();
     const iconHighlight = !!data.prompt || !!data.file || !!data.report
 
     const _clickOnSetting = (icon: IconInfo): void => {
@@ -94,7 +94,7 @@ function TurboNodeInstance(elm: NodeProps<IFlow>) {
                             <div className='grow shrink overflow-hidden'>
                                 <div className="text-[20px] mb-[2px] leading-1 ellipsis wf-name"
                                     data-pr-tooltip={data.name}
-                                >{data.name}</div>
+                                >{data.type === 'template' ? templateMap[data.templateId || ''] : data.name}</div>
                                 <div className="text-[16px] text-light-weak">{data.type}</div>
                             </div>
                         </div>

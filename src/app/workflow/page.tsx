@@ -1,16 +1,17 @@
 'use client'
-import { faAdd } from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import _ from "lodash";
+import { map } from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
+import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { MultiSelect } from "primereact/multiselect";
 import { SelectItem } from "primereact/selectitem";
 import { useEffect, useState } from 'react'
 
 import apiCaller from "@/api-helpers/api-caller";
 import { coverToQueryString } from "@/api-helpers/url-helper";
+import DndList from "@/components/dnd-list";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import Modal from "@/components/modal";
@@ -23,7 +24,7 @@ import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 interface FormData {
     id?: string;
     name?: string;
-    template?: string[];
+    template?: { value: string }[];
 }
 
 export default function Page() {
@@ -38,7 +39,7 @@ export default function Page() {
 
     const getTemplateOpts = async () => {
         const res = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
-        const opts = _.map<ITemplate, SelectItem>(res.data || [], t => ({ label: t.name, value: t.id }))
+        const opts = map<ITemplate, SelectItem>(res.data || [], t => ({ label: t.name, value: t.id }))
         setTemplateOpts(opts)
     }
 
@@ -86,7 +87,7 @@ export default function Page() {
                     .then(({ name, template }) => {
                         const queries: { [key: string]: string | undefined } = { name }
                         if (!!template?.length) {
-                            queries.template = _.join(template || [], ',')
+                            queries.template = template.map(t => t.value).join(',')
                         }
                         router.push(`${editorUrl}${coverToQueryString(queries)}`);
                     }).catch(() => {
@@ -97,20 +98,55 @@ export default function Page() {
                 setAddNewFlow(false)
             }}>
             <Form
-                onLoad={(form: FormInstance<FormData>) => setForm(form)}
+                onLoad={(form: FormInstance<FormData>) => {
+                    setForm(form)
+                }}
                 onDestroyed={() => {
                     setForm(undefined)
                 }}
             >
                 {
-                    Item => (
+                    ({ Item, List }) => (
                         <>
                             <Item name={'name'} label="Workflow Name" rules={{ required: 'Please give a name to workflow!', }}>
                                 <InputText />
                             </Item>
-                            <Item name={'template'} label="Apply Template">
-                                <MultiSelect options={templateOpts} />
-                            </Item>
+                            <List name='template' label="Template">{({ fields, append, remove, move }) => {
+                                return <>
+                                    <DndList
+                                        items={fields}
+                                        renderContent={(item, idx) => {
+                                            return <div className="flex w-full mt-1">
+                                                <Item className="grow" name={`template.${idx}.value`}>
+                                                    <Dropdown options={templateOpts} />
+                                                </Item>
+                                                <Button
+                                                    type='button'
+                                                    severity='danger'
+                                                    className="ml-1"
+                                                    icon={<FontAwesomeIcon icon={faTrash} />}
+                                                    onClick={(): void => {
+                                                        remove(idx)
+                                                    }}
+                                                />
+                                            </div>
+                                        }}
+                                        onDragEnd={({ source, destination }) => {
+                                            if (destination?.index === undefined) return;
+                                            move(source.index, destination.index)
+                                        }}
+                                    />
+                                    <Button
+                                        type='button'
+                                        className="mt-2 w-full"
+                                        icon={<FontAwesomeIcon icon={faAdd} />}
+                                        onClick={(): void => {
+                                            append({ value: '' })
+                                        }}
+                                    />
+                                </>
+                            }}
+                            </List>
                         </>
                     )
                 }</Form>

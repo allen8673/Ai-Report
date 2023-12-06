@@ -27,12 +27,12 @@ export interface ITemplate {
     rootNdeId: string[];
 }
 
-export type FlowTyep = 'prompt' | 'file-upload' | 'file-download';
+export type FlowTyep = 'prompt' | 'file-upload' | 'file-download' | 'template';
 export type FlowStatus = 'none' | 'success' | 'failure' | 'warning';
 export interface IFlowBase {
     id: string;
     type: FlowTyep;
-    name: string;
+    name?: string;
 }
 export interface IFlow extends IFlowBase {
     prompt?: string;
@@ -43,5 +43,6 @@ export interface IFlow extends IFlowBase {
     running?: boolean;
     status?: FlowStatus;
     depth?: number;
+    templateId?: string;
 }
 

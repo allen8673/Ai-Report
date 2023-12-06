@@ -40,3 +40,8 @@ body {
 .ellipsis {
   @apply text-ellipsis overflow-hidden whitespace-nowrap;
 }
+
+.normal-lable {
+  top: -0.75rem;
+  font-size: 12px;
+}

@@ -1,4 +1,4 @@
-import { IconDefinition, faUpload, faDownload, faBrain, faCloudUpload, faCloud, faFileArrowUp, faComment, faCloudDownload } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition, faUpload, faDownload, faBrain, faCloudUpload, faCloud, faFileArrowUp, faComment, faCloudDownload, faShapes } from '@fortawesome/free-solid-svg-icons'
 import { Edge, MarkerType } from 'reactflow';
 
 import { IFlowBase } from '@/interface/workflow';
@@ -18,15 +18,20 @@ export const REPORT_ITEMS: IFlowBase[] = [
         type: 'prompt'
     },
     {
-        id: 'file-upload',
-        name: 'Upload',
-        type: 'file-upload'
+        id: 'template',
+        name: 'Template',
+        type: 'template'
     },
-    {
-        id: 'file-download',
-        name: 'Done',
-        type: 'file-download'
-    },
+    // {
+    //     id: 'file-upload',
+    //     name: 'Upload',
+    //     type: 'file-upload'
+    // },
+    // {
+    //     id: 'file-download',
+    //     name: 'Done',
+    //     type: 'file-download'
+    // },
 ]
 
 export interface IconInfo {
@@ -59,6 +64,19 @@ export const flowInfoMap: {
     'prompt': {
         nodeType: '',
         icon: faBrain,
+        actIcon: {
+            icon: faCloud,
+            label: 'the prompt is set up.'
+        },
+        editIcon: {
+            icon: faComment,
+            label: 'set the prompt.',
+            interactable: true
+        }
+    },
+    'template': {
+        nodeType: '',
+        icon: faShapes,
         actIcon: {
             icon: faCloud,
             label: 'the prompt is set up.'

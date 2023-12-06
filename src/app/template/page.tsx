@@ -90,6 +90,7 @@ export default function Page() {
                             graphRef.current.reactFlowInstance?.fitView({ duration: 500 })
                         }
                     }}
+                    templateMap={{}}
                 />
             </SplitterPanel>
             <SplitterPanel className="overflow-auto px-[7px]" size={60}>

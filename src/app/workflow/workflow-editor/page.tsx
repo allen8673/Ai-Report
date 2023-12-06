@@ -12,7 +12,7 @@ import { v4 } from "uuid";
 import apiCaller from "@/api-helpers/api-caller";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowGraph from "@/components/flow-editor";
-import { Y_GAP, calculateDepth, getNewPosition } from "@/components/flow-editor/helper";
+import { X_GAP, calculateDepth, getNewPosition } from "@/components/flow-editor/helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
@@ -33,6 +33,7 @@ export default function Page() {
     const { graphRef } = useGraphRef<IFlow, any>();
     const [inEdit, setInEdit] = useState<boolean>();
     const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
+    const [templateMap, setTemplateMap] = useState<{ [id: string]: string }>({})
     const [form, setForm] = useState<FormInstance<ITemplate>>()
 
     const { showMessage } = useLayoutContext();
@@ -40,9 +41,28 @@ export default function Page() {
     const wfUrl = getFullUrl(RouterInfo.WORKFLOW);
 
     useEffect(() => {
-        setInEdit(mode === 'add');
-        mode === 'add' ? prepareNewWorkflow(paramObj) : fetchWorkflow(paramObj.id || '')
+        initial()
     }, []);
+
+    const initial = async () => {
+        setInEdit(mode === 'add');
+        await fetchTemplateData();
+        if (mode === 'add') {
+            prepareNewWorkflow(paramObj)
+        } else {
+            fetchWorkflow(paramObj.id || '')
+        }
+    }
+
+    const fetchTemplateData = async () => {
+        const temps = (await apiCaller.get<ITemplate[]>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`)).data;
+        if (!temps) return;
+
+        setTemplateMap(temps.reduce<{ [id: string]: string }>((pre, temp) => {
+            pre[temp.id] = temp.name
+            return pre;
+        }, {}))
+    }
 
     const fetchWorkflow = async (id: string) => {
         // TODO: call API to fetch the workflow
@@ -51,26 +71,57 @@ export default function Page() {
     }
 
     const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
-        const id = '';//v4();
-        const templateIds = paramObj.template?.split(',') || [];
-        // TODO: call API to fetch the tempplates by ids.
-        const templates: ITemplate[] = [];
-        for (const temp_id of templateIds) {
-            const rsp =
-                await apiCaller.get<ITemplate>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${temp_id}`);
-            if (!!rsp.data) templates.push(rsp.data)
+        const addId2Forwards = (_node: IFlow, id: string): void => {
+            _node.forwards = _node.forwards || [];
+            _node.forwards?.push(id);
         }
 
-        // initialize the workflow by templates
-        const flows: IFlow[] = templates.reduce<IFlow[]>((f, temp) => {
-            const start_y = (_.max(_.map(f, i => i?.position?.y || 0)) || 0) + Y_GAP;
-            const result = temp.flows.map<IFlow>(({ position, ...i }) => ({ ...i, position: { y: start_y + position.y, x: position.x } }))
-            return f.concat(result);
-        }, []);
+        const templateIds = paramObj.template?.split(',') || [];
+        const y = 0;
+        const rootId = `tmp_${v4()}`
+        const doneId = `tmp_${v4()}`
+        let x = 0, idx = 0;
+        const flows: IFlow[] = [
+            { id: rootId, type: 'file-upload', name: 'Upload', position: { x, y } }
+        ]
 
-        const rootNdeId: string[] = _.filter(flows, ['type', 'file-upload']).map(i => i.id)
+        for (const temp_id of templateIds) {
+            const id = `tmp_${v4()}`
+            x += X_GAP;
+            flows.push({
+                id,
+                type: 'template',
+                // name: templateMap[temp_id],
+                templateId: temp_id,
+                position: { x, y }
+            });
 
-        setWorkflow({ id, name: paramObj.name || '', flows, rootNdeId })
+            addId2Forwards(flows[idx], id);
+            idx++;
+        }
+
+        if (!!idx) {
+            x += X_GAP;
+            addId2Forwards(flows[idx], doneId);
+        } else {
+            x += X_GAP * 3;
+        }
+
+        flows.push(
+            {
+                id: doneId,
+                type: 'file-download',
+                name: 'Done',
+                position: { x, y }
+            }
+        );
+
+        setWorkflow({
+            id: '',
+            name: paramObj.name || '',
+            flows,
+            rootNdeId: [rootId]
+        })
     }
 
     const saveNewTemplate = async ({ name }: ITemplate) => {
@@ -250,6 +301,7 @@ export default function Page() {
                 graphRef={graphRef}
                 hideMiniMap
                 inEdit={inEdit}
+                templateMap={templateMap}
             />
             <Modal
                 title='Save as Template'
@@ -272,7 +324,7 @@ export default function Page() {
                     onSubmit={saveNewTemplate}
                 >
                     {
-                        Item => (
+                        ({ Item }) => (
                             <>
                                 <Item name={'name'} label="Template Name" rules={{ required: 'Please give a template name!' }}>
                                     <InputText />

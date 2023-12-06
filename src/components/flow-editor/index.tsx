@@ -1,9 +1,11 @@
-import _ from "lodash";
+import _, { includes, map } from "lodash";
 import { Button } from "primereact/button";
+import { Dropdown } from "primereact/dropdown";
 import { Fieldset } from "primereact/fieldset";
 import { FileUpload } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
+import { SelectItem } from "primereact/selectitem";
 import { Tooltip } from "primereact/tooltip";
 import { useEffect, useState } from "react";
 import { Connection, Edge, Node } from 'reactflow'
@@ -18,12 +20,12 @@ import { useGraphRef } from "../graph/helper";
 import Modal from "../modal";
 
 import { EDGE_DEF_SETTING, REPORT_ITEMS } from "./configuration";
-import { FlowGrapContext } from "./context";
+import { FlowGrapContext, ITemplateMap } from "./context";
 import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import ReportItem from "./report-item";
 
-import { IFlow, IFlowBase } from "@/interface/workflow";
+import { FlowTyep, IFlow, IFlowBase } from "@/interface/workflow";
 
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
@@ -39,14 +41,18 @@ interface FlowGraphProps extends Omit<GraphProps<IFlow>,
     'readonly'> {
     flows: IFlow[];
     inEdit?: boolean;
+    templateMap: ITemplateMap
 }
 
-export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...others }: FlowGraphProps) {
+const UNREMOVABLE_TYPES: FlowTyep[] = ['file-upload', 'file-download']
+
+export default function FlowGraph({ flows, inEdit = false, graphRef: ref, templateMap, ...others }: FlowGraphProps) {
 
     const [onDragItem, setOnDragItem] = useState<IFlowBase>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
     const [initialNodes, setInitialNodes] = useState<Node<IFlow>[]>([]);
-    const [form, setForm] = useState<FormInstance<IFlow>>()
+    const [promptForm, setPromptForm] = useState<FormInstance<IFlow>>()
+    const [tempForm, setTempForm] = useState<FormInstance<IFlow>>()
     const { graphRef } = useGraphRef<IFlow, any>(ref);
     const [openModal, setOpenModal] = useState<IFlow>();
 
@@ -54,9 +60,16 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
         setOpenModal(flow)
     }
     const setPrompt = () => {
-        const val = form?.getValues();
+        const val = promptForm?.getValues();
         if (!val) return
         graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, prompt: val.prompt, name: val.name } }))
+        setOpenModal(undefined);
+    }
+
+    const setTemplate = () => {
+        const val = tempForm?.getValues();
+        if (!val) return
+        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, templateId: val.templateId } }))
         setOpenModal(undefined);
     }
 
@@ -69,7 +82,14 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
             _.forEach(forwards, fw => {
                 edges.push({ id: `${flow.id}-${fw}`, source: flow.id, target: fw, deletable: inEdit })
             })
-            return ({ id, position, type: 'turbo', data: flow, selectable: inEdit })
+            return ({
+                id,
+                position,
+                type: 'turbo',
+                data: flow,
+                selectable: inEdit,
+                deletable: !includes(UNREMOVABLE_TYPES, flow.type)
+            })
         });
         setInitialEdges(edges);
         setInitialNodes(nodes);
@@ -81,7 +101,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
         graphRef.current.setEdges(e => ({ ...e, deletable: inEdit, selected: false, }));
     }, [inEdit]);
 
-    return <FlowGrapContext.Provider value={{ inEdit, clickOnSetting }}>
+    return <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, templateMap }}>
         <div className="flow-editor h-full w-full relative">
             {inEdit && <div className={`absolute 
             z-20 
@@ -166,9 +186,9 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
             >
                 <Form
                     defaultValues={openModal}
-                    onLoad={form => setForm(form)}
-                    onDestroyed={() => setForm(undefined)}>{
-                        (Item) =>
+                    onLoad={form => setPromptForm(form)}
+                    onDestroyed={() => setPromptForm(undefined)}>{
+                        ({ Item }) =>
                             <>
                                 <Item name='name' label="Name" >
                                     <InputText />
@@ -177,7 +197,8 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
                                     <InputTextarea className="w-full min-h-[100px]" />
                                 </Item>
                             </>
-                    }</Form>
+                    }
+                </Form>
             </Modal>
             <Modal
                 title="Upload your files"
@@ -210,6 +231,25 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, ...oth
                 <Fieldset legend="Preview your report" className="w-full" >
                     {openModal?.report || ''}
                 </Fieldset>
+            </Modal>
+            <Modal
+                title="Set Template"
+                onOk={setTemplate}
+                onCancel={closeModal}
+                visible={openModal?.type === 'template'}
+            >
+                <Form
+                    defaultValues={openModal}
+                    onLoad={form => setTempForm(form)}
+                    onDestroyed={() => setTempForm(undefined)}>{
+                        ({ Item }) =>
+                            <>
+                                <Item name='templateId' label="Template" >
+                                    <Dropdown options={map<ITemplateMap, SelectItem>(templateMap, (v, k) => ({ label: v, value: k }))} />
+                                </Item>
+                            </>
+                    }
+                </Form>
             </Modal>
         </div>
     </FlowGrapContext.Provider>
