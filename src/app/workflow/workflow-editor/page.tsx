@@ -1,7 +1,7 @@
 'use client'
 import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import _ from "lodash";
+import { debounce, filter, includes, map, range, some, uniq } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
@@ -91,7 +91,7 @@ export default function Page() {
                 wf.push({
                     ...tf,
                     id: id_trans[tf.id],
-                    forwards: _.map(tf.forwards, f => id_trans[f])
+                    forwards: map(tf.forwards, f => id_trans[f])
                 })
                 return wf;
             }, []);
@@ -179,7 +179,7 @@ export default function Page() {
         const id_trans: Record<string, string> = getNewIdTrans(old_nodes)
 
         // calculate new position for all nodes
-        const startNodes = _.filter(old_nodes, n => { return n.type === 'Input' })
+        const startNodes = filter(old_nodes, n => { return n.type === 'Input' })
         const position = getNewPosition(startNodes, old_nodes);
         // assign new ids to nodes, and reset the node position
         const nodes = old_nodes.reduce<IFlow[]>((result, cur) => {
@@ -205,26 +205,37 @@ export default function Page() {
         setOpenTemplateModal(false)
     }
 
+    const ifWorkflowIsCompleted = (nodes: IFlow[] = []): boolean => {
+        for (const node of nodes) {
+            if (node.type === 'Output') {
+                if (!some(nodes, n => includes(n.forwards, node.id))) return false
+            } else {
+                if (!node.forwards?.length) return false;
+            }
+        }
+        return true
+    }
+
     const mock_run = (forwards: string[]): void => {
         let next: string[] = [];
         graphRef.current?.setNodes(pre => {
-            if (_.includes(forwards, pre.id)) {
-                next = _.uniq(next.concat(pre.data.forwards || []))
+            if (includes(forwards, pre.id)) {
+                next = uniq(next.concat(pre.data.forwards || []))
                 return { ...pre, data: { ...pre.data, running: true } }
             }
             return pre
         });
 
-        _.debounce(async () => {
+        debounce(async () => {
             graphRef.current?.setNodes(pre => {
-                if (_.includes(forwards, pre.id)) {
+                if (includes(forwards, pre.id)) {
                     let status: FlowStatus = 'success';
                     let report: any = undefined;
                     if (pre.id == 'f-2') status = 'failure';
                     else if (pre.id == 'f-5') status = 'warning';
 
                     if (pre.data.type === 'Output') {
-                        report = <>{_.map(_.range(0, 30), () => (<p>
+                        report = <>{map(range(0, 30), () => (<p>
                             <p className="m-0">
                                 Next.js is a React framework for building full-stack web applications. You use React Components to build user interfaces, and Next.js for additional features and optimizations.
                             </p>
@@ -241,7 +252,7 @@ export default function Page() {
                 }
                 return pre
             });
-            _.debounce(() => {
+            debounce(() => {
                 if (!!next.length) mock_run(next);
                 else {
                     showMessage('workflow is done')
@@ -288,7 +299,7 @@ export default function Page() {
                                 label="Save"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
-                                    const flows: IFlow[] = _.map(graphRef.current?.getNodes() || [], n => ({
+                                    const flows: IFlow[] = map(graphRef.current?.getNodes() || [], n => ({
                                         ...n.data, position: n.position
                                     }));
                                     // TODO: Call API to save the edit result
@@ -314,6 +325,22 @@ export default function Page() {
                                 tooltip="Save as template"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={() => {
+                                    if (!ifWorkflowIsCompleted(workflow?.flows)) {
+                                        showMessage({
+                                            message: 'Cannot be saved as a template since the workflow is not completed.',
+                                            type: 'error'
+                                        })
+                                        return
+                                    }
+
+                                    // TODO: will allow the reference wf save as template in step 2
+                                    if (some(workflow?.flows, (f => f.type === 'Workflow'))) {
+                                        showMessage({
+                                            message: `Cannot be saved as a template since we don't allow the workflow reference to be saved into a template.`,
+                                            type: 'error'
+                                        })
+                                        return
+                                    }
                                     setOpenTemplateModal(true)
                                 }}
                             />
@@ -322,6 +349,13 @@ export default function Page() {
                                 tooltip="Run Flow"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
+                                    if (!ifWorkflowIsCompleted(workflow?.flows)) {
+                                        showMessage({
+                                            message: 'Cannot run the workflow since the workflow is not completed.',
+                                            type: 'error'
+                                        })
+                                        return
+                                    }
                                     graphRef.current?.setNodes(pre => {
                                         return { ...pre, data: { ...pre.data, status: 'none', running: false } }
                                     });
