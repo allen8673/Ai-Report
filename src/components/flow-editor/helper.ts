@@ -1,4 +1,4 @@
-import { filter, includes, max, mergeWith, min, } from "lodash";
+import { filter, includes, max, mergeWith, min, values } from "lodash";
 import { XYPosition } from "reactflow";
 import { v4 } from "uuid";
 
@@ -12,26 +12,62 @@ export const calculateDepth = (nodes: IFlowNode[], fullFlows: IFlowNode[], deep 
     });
 }
 
+export type NewPositionReturn = Record<string, {
+    groupId?: string;
+    position: XYPosition
+}>
 export const X_GAP = 430, Y_GAP = 150;
-export const getNewPosition = (nodes: IFlowNode[], flows: IFlowNode[] = [], x = 0, y = 0): Record<string, XYPosition> => {
+export const getNewPosition = (nodes: IFlowNode[], flows: IFlowNode[] = [], x = 0, y = 0):
+    NewPositionReturn => {
+
+    /**
+     * groupId is use to check if the sibling node is in same group
+     */
+    let groupId: string | undefined;
     return nodes
-        .sort((a, b) => (a.position.y < b.position.y ? -1 : 1))
-        .reduce<Record<string, XYPosition>>((result, node) => {
+        .reduce<NewPositionReturn>((result, node) => {
+            /**
+             * fist,  get the forwar nodes, and calculate the new positions
+             */
             const forwars_nodes = filter(flows, n => includes(node.forwards, n.id))
+            const newPosition = getNewPosition(forwars_nodes, flows, x + X_GAP, y);
+
+            /**
+             * merge the new position of forward nodes and other calculated position
+             */
             const merge = mergeWith(
                 result,
-                getNewPosition(forwars_nodes, flows, x + X_GAP, y),
+                newPosition,
                 (obj, src) => {
-                    return { x: max([(obj || src).x, src.x || 0]), y: min([(obj || src).y, src.y]) }
+                    return {
+                        groupId: (obj || src).groupId,
+                        position: {
+                            x: max([(obj || src).position.x, src.position.x || 0]),
+                            y: min([(obj || src).position.y, src.position.y])
+                        }
+                    }
                 }
             );
 
             result = {
                 ...merge,
-                [node.id]: { x, y }
+                [node.id]: {
+                    groupId: node.groupId,
+                    position: { x, y }
+                }
             }
-            y += Y_GAP;
 
+            /**
+             * if the sibling node is in difference group, 
+             * then the y-point should start from the last group
+             */
+            if (groupId !== node.groupId) {
+                const groupInfos = values(merge).filter(v => v.groupId === groupId)
+                y = (max(groupInfos.map(g => g.position.y)) || 0)
+            }
+
+            y += Y_GAP;
+            groupId = node?.groupId
             return result;
         }, {})
 }

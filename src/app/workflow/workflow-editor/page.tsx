@@ -187,7 +187,7 @@ export default function Page() {
                 ...cur,
                 id: (id_trans[cur.id] || ''),
                 forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || [],
-                position: position[cur.id]
+                position: position[cur.id].position
             })
             return result;
         }, []);
@@ -219,8 +219,9 @@ export default function Page() {
          */
         for (const ref_wf of ref_wfs) {
             const wf = await (await apiCaller.get<IWorkflow>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${ref_wf.workflowId}`)).data;
-            if (!wf) continue
+            if (!wf) continue;
 
+            const groupId = v4();
             /**
              * first, expand the reference nodes in the workflow
              */
@@ -233,6 +234,7 @@ export default function Page() {
             let wf_start: IFlowNode | undefined, wf_end: IFlowNode | undefined
 
             for (const flow of wf_flows) {
+                flow.groupId = groupId;
                 if (!includes(['Input', 'Output'], flow.type)) continue;
                 if (flow.type === 'Input') wf_start = flow;
                 if (flow.type === 'Output') wf_end = flow;
