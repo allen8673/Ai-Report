@@ -25,12 +25,12 @@ import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import ReportItem from "./report-item";
 
-import { FlowTyep, IFlow, IFlowBase } from "@/interface/workflow";
+import { FlowTyep, IFlowNode, IFlowNodeBase } from "@/interface/workflow";
 
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
 
-interface FlowGraphProps extends Omit<GraphProps<IFlow>,
+interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     'initialNodes' |
     'initialEdges' |
     'nodeTypes' |
@@ -39,7 +39,7 @@ interface FlowGraphProps extends Omit<GraphProps<IFlow>,
     'onConnect' |
     'onEdgesDelete' |
     'readonly'> {
-    flows: IFlow[];
+    flows: IFlowNode[];
     inEdit?: boolean;
     workflowMap: IWorkflowMap
 }
@@ -48,15 +48,15 @@ const UNREMOVABLE_TYPES: FlowTyep[] = ['Input', 'Output']
 
 export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workflowMap, ...others }: FlowGraphProps) {
 
-    const [onDragItem, setOnDragItem] = useState<IFlowBase>();
+    const [onDragItem, setOnDragItem] = useState<IFlowNodeBase>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
-    const [initialNodes, setInitialNodes] = useState<Node<IFlow>[]>([]);
-    const [promptForm, setPromptForm] = useState<FormInstance<IFlow>>()
-    const [tempForm, setTempForm] = useState<FormInstance<IFlow>>()
-    const { graphRef } = useGraphRef<IFlow, any>(ref);
-    const [openModal, setOpenModal] = useState<IFlow>();
+    const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
+    const [promptForm, setPromptForm] = useState<FormInstance<IFlowNode>>()
+    const [tempForm, setTempForm] = useState<FormInstance<IFlowNode>>()
+    const { graphRef } = useGraphRef<IFlowNode, any>(ref);
+    const [openModal, setOpenModal] = useState<IFlowNode>();
 
-    const clickOnSetting = (flow: IFlow) => {
+    const clickOnSetting = (flow: IFlowNode) => {
         setOpenModal(flow)
     }
     const setPrompt = () => {
@@ -77,7 +77,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
 
     useEffect(() => {
         const edges: Edge[] = [];
-        const nodes = _.map<IFlow, Node<IFlow>>(flows, flow => {
+        const nodes = _.map<IFlowNode, Node<IFlowNode>>(flows, flow => {
             const { id, position, forwards } = flow;
             _.forEach(forwards, fw => {
                 edges.push({ id: `${flow.id}-${fw}`, source: flow.id, target: fw, deletable: inEdit })

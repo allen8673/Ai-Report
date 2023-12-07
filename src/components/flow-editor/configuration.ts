@@ -1,7 +1,7 @@
 import { IconDefinition, faUpload, faDownload, faBrain, faCloudUpload, faCloud, faFileArrowUp, faComment, faCloudDownload, faShareNodes } from '@fortawesome/free-solid-svg-icons'
 import { Edge, MarkerType } from 'reactflow';
 
-import { FlowTyep, IFlowBase } from '@/interface/workflow';
+import { FlowTyep, IFlowNodeBase } from '@/interface/workflow';
 
 export const EDGE_DEF_SETTING: Partial<Edge> = {
     // type: 'smoothstep',
@@ -11,7 +11,7 @@ export const EDGE_DEF_SETTING: Partial<Edge> = {
     interactionWidth: 20,
 }
 
-export const REPORT_ITEMS: IFlowBase[] = [
+export const REPORT_ITEMS: IFlowNodeBase[] = [
     {
         id: 'custom-prompt',
         name: 'Custom Prompt',

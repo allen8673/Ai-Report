@@ -5,10 +5,10 @@ import React from 'react';
 
 import { flowInfoMap } from '../configuration';
 
-import { IFlowBase } from '@/interface/workflow';
+import { IFlowNodeBase } from '@/interface/workflow';
 import './report-item.css';
 
-export interface ReportItemProps extends IFlowBase {
+export interface ReportItemProps extends IFlowNodeBase {
     onDelete?: () => void;
 }
 
