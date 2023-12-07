@@ -48,7 +48,7 @@ export default function Page() {
 
     const initial = async () => {
         setInEdit(mode === 'add');
-        await fetchTemplateData();
+        await fetchAllWorflowData();
         if (mode === 'add') {
             prepareNewWorkflow(paramObj)
         } else {
@@ -56,12 +56,12 @@ export default function Page() {
         }
     }
 
-    const fetchTemplateData = async () => {
-        const temps = (await apiCaller.get<IWorkflow[]>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`)).data;
-        if (!temps) return;
+    const fetchAllWorflowData = async () => {
+        const wfs = (await apiCaller.get<IWorkflow[]>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`)).data;
+        if (!wfs) return;
 
-        setWorkflowMap(temps.reduce<{ [id: string]: string }>((pre, temp) => {
-            pre[temp.id] = temp.name
+        setWorkflowMap(wfs.reduce<{ [id: string]: string }>((pre, wf) => {
+            if (wf.id !== paramObj?.id) pre[wf.id] = wf.name
             return pre;
         }, {}))
     }
