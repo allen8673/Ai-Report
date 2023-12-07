@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 import { v4 } from "uuid";
 
 import { ApiResult } from "@/interface/api";
-import { ITemplate } from "@/interface/workflow";
+import { IWorkflow } from "@/interface/workflow";
 import { mock_templates } from "@/mock-data/mock"
 
 export async function GET(request: NextRequest) {
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-    const data = await request.json() as (ITemplate | undefined);
+    const data = await request.json() as (IWorkflow | undefined);
     const result: ApiResult = { status: 'success' }
     if (!data) {
         result.status = 'failure';

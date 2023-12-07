@@ -11,20 +11,11 @@ export interface IEditWorkflow {
  * the interface for the diagram of AI report
  */
 export interface IWorkflow {
+    type: 'workflow' | 'template',
     id: string;
     name: string;
     rootNdeId: string[];
     flows: IFlowNode[];
-}
-
-/**
- * the interface for the template
- */
-export interface ITemplate {
-    id: string;
-    name: string;
-    flows: IFlowNode[]
-    rootNdeId: string[];
 }
 
 export type FlowTyep = 'Input' | 'Output' | 'Normal' | 'Workflow';
@@ -33,6 +24,7 @@ export interface IFlowNodeBase {
     id: string;
     type: FlowTyep;
     name?: string;
+    groupId?: string;
 }
 export interface IFlowNode extends IFlowNodeBase {
     position: XYPosition;

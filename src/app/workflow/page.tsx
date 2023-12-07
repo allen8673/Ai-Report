@@ -17,7 +17,7 @@ import Modal from "@/components/modal";
 import Table from "@/components/table";
 import { Column } from "@/components/table/table";
 import TitlePane from "@/components/title-pane";
-import { ITemplate, IWorkflow } from "@/interface/workflow";
+import { IWorkflow } from "@/interface/workflow";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
 interface FormData {
@@ -39,7 +39,7 @@ export default function Page() {
 
     const getTemplateOpts = async () => {
         const res = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
-        const opts = map<ITemplate, SelectItem>(res.data || [], t => ({ label: t.name, value: t.id }))
+        const opts = map<IWorkflow, SelectItem>(res.data || [], t => ({ label: t.name, value: t.id }))
         setTemplateOpts(opts)
     }
 

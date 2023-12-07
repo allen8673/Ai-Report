@@ -21,7 +21,7 @@ import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/title-pane";
 import { ApiResult } from "@/interface/api";
-import { FlowStatus, IEditWorkflow, IFlowNode, ITemplate, IWorkflow } from "@/interface/workflow";
+import { FlowStatus, IEditWorkflow, IFlowNode, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
@@ -36,7 +36,7 @@ export default function Page() {
     const [inEdit, setInEdit] = useState<boolean>();
     const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
     const [workflowMap, setWorkflowMap] = useState<IWorkflowMap>({})
-    const [form, setForm] = useState<FormInstance<ITemplate>>()
+    const [form, setForm] = useState<FormInstance<IWorkflow>>()
 
     const { showMessage } = useLayoutContext();
     const router = useRouter();
@@ -74,9 +74,9 @@ export default function Page() {
 
     const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
         const id = '';
-        const template: (ITemplate | undefined) =
+        const template: (IWorkflow | undefined) =
             (!!paramObj.template ?
-                (await apiCaller.get<ITemplate>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${paramObj.template}`)).data :
+                (await apiCaller.get<IWorkflow>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${paramObj.template}`)).data :
                 undefined);
 
         if (!!template) {
@@ -95,7 +95,7 @@ export default function Page() {
                 })
                 return wf;
             }, []);
-            setWorkflow({ id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
+            setWorkflow({ type: 'workflow', id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
 
         } else {
             /**
@@ -121,7 +121,7 @@ export default function Page() {
                 },
 
             ]
-            setWorkflow({ id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
+            setWorkflow({ type: 'workflow', id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
         }
     }
 
@@ -193,7 +193,8 @@ export default function Page() {
         }, []);
 
         calculateDepth(_nodes.filter(n => n.type === 'Input'), _nodes);
-        const template: ITemplate = {
+        const template: IWorkflow = {
+            type: 'template',
             id: '', //v4(),
             rootNdeId: [],
             name,
@@ -465,7 +466,7 @@ export default function Page() {
                     setOpenTemplateModal(false)
                 }}>
                 <Form
-                    onLoad={(form: FormInstance<ITemplate>) => setForm(form)}
+                    onLoad={(form: FormInstance<IWorkflow>) => setForm(form)}
                     onDestroyed={() => {
                         setForm(undefined)
                     }}

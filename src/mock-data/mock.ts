@@ -1,9 +1,10 @@
 
-import { ITemplate, IWorkflow } from "@/interface/workflow";
+import { IWorkflow } from "@/interface/workflow";
 
 
 export const mock_workflows: IWorkflow[] = [
     {
+        type: 'workflow',
         "id": "d521066f-7f61-4be0-a9b9-a4517edfc825",
         "name": "demo workflow",
         "rootNdeId": ["e7bce421-054c-45f6-b663-c8816f75df67"],
@@ -99,6 +100,7 @@ export const mock_workflows: IWorkflow[] = [
         ]
     },
     {
+        type: 'workflow',
         "id": "46fa59de-1acc-4e7d-9149-7756f828e73a",
         "name": "demo wf 2",
         "flows": [
@@ -219,16 +221,31 @@ export const mock_workflows: IWorkflow[] = [
         ]
     },
     {
+        type: 'workflow',
         "id": "37yyy2-3172-470c-94a0-472fd1a1cdf4",
         "name": "demo 3",
         "flows": [
+            {
+                "id": "tmp_2af4b481-861f-4728-8ada-f37c7eef9232",
+                "name": "Workflow",
+                "type": "Workflow",
+                "position": {
+                    "x": 630,
+                    "y": -100
+                },
+                "forwards": [
+                    "tmp_2b2b8a36-eb42-4164-8f13-071806b8bce7"
+                ],
+                "workflowId": "46fa59de-1acc-4e7d-9149-7756f828e73a",
+                "depth": 1
+            },
             {
                 "id": "tmp_e4ec56d8-5416-427a-8827-f766f364cc25",
                 "name": "Workflow",
                 "type": "Workflow",
                 "position": {
-                    "x": 890,
-                    "y": -80
+                    "x": 870,
+                    "y": 120
                 },
                 "forwards": [
                     "tmp_2b2b8a36-eb42-4164-8f13-071806b8bce7"
@@ -241,8 +258,8 @@ export const mock_workflows: IWorkflow[] = [
                 "name": "Workflow",
                 "type": "Workflow",
                 "position": {
-                    "x": 370,
-                    "y": -20
+                    "x": 380,
+                    "y": 120
                 },
                 "forwards": [
                     "tmp_e4ec56d8-5416-427a-8827-f766f364cc25"
@@ -270,7 +287,8 @@ export const mock_workflows: IWorkflow[] = [
                     "y": 0
                 },
                 "forwards": [
-                    "tmp_53919e68-e5d5-43c4-bb61-c7cbaf4960b3"
+                    "tmp_53919e68-e5d5-43c4-bb61-c7cbaf4960b3",
+                    "tmp_2af4b481-861f-4728-8ada-f37c7eef9232"
                 ],
                 "depth": 0
             }
@@ -281,8 +299,9 @@ export const mock_workflows: IWorkflow[] = [
     }
 ]
 
-export const mock_templates: ITemplate[] = [
+export const mock_templates: IWorkflow[] = [
     {
+        type: 'template',
         id: 'dde9c1d8-15eb-45b1-9cc5-f5c8a12df64d',
         name: 'Base Template',
         "rootNdeId": ["52273db9-9caa-484c-947e-878d570bbfbe"],
@@ -325,6 +344,7 @@ export const mock_templates: ITemplate[] = [
         ],
     },
     {
+        type: 'template',
         id: '067d661d-125f-41bf-853f-11b373b2e4be',
         name: 'Analyze Attack Events ',
         "rootNdeId": ["6dc25c53-7615-47f5-a3f8-9c25b565e915"],
