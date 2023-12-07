@@ -212,7 +212,6 @@ export default function Page() {
          */
         const ref_wfs = filter(_node, n => n.type === 'Workflow')
 
-
         /**
          * get all workflows by reference nodes,
          * and use the workflows instead of all reference nodes. 
@@ -409,15 +408,6 @@ export default function Page() {
                                         })
                                         return
                                     }
-
-                                    // TODO: will allow the reference wf save as template in step 2
-                                    // if (some(workflow?.flows, (f => f.type === 'Workflow'))) {
-                                    //     showMessage({
-                                    //         message: `Cannot be saved as a template since we don't allow the workflow reference to be saved into a template.`,
-                                    //         type: 'error'
-                                    //     })
-                                    //     return
-                                    // }
                                     setOpenTemplateModal(true)
                                 }}
                             />
