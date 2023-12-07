@@ -14,14 +14,14 @@ import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowGraph from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
 import { IWorkflowMap } from "@/components/flow-editor/context";
-import { X_GAP, calculateDepth, getNewIdTrans, getNewPosition } from "@/components/flow-editor/helper";
+import { X_GAP, calculateDepth, getNewIdTrans, resetPosition_x, resetPosition_y } from "@/components/flow-editor/helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/title-pane";
 import { ApiResult } from "@/interface/api";
-import { FlowStatus, IEditWorkflow, IFlowNode, ITemplate, IWorkflow } from "@/interface/workflow";
+import { FlowStatus, IEditWorkflow, IFlowNode, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
@@ -36,7 +36,7 @@ export default function Page() {
     const [inEdit, setInEdit] = useState<boolean>();
     const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
     const [workflowMap, setWorkflowMap] = useState<IWorkflowMap>({})
-    const [form, setForm] = useState<FormInstance<ITemplate>>()
+    const [form, setForm] = useState<FormInstance<IWorkflow>>()
 
     const { showMessage } = useLayoutContext();
     const router = useRouter();
@@ -74,9 +74,9 @@ export default function Page() {
 
     const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
         const id = '';
-        const template: (ITemplate | undefined) =
+        const template: (IWorkflow | undefined) =
             (!!paramObj.template ?
-                (await apiCaller.get<ITemplate>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${paramObj.template}`)).data :
+                (await apiCaller.get<IWorkflow>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${paramObj.template}`)).data :
                 undefined);
 
         if (!!template) {
@@ -95,7 +95,7 @@ export default function Page() {
                 })
                 return wf;
             }, []);
-            setWorkflow({ id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
+            setWorkflow({ type: 'workflow', id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
 
         } else {
             /**
@@ -121,7 +121,7 @@ export default function Page() {
                 },
 
             ]
-            setWorkflow({ id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
+            setWorkflow({ type: 'workflow', id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
         }
     }
 
@@ -179,21 +179,22 @@ export default function Page() {
         const id_trans: Record<string, string> = getNewIdTrans(nodes)
 
         // calculate new position for all nodes
-        const startNodes = filter(nodes, n => { return n.type === 'Input' })
-        const position = getNewPosition(startNodes, nodes);
+        const input_id = nodes.find(n => n.type === 'Input')?.id || ''
+        resetPosition_x(nodes, [input_id]);
+        resetPosition_y(nodes, [input_id]);
         // assign new ids to nodes, and reset the node position
         const _nodes = nodes.reduce<IFlowNode[]>((result, cur) => {
             result.push({
                 ...cur,
                 id: (id_trans[cur.id] || ''),
                 forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || [],
-                position: position[cur.id]
             })
             return result;
         }, []);
 
         calculateDepth(_nodes.filter(n => n.type === 'Input'), _nodes);
-        const template: ITemplate = {
+        const template: IWorkflow = {
+            type: 'template',
             id: '', //v4(),
             rootNdeId: [],
             name,
@@ -218,7 +219,7 @@ export default function Page() {
          */
         for (const ref_wf of ref_wfs) {
             const wf = await (await apiCaller.get<IWorkflow>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${ref_wf.workflowId}`)).data;
-            if (!wf) continue
+            if (!wf) continue;
 
             /**
              * first, expand the reference nodes in the workflow
@@ -465,7 +466,7 @@ export default function Page() {
                     setOpenTemplateModal(false)
                 }}>
                 <Form
-                    onLoad={(form: FormInstance<ITemplate>) => setForm(form)}
+                    onLoad={(form: FormInstance<IWorkflow>) => setForm(form)}
                     onDestroyed={() => {
                         setForm(undefined)
                     }}

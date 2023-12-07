@@ -1,5 +1,4 @@
-import { filter, includes, max, mergeWith, min, } from "lodash";
-import { XYPosition } from "reactflow";
+import { filter, find, includes, max, some } from "lodash";
 import { v4 } from "uuid";
 
 import { IFlowNode } from "@/interface/workflow";
@@ -12,28 +11,27 @@ export const calculateDepth = (nodes: IFlowNode[], fullFlows: IFlowNode[], deep 
     });
 }
 
-export const X_GAP = 430, Y_GAP = 150;
-export const getNewPosition = (nodes: IFlowNode[], flows: IFlowNode[] = [], x = 0, y = 0): Record<string, XYPosition> => {
-    return nodes
-        .sort((a, b) => (a.position.y < b.position.y ? -1 : 1))
-        .reduce<Record<string, XYPosition>>((result, node) => {
-            const forwars_nodes = filter(flows, n => includes(node.forwards, n.id))
-            const merge = mergeWith(
-                result,
-                getNewPosition(forwars_nodes, flows, x + X_GAP, y),
-                (obj, src) => {
-                    return { x: max([(obj || src).x, src.x || 0]), y: min([(obj || src).y, src.y]) }
-                }
-            );
-
-            result = {
-                ...merge,
-                [node.id]: { x, y }
-            }
-            y += Y_GAP;
-
-            return result;
-        }, {})
+export const X_GAP = 400, Y_GAP = 150;
+export const resetPosition_x = (nodes: IFlowNode[], resetIds: string[], setX = 0) => {
+    for (const id of resetIds) {
+        const node = find(nodes, ['id', id]);
+        if (!node) continue;
+        node.position.x = max([node.position.x, setX]) || node.position.x;
+        resetPosition_x(nodes, node.forwards, setX + X_GAP)
+    }
+}
+export const resetPosition_y = (nodes: IFlowNode[], resetIds: string[], setY = 0) => {
+    for (const id of resetIds) {
+        const node = find(nodes, ['id', id]);
+        if (!node) continue;
+        while (some(nodes.filter(n => n !== node),
+            n => n.position.x === node.position.x && n.position.y === setY)
+        ) {
+            setY += Y_GAP
+        }
+        node.position.y = setY;
+        resetPosition_y(nodes, node.forwards)
+    }
 }
 
 /**
