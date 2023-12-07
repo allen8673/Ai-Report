@@ -24,7 +24,6 @@ export interface IFlowNodeBase {
     id: string;
     type: FlowTyep;
     name?: string;
-    groupId?: string;
 }
 export interface IFlowNode extends IFlowNodeBase {
     position: XYPosition;

@@ -14,7 +14,7 @@ import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowGraph from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
 import { IWorkflowMap } from "@/components/flow-editor/context";
-import { X_GAP, calculateDepth, getNewIdTrans, getNewPosition } from "@/components/flow-editor/helper";
+import { X_GAP, calculateDepth, getNewIdTrans, resetPosition_x, resetPosition_y } from "@/components/flow-editor/helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
@@ -179,15 +179,15 @@ export default function Page() {
         const id_trans: Record<string, string> = getNewIdTrans(nodes)
 
         // calculate new position for all nodes
-        const startNodes = filter(nodes, n => { return n.type === 'Input' })
-        const position = getNewPosition(startNodes, nodes);
+        const input_id = nodes.find(n => n.type === 'Input')?.id || ''
+        resetPosition_x(nodes, [input_id]);
+        resetPosition_y(nodes, [input_id]);
         // assign new ids to nodes, and reset the node position
         const _nodes = nodes.reduce<IFlowNode[]>((result, cur) => {
             result.push({
                 ...cur,
                 id: (id_trans[cur.id] || ''),
                 forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || [],
-                position: position[cur.id].position
             })
             return result;
         }, []);
@@ -221,7 +221,6 @@ export default function Page() {
             const wf = await (await apiCaller.get<IWorkflow>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${ref_wf.workflowId}`)).data;
             if (!wf) continue;
 
-            const groupId = v4();
             /**
              * first, expand the reference nodes in the workflow
              */
@@ -234,7 +233,6 @@ export default function Page() {
             let wf_start: IFlowNode | undefined, wf_end: IFlowNode | undefined
 
             for (const flow of wf_flows) {
-                flow.groupId = groupId;
                 if (!includes(['Input', 'Output'], flow.type)) continue;
                 if (flow.type === 'Input') wf_start = flow;
                 if (flow.type === 'Output') wf_end = flow;
