@@ -1,10 +1,10 @@
-import { filter, includes, max, mergeWith, min } from "lodash";
+import { filter, includes, max, mergeWith, min, } from "lodash";
 import { XYPosition } from "reactflow";
 import { v4 } from "uuid";
 
-import { IFlow } from "@/interface/workflow";
+import { IFlowNode } from "@/interface/workflow";
 
-export const calculateDepth = (nodes: IFlow[], fullFlows: IFlow[], deep = 0): void => {
+export const calculateDepth = (nodes: IFlowNode[], fullFlows: IFlowNode[], deep = 0): void => {
     nodes.forEach(node => {
         const forwars_nodes = filter(fullFlows, n => includes(node.forwards, n.id));
         calculateDepth(forwars_nodes, fullFlows, deep + 1);
@@ -13,7 +13,7 @@ export const calculateDepth = (nodes: IFlow[], fullFlows: IFlow[], deep = 0): vo
 }
 
 export const X_GAP = 430, Y_GAP = 150;
-export const getNewPosition = (nodes: IFlow[], flows: IFlow[] = [], x = 0, y = 0): Record<string, XYPosition> => {
+export const getNewPosition = (nodes: IFlowNode[], flows: IFlowNode[] = [], x = 0, y = 0): Record<string, XYPosition> => {
     return nodes
         .sort((a, b) => (a.position.y < b.position.y ? -1 : 1))
         .reduce<Record<string, XYPosition>>((result, node) => {
@@ -41,7 +41,7 @@ export const getNewPosition = (nodes: IFlow[], flows: IFlow[] = [], x = 0, y = 0
  * @param nodes 
  * @returns 
  */
-export const getNewIdTrans = (nodes: IFlow[]): Record<string, string> => {
+export const getNewIdTrans = (nodes: IFlowNode[]): Record<string, string> => {
     return nodes.reduce<Record<string, string>>((result, cur) => {
         result[cur.id] = `tmp_${v4()}`;
         return result

@@ -21,7 +21,7 @@ import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/title-pane";
 import { ApiResult } from "@/interface/api";
-import { FlowStatus, IEditWorkflow, IFlow, ITemplate, IWorkflow } from "@/interface/workflow";
+import { FlowStatus, IEditWorkflow, IFlowNode, ITemplate, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
@@ -32,7 +32,7 @@ export default function Page() {
     const paramObj = coverSearchParamsToObj<IEditWorkflow>(searchParams);
     const mode: EditMode = !!paramObj.id ? 'normal' : 'add';
     const [workflow, setWorkflow] = useState<IWorkflow>();
-    const { graphRef } = useGraphRef<IFlow, any>();
+    const { graphRef } = useGraphRef<IFlowNode, any>();
     const [inEdit, setInEdit] = useState<boolean>();
     const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
     const [workflowMap, setWorkflowMap] = useState<IWorkflowMap>({})
@@ -48,7 +48,7 @@ export default function Page() {
 
     const initial = async () => {
         setInEdit(mode === 'add');
-        await fetchTemplateData();
+        await fetchAllWorflowData();
         if (mode === 'add') {
             prepareNewWorkflow(paramObj)
         } else {
@@ -56,12 +56,12 @@ export default function Page() {
         }
     }
 
-    const fetchTemplateData = async () => {
-        const temps = (await apiCaller.get<IWorkflow[]>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`)).data;
-        if (!temps) return;
+    const fetchAllWorflowData = async () => {
+        const wfs = (await apiCaller.get<IWorkflow[]>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`)).data;
+        if (!wfs) return;
 
-        setWorkflowMap(temps.reduce<{ [id: string]: string }>((pre, temp) => {
-            pre[temp.id] = temp.name
+        setWorkflowMap(wfs.reduce<{ [id: string]: string }>((pre, wf) => {
+            if (wf.id !== paramObj?.id) pre[wf.id] = wf.name
             return pre;
         }, {}))
     }
@@ -86,7 +86,7 @@ export default function Page() {
              */
             const id_trans = getNewIdTrans(template.flows)
             let rootId = ''
-            const flows: IFlow[] = template.flows.reduce<IFlow[]>((wf, tf) => {
+            const flows: IFlowNode[] = template.flows.reduce<IFlowNode[]>((wf, tf) => {
                 if (tf.type === 'Input') rootId = id_trans[tf.id]
                 wf.push({
                     ...tf,
@@ -104,7 +104,7 @@ export default function Page() {
              */
             const rootId = `tmp_${v4()}`
             const doneId = `tmp_${v4()}`
-            const flows: IFlow[] = [
+            const flows: IFlowNode[] = [
                 {
                     id: doneId,
                     type: 'Output',
@@ -174,7 +174,7 @@ export default function Page() {
     // }
     //#endregion
 
-    const saveNewTemplate = async (nodes: IFlow[], name: string) => {
+    const saveNewTemplate = async (nodes: IFlowNode[], name: string) => {
         // assign new ids to nodes
         const id_trans: Record<string, string> = getNewIdTrans(nodes)
 
@@ -182,7 +182,7 @@ export default function Page() {
         const startNodes = filter(nodes, n => { return n.type === 'Input' })
         const position = getNewPosition(startNodes, nodes);
         // assign new ids to nodes, and reset the node position
-        const _nodes = nodes.reduce<IFlow[]>((result, cur) => {
+        const _nodes = nodes.reduce<IFlowNode[]>((result, cur) => {
             result.push({
                 ...cur,
                 id: (id_trans[cur.id] || ''),
@@ -205,13 +205,12 @@ export default function Page() {
         setOpenTemplateModal(false)
     }
 
-    const expandRefWF = async (nodes: IFlow[]) => {
-        const _node = cloneDeep(nodes || []);
+    const expandRefWF = async (nodes: IFlowNode[]) => {
+        const _nodes = cloneDeep(nodes || []);
         /**
          * get all reference nodes from input nodes
          */
-        const ref_wfs = filter(_node, n => n.type === 'Workflow')
-
+        const ref_wfs = filter(_nodes, n => n.type === 'Workflow')
 
         /**
          * get all workflows by reference nodes,
@@ -230,7 +229,7 @@ export default function Page() {
              * get the workflow start node and end node.
              * and remove the starrt node and end node from the flows of workflow
              */
-            let wf_start: IFlow | undefined, wf_end: IFlow | undefined
+            let wf_start: IFlowNode | undefined, wf_end: IFlowNode | undefined
 
             for (const flow of wf_flows) {
                 if (!includes(['Input', 'Output'], flow.type)) continue;
@@ -244,7 +243,7 @@ export default function Page() {
              * and put all of forwards of workflow start node to all forwards of source nodes,
              * to instead of reference node.
              */
-            const sources = filter(_node, n => includes(n.forwards, ref_wf.id));
+            const sources = filter(_nodes, n => includes(n.forwards, ref_wf.id));
             for (const src of sources) {
                 if (!src.forwards) continue;
                 remove(src.forwards, ref_wf.id);
@@ -264,15 +263,15 @@ export default function Page() {
             /**
              * at the end, push the workflow to the node instead of reference node
              */
-            _node.push(...wf_flows)
-            remove(_node, ['id', ref_wf.id]);
+            _nodes.push(...wf_flows)
+            remove(_nodes, ['id', ref_wf.id]);
         }
 
         /**
          * have to trans the node id before return
          */
-        const id_trans: Record<string, string> = getNewIdTrans(_node);
-        return _node.reduce<IFlow[]>((result, cur) => {
+        const id_trans: Record<string, string> = getNewIdTrans(_nodes);
+        return _nodes.reduce<IFlowNode[]>((result, cur) => {
             result.push({
                 ...cur,
                 id: (id_trans[cur.id] || ''),
@@ -282,7 +281,7 @@ export default function Page() {
         }, []);
     }
 
-    const ifWorkflowIsCompleted = (nodes: IFlow[] = []): boolean => {
+    const ifWorkflowIsCompleted = (nodes: IFlowNode[] = []): boolean => {
         for (const node of nodes) {
             if (node.type === 'Output') {
                 if (!some(nodes, n => includes(n.forwards, node.id))) return false
@@ -376,7 +375,7 @@ export default function Page() {
                                 label="Save"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
-                                    const flows: IFlow[] = map(graphRef.current?.getNodes() || [], n => ({
+                                    const flows: IFlowNode[] = map(graphRef.current?.getNodes() || [], n => ({
                                         ...n.data, position: n.position
                                     }));
                                     // TODO: Call API to save the edit result
@@ -409,15 +408,6 @@ export default function Page() {
                                         })
                                         return
                                     }
-
-                                    // TODO: will allow the reference wf save as template in step 2
-                                    // if (some(workflow?.flows, (f => f.type === 'Workflow'))) {
-                                    //     showMessage({
-                                    //         message: `Cannot be saved as a template since we don't allow the workflow reference to be saved into a template.`,
-                                    //         type: 'error'
-                                    //     })
-                                    //     return
-                                    // }
                                     setOpenTemplateModal(true)
                                 }}
                             />

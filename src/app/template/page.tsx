@@ -13,14 +13,14 @@ import Table from '@/components/table';
 import { Column } from '@/components/table/table';
 import TitlePane from '@/components/title-pane';
 import { ApiResult } from '@/interface/api';
-import { IFlow, ITemplate } from '@/interface/workflow';
+import { IFlowNode, ITemplate } from '@/interface/workflow';
 
 export default function Page() {
 
     const [templates, setTemplates] = useState<ITemplate[]>([]);
     const [selection, setSelection] = useState<ITemplate>();
 
-    const { graphRef } = useGraphRef<IFlow, any>();
+    const { graphRef } = useGraphRef<IFlowNode, any>();
     const columns: Column<ITemplate>[] = [
         { key: 'id', title: 'ID', style: { width: '25%' } },
         { key: 'name', title: 'Name' },

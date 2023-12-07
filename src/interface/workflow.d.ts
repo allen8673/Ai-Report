@@ -14,7 +14,7 @@ export interface IWorkflow {
     id: string;
     name: string;
     rootNdeId: string[];
-    flows: IFlow[];
+    flows: IFlowNode[];
 }
 
 /**
@@ -23,26 +23,26 @@ export interface IWorkflow {
 export interface ITemplate {
     id: string;
     name: string;
-    flows: IFlow[]
+    flows: IFlowNode[]
     rootNdeId: string[];
 }
 
 export type FlowTyep = 'Input' | 'Output' | 'Normal' | 'Workflow';
 export type FlowStatus = 'none' | 'success' | 'failure' | 'warning';
-export interface IFlowBase {
+export interface IFlowNodeBase {
     id: string;
     type: FlowTyep;
     name?: string;
 }
-export interface IFlow extends IFlowBase {
-    prompt?: string;
-    file?: any;
-    report?: any;
-    forwards: string[];
+export interface IFlowNode extends IFlowNodeBase {
     position: XYPosition;
-    running?: boolean;
-    status?: FlowStatus;
+    forwards: string[];
+    prompt?: string;
     depth?: number;
     workflowId?: string;
+    file?: any;
+    report?: any;
+    running?: boolean;
+    status?: FlowStatus;
 }
 
