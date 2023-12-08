@@ -1,4 +1,4 @@
-import { IconDefinition, faUpload, faDownload, faBrain, faCloudUpload, faCloud, faFileArrowUp, faComment, faCloudDownload, faShareNodes } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition, faUpload, faDownload, faBrain, faCloud, faComment, faCloudDownload, faShareNodes } from '@fortawesome/free-solid-svg-icons'
 import { Edge, MarkerType } from 'reactflow';
 
 import { FlowTyep, IFlowNodeBase } from '@/interface/workflow';
