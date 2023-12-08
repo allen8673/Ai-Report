@@ -270,6 +270,8 @@ export default function Page() {
             remove(_nodes, ['id', ref_wf.id]);
         }
 
+
+
         /**
          * have to trans the node id before return
          */
@@ -499,7 +501,7 @@ export default function Page() {
                     mode='advanced'
                     multiple
                     accept="*"
-                    maxFileSize={1000000}
+                    // maxFileSize={1000000}
                     contentClassName="rounded-sm mt-1"
                     headerTemplate={(opts) => {
                         return <div
@@ -582,6 +584,30 @@ export default function Page() {
                                 </div>
                             </div>
                         )
+                    }}
+                    customUpload
+                    uploadHandler={e => {
+
+                        if (workflow && e.files && e.files.length > 0) {
+                            const formData = new FormData();
+                            for (let i = 0; i < e.files.length; i++) {
+                                const file = e.files[i]
+                                formData.append('files', file);
+                            }
+
+                            formData.append('userId', '23224');
+                            formData.append('workflowId', workflow.id);
+                            formData.append('version', '1');
+
+                            apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_RUN}`, formData, {
+                                headers: {
+                                    "Content-Type": "multipart/form-data",
+                                    // "x-rapidapi-host": "file-upload8.p.rapidapi.com",
+                                    // "x-rapidapi-key": "your-rapidapi-key-here",
+                                },
+                            });
+                        }
+
                     }}
                 />
             </Modal>
