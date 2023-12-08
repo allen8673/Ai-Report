@@ -2,7 +2,6 @@ import _, { includes, map } from "lodash";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { Fieldset } from "primereact/fieldset";
-import { FileUpload } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { SelectItem } from "primereact/selectitem";
@@ -206,21 +205,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                     }
                 </Form>
             </Modal>
-            <Modal
-                title="Upload your files"
-                onOk={() => setOpenModal(undefined)}
-                okLabel="Close"
-                visible={openModal?.type === 'Input'}
-            >
-                <FileUpload name="upload" url={''}
-                    mode='advanced'
-                    multiple
-                    accept="*"
-                    maxFileSize={1000000}
-                    emptyTemplate={<p className="m-0">Drag and drop files to here to upload.</p>}
-                    itemTemplate={<></>}
-                />
-            </Modal>
+
             <Modal
                 className="preview-doc-modal"
                 onOk={() => setOpenModal(undefined)}

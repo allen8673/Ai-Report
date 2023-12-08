@@ -53,15 +53,15 @@ export const flowInfoMap: {
         nodeType: 'start',
         icon: faUpload,
         nodeName: 'Upload',
-        actIcon: {
-            icon: faCloudUpload,
-            label: 'the files has uploaded.'
-        },
-        editIcon: {
-            icon: faFileArrowUp,
-            label: 'upload your files.',
-            interactable: true
-        }
+        // actIcon: {
+        //     icon: faCloudUpload,
+        //     label: 'the files has uploaded.'
+        // },
+        // editIcon: {
+        //     icon: faFileArrowUp,
+        //     label: 'upload your files.',
+        //     interactable: true
+        // }
     },
     'Normal': {
         nodeType: '',

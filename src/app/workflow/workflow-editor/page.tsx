@@ -1,11 +1,13 @@
 'use client'
-import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faCancel, faCloudUpload, faEraser, faFile, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cloneDeep, debounce, filter, includes, map, range, remove, some, uniq } from "lodash";
+import { cloneDeep, filter, includes, map, remove, some } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
+import { FileUpload } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
+import { Tooltip } from "primereact/tooltip";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
 
@@ -21,7 +23,7 @@ import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/title-pane";
 import { ApiResult } from "@/interface/api";
-import { FlowStatus, IEditWorkflow, IFlowNode, IWorkflow } from "@/interface/workflow";
+import { IEditWorkflow, IFlowNode, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
@@ -37,6 +39,7 @@ export default function Page() {
     const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
     const [workflowMap, setWorkflowMap] = useState<IWorkflowMap>({})
     const [form, setForm] = useState<FormInstance<IWorkflow>>()
+    const [openUpload, setOpenUpload] = useState<boolean>(false);
 
     const { showMessage } = useLayoutContext();
     const router = useRouter();
@@ -292,50 +295,50 @@ export default function Page() {
         return true
     }
 
-    const mock_run = (forwards: string[]): void => {
-        let next: string[] = [];
-        graphRef.current?.setNodes(pre => {
-            if (includes(forwards, pre.id)) {
-                next = uniq(next.concat(pre.data.forwards || []))
-                return { ...pre, data: { ...pre.data, running: true } }
-            }
-            return pre
-        });
+    // const mock_run = (forwards: string[]): void => {
+    //     let next: string[] = [];
+    //     graphRef.current?.setNodes(pre => {
+    //         if (includes(forwards, pre.id)) {
+    //             next = uniq(next.concat(pre.data.forwards || []))
+    //             return { ...pre, data: { ...pre.data, running: true } }
+    //         }
+    //         return pre
+    //     });
 
-        debounce(async () => {
-            graphRef.current?.setNodes(pre => {
-                if (includes(forwards, pre.id)) {
-                    let status: FlowStatus = 'success';
-                    let report: any = undefined;
-                    if (pre.id == 'f-2') status = 'failure';
-                    else if (pre.id == 'f-5') status = 'warning';
+    //     debounce(async () => {
+    //         graphRef.current?.setNodes(pre => {
+    //             if (includes(forwards, pre.id)) {
+    //                 let status: FlowStatus = 'success';
+    //                 let report: any = undefined;
+    //                 if (pre.id == 'f-2') status = 'failure';
+    //                 else if (pre.id == 'f-5') status = 'warning';
 
-                    if (pre.data.type === 'Output') {
-                        report = <>{map(range(0, 30), () => (<p>
-                            <p className="m-0">
-                                Next.js is a React framework for building full-stack web applications. You use React Components to build user interfaces, and Next.js for additional features and optimizations.
-                            </p>
-                            <p className="m-0">
-                                Under the hood, Next.js also abstracts and automatically configures tooling needed for React, like bundling, compiling, and more. This allows you to focus on building your application instead of spending time with configuration.
-                            </p>
-                            <p className="m-0">
-                                Whether you re an individual developer or part of a larger team, Next.js can help you build interactive, dynamic, and fast React applications.
-                            </p>
-                        </p>))}</>
-                    }
+    //                 if (pre.data.type === 'Output') {
+    //                     report = <>{map(range(0, 30), () => (<p>
+    //                         <p className="m-0">
+    //                             Next.js is a React framework for building full-stack web applications. You use React Components to build user interfaces, and Next.js for additional features and optimizations.
+    //                         </p>
+    //                         <p className="m-0">
+    //                             Under the hood, Next.js also abstracts and automatically configures tooling needed for React, like bundling, compiling, and more. This allows you to focus on building your application instead of spending time with configuration.
+    //                         </p>
+    //                         <p className="m-0">
+    //                             Whether you re an individual developer or part of a larger team, Next.js can help you build interactive, dynamic, and fast React applications.
+    //                         </p>
+    //                     </p>))}</>
+    //                 }
 
-                    return { ...pre, data: { ...pre.data, status: status, running: false, report } }
-                }
-                return pre
-            });
-            debounce(() => {
-                if (!!next.length) mock_run(next);
-                else {
-                    showMessage('workflow is done')
-                }
-            }, 500)()
-        }, 3000)()
-    }
+    //                 return { ...pre, data: { ...pre.data, status: status, running: false, report } }
+    //             }
+    //             return pre
+    //         });
+    //         debounce(() => {
+    //             if (!!next.length) mock_run(next);
+    //             else {
+    //                 showMessage('workflow is done')
+    //             }
+    //         }, 500)()
+    //     }, 3000)()
+    // }
 
     return <div className="flex h-full flex-row gap-std items-stretch">
         <div className="shrink grow flex flex-col gap-std">
@@ -422,11 +425,12 @@ export default function Page() {
                                         })
                                         return
                                     }
-                                    graphRef.current?.setNodes(pre => {
-                                        return { ...pre, data: { ...pre.data, status: 'none', running: false } }
-                                    });
-                                    await new Promise(resolve => setTimeout(resolve, 500));
-                                    if (!!workflow?.rootNdeId) mock_run(workflow?.rootNdeId)
+                                    setOpenUpload(true);
+                                    // graphRef.current?.setNodes(pre => {
+                                    //     return { ...pre, data: { ...pre.data, status: 'none', running: false } }
+                                    // });
+                                    // await new Promise(resolve => setTimeout(resolve, 500));
+                                    // if (!!workflow?.rootNdeId) mock_run(workflow?.rootNdeId)
                                 }}
                             />
                             <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}
@@ -482,6 +486,104 @@ export default function Page() {
                             </>
                         )
                     }</Form>
+            </Modal>
+            <Modal
+                title="Upload your files"
+                visible={openUpload}
+            >
+                <Tooltip target=".custom-choose-btn" content="Add files" position="bottom" />
+                <Tooltip target=".custom-upload-btn" content="Upload and Run workflow" position="bottom" />
+                <Tooltip target=".custom-cancel-btn" content="Clear files" position="bottom" />
+
+                <FileUpload name="upload" url={''}
+                    mode='advanced'
+                    multiple
+                    accept="*"
+                    maxFileSize={1000000}
+                    contentClassName="rounded-sm mt-1"
+                    headerTemplate={(opts) => {
+                        return <div
+                            className={`
+                            h-[60px] px-[12px]
+                            rounded-std-sm 
+                            border-solid
+                            border-light-weak
+                            flex items-center justify-between
+                            `}>
+                            <span className="flex gap-1">
+                                {opts.chooseButton}
+                                {opts.cancelButton}
+                            </span>
+                            <span className="flex gap-1">
+                                {opts.uploadButton}
+                                <Button
+                                    icon={<FontAwesomeIcon
+                                        className="w-[18px] h-[18px] p-[3px]"
+                                        icon={faXmark}
+                                    />}
+                                    className="p-button-rounded p-button-outlined border-2"
+                                    style={{ color: 'rgba(185, 28, 28, 1)' }}
+                                    tooltip="Cancel"
+                                    onClick={() => {
+                                        setOpenUpload(false)
+                                    }}
+                                />
+
+                            </span>
+                        </div>
+                    }}
+                    chooseOptions={{
+                        icon: <FontAwesomeIcon
+                            className="w-[18px] h-[18px]  p-[3px]"
+                            icon={faAdd}
+                        />,
+                        iconOnly: true,
+                        className: 'custom-choose-btn p-button-rounded p-button-outlined border-2',
+                        style: { color: '#BA4AFF' }
+                    }}
+                    uploadOptions={{
+                        icon: <FontAwesomeIcon
+                            className="w-[18px] h-[18px] p-[3px]"
+                            icon={faCloudUpload}
+                        />,
+                        iconOnly: true,
+                        className: 'custom-upload-btn p-button-rounded p-button-outlined border-2',
+                        style: { color: '#2a8af6' }
+                    }}
+                    cancelOptions={{
+                        icon: <FontAwesomeIcon
+                            className="w-[18px] h-[18px] p-[3px]"
+                            icon={faEraser}
+                        />,
+                        iconOnly: true,
+                        className: 'custom-cancel-btn p-button-rounded p-button-outlined border-2',
+                        style: { color: 'rgba(185, 28, 28, 1)' }
+                    }}
+                    emptyTemplate={<p className="m-0">Drag and drop files to here to upload.</p>}
+                    itemTemplate={(file: any, opts) => {
+                        const _file = (file as File);
+                        return (
+                            <div className="flex items-center gap-[7px] h-[45px] my-1">
+                                <span className="h-[40px] w-[40px] text-center">{
+                                    !!file?.objectURL ?
+                                        <img alt='' src={file?.objectURL} className="w-full h-full" /> :
+                                        <FontAwesomeIcon className="w-full h-full" icon={faFile} />
+                                }</span>
+                                <div className="flex grow items-center [&>div]:text-left">
+                                    <div className="flex flex-column grow">
+                                        <div>{_file.name}</div>
+                                        <div>{_file.size}</div>
+                                    </div>
+                                    <FontAwesomeIcon
+                                        className=''
+                                        icon={faTrash}
+                                        onClick={(e) => { opts.onRemove(e) }}
+                                    />
+                                </div>
+                            </div>
+                        )
+                    }}
+                />
             </Modal>
         </div>
     </div>
