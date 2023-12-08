@@ -10,6 +10,7 @@ export interface IEditWorkflow {
 export interface IWorkflowBase {
     id: string;
     name: string;
+    used?: string[]
 }
 
 /**
