@@ -13,15 +13,15 @@ import Table from '@/components/table';
 import { Column } from '@/components/table/table';
 import TitlePane from '@/components/title-pane';
 import { ApiResult } from '@/interface/api';
-import { IFlowNode, IWorkflow } from '@/interface/workflow';
+import { IFlowNode, IWorkflow, IWorkflowBase } from '@/interface/workflow';
 
 export default function Page() {
 
-    const [templates, setTemplates] = useState<IWorkflow[]>([]);
+    const [templates, setTemplates] = useState<IWorkflowBase[]>([]);
     const [selection, setSelection] = useState<IWorkflow>();
 
     const { graphRef } = useGraphRef<IFlowNode, any>();
-    const columns: Column<IWorkflow>[] = [
+    const columns: Column<IWorkflowBase>[] = [
         { key: 'id', title: 'ID', style: { width: '25%' } },
         { key: 'name', title: 'Name' },
         {
@@ -52,8 +52,8 @@ export default function Page() {
     ];
 
     const fetchTemplates = async () => {
-        const rsp = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
-        setTemplates(rsp.data)
+        const tmps = (await apiCaller.get<ApiResult<IWorkflowBase[]>>(`${process.env.NEXT_PUBLIC_FLOWS_API}/TEMPLATE`)).data.data || [];
+        setTemplates(tmps)
     }
 
     useEffect(() => {
@@ -102,8 +102,8 @@ export default function Page() {
                     first={0}
                     totalRecords={5}
                     onSelectionChange={async e => {
-                        const rsp = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${e.value.id}`)
-                        setSelection(rsp.data);
+                        const tmp = await (await apiCaller.get<ApiResult<IWorkflow>>(`${process.env.NEXT_PUBLIC_FLOW_API}/${e.value.id}`)).data.data
+                        setSelection(tmp);
                     }}
                     selection={selection}
                 />

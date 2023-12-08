@@ -1,7 +1,6 @@
 'use client'
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { map } from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
@@ -17,7 +16,8 @@ import Modal from "@/components/modal";
 import Table from "@/components/table";
 import { Column } from "@/components/table/table";
 import TitlePane from "@/components/title-pane";
-import { IWorkflow } from "@/interface/workflow";
+import { ApiResult } from "@/interface/api";
+import { IWorkflowBase } from "@/interface/workflow";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
 interface FormData {
@@ -29,7 +29,7 @@ interface FormData {
 
 export default function Page() {
 
-    const [workflows, setWorkflow] = useState<IWorkflow[]>([]);
+    const [workflows, setWorkflow] = useState<IWorkflowBase[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<FormData>>()
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([])
@@ -37,23 +37,20 @@ export default function Page() {
     const router = useRouter();
     const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
 
-    const getTemplateOpts = async () => {
-        const res = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
-        const opts = map<IWorkflow, SelectItem>(res.data || [], t => ({ label: t.name, value: t.id }))
-        setTemplateOpts(opts)
-    }
-
-    const getWorkflows = async () => {
-        const rsp = await apiCaller.get<IWorkflow[]>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`);
-        setWorkflow(rsp.data)
+    const getAllData = async () => {
+        const { workflow, template } = (await apiCaller.get<ApiResult<{
+            workflow: IWorkflowBase[],
+            template: IWorkflowBase[]
+        }>>(`${process.env.NEXT_PUBLIC_FLOWS_API}/ALL`)).data.data || {};
+        setWorkflow(workflow || []);
+        setTemplateOpts(template?.map(t => ({ label: t.name, value: t.id })) || [])
     }
 
     useEffect(() => {
-        getWorkflows()
-        getTemplateOpts()
+        getAllData();
     }, [])
 
-    const columns: Column<IWorkflow>[] = [
+    const columns: Column<IWorkflowBase>[] = [
         { key: 'id', title: 'ID', style: { width: '25%' } },
         { key: 'name', title: 'Name' }
     ]

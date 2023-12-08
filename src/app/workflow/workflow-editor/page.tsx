@@ -57,7 +57,7 @@ export default function Page() {
     }
 
     const fetchAllWorflowData = async () => {
-        const wfs = (await apiCaller.get<IWorkflow[]>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`)).data;
+        const wfs = (await apiCaller.get<ApiResult<IWorkflow[]>>(`${process.env.NEXT_PUBLIC_FLOWS_API}/WORKFLOW`)).data.data;
         if (!wfs) return;
 
         setWorkflowMap(wfs.reduce<{ [id: string]: string }>((pre, wf) => {
@@ -67,8 +67,7 @@ export default function Page() {
     }
 
     const fetchWorkflow = async (id: string) => {
-        // TODO: call API to fetch the workflow
-        const wf = await (await apiCaller.get(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${id}`)).data
+        const wf = await (await apiCaller.get<ApiResult<IWorkflow>>(`${process.env.NEXT_PUBLIC_FLOW_API}/${id}`)).data.data
         setWorkflow(wf);
     }
 
@@ -218,7 +217,7 @@ export default function Page() {
          * and use the workflows instead of all reference nodes. 
          */
         for (const ref_wf of ref_wfs) {
-            const wf = await (await apiCaller.get<IWorkflow>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${ref_wf.workflowId}`)).data;
+            const wf = await (await apiCaller.get<ApiResult<IWorkflow>>(`${process.env.NEXT_PUBLIC_FLOW_API}/${ref_wf.workflowId}`)).data.data;
             if (!wf) continue;
 
             /**
@@ -355,7 +354,6 @@ export default function Page() {
                                         icon: 'pi pi-info-circle',
                                         acceptClassName: 'p-button-danger',
                                         accept: async () => {
-                                            // TODO: Call API to delete this workflow
                                             const rsp = await apiCaller.delete<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${workflow?.id || ''}`,);
                                             if (rsp.data.status === 'failure') return;
                                             router.push(wfUrl)
@@ -385,9 +383,9 @@ export default function Page() {
                                         if (!result) return result;
                                         calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
                                         if (mode === 'add') {
-                                            apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, result);
+                                            apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_CREATEFLOW}`, result);
                                         } else {
-                                            apiCaller.put<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, result);
+                                            apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_UPDATEFLOW}`, result);
                                         }
                                         return result
                                     });

@@ -7,13 +7,16 @@ export interface IEditWorkflow {
     template?: string;
 }
 
+export interface IWorkflowBase {
+    id: string;
+    name: string;
+}
+
 /**
  * the interface for the diagram of AI report
  */
-export interface IWorkflow {
+export interface IWorkflow extends IWorkflowBase {
     type: 'workflow' | 'template',
-    id: string;
-    name: string;
     rootNdeId: string[];
     flows: IFlowNode[];
 }

@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: 'my nextjs app',
+            name: 'Ai Report FE:7788',
             // exec_mode: 'cluster',
             // instances: 4, // Or a number of instances
             script: './node_modules/next/dist/bin/next',
@@ -10,7 +10,7 @@ module.exports = {
             watch: false,
             max_memory_restart: '1G',
             env: {
-                PORT: 4000
+                PORT: 7788
             }
         }
     ]
