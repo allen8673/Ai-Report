@@ -33,7 +33,7 @@ export interface IFlowNode extends IFlowNodeBase {
     forwards: string[];
     prompt?: string;
     depth?: number;
-    workflowId?: string;
+    workflowid?: string;
     file?: any;
     report?: any;
     running?: boolean;

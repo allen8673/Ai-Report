@@ -95,7 +95,7 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
                                 <div className="text-[20px] mb-[2px] leading-1 ellipsis wf-name"
                                     data-pr-tooltip={data.name}
                                 >
-                                    {(data.type === 'Workflow' ? workflowMap[data.workflowId || ''] : (nodeName || data.name))
+                                    {(data.type === 'Workflow' ? workflowMap[data.workflowid || ''] : (nodeName || data.name))
                                         || <span className='italic'>N / A</span>}
                                 </div>
                                 <div className="text-[16px] text-light-weak">{data.type}</div>

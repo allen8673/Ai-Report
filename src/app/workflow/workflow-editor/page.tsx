@@ -217,7 +217,7 @@ export default function Page() {
          * and use the workflows instead of all reference nodes. 
          */
         for (const ref_wf of ref_wfs) {
-            const wf = await (await apiCaller.get<ApiResult<IWorkflow>>(`${process.env.NEXT_PUBLIC_FLOW_API}/${ref_wf.workflowId}`)).data.data;
+            const wf = await (await apiCaller.get<ApiResult<IWorkflow>>(`${process.env.NEXT_PUBLIC_FLOW_API}/${ref_wf.workflowid}`)).data.data;
             if (!wf) continue;
 
             /**
