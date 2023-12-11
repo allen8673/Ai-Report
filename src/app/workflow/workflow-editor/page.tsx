@@ -378,21 +378,18 @@ export default function Page() {
                                     calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
 
                                     const res = (mode === 'add' ?
-                                        await apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_CREATEFLOW}`, result) :
-                                        await apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_UPDATEFLOW}`, result)
-                                    )
+                                        await apiCaller.post<ApiResult<{ workflowid?: string }>>(`${process.env.NEXT_PUBLIC_CREATEFLOW}`, result) :
+                                        await apiCaller.post<ApiResult<{ workflowid?: string }>>(`${process.env.NEXT_PUBLIC_UPDATEFLOW}`, result)
+                                    ).data
 
-                                    if (res.data.status !== 'ok' && res.data.status !== 'success') {
+                                    if (res.status !== 'ok' && res.status !== 'success') {
                                         showMessage({
-                                            message: res.data.message || 'Add failure',
+                                            message: res.message || 'Add failure',
                                             type: 'error'
                                         })
                                         return;
                                     }
-                                    // TODO: If add success, then should set the wf id 
-
-
-                                    setWorkflow(result);
+                                    setWorkflow({ ...result, id: res.data?.workflowid || workflow.id });
                                     setInEdit(false);
                                     setMode('normal')
                                 }}
