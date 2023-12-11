@@ -205,6 +205,7 @@ export default function Page() {
             flows: _nodes
         }
 
+        // TODO: Call API to add template
         await apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_FLOW_API}`, template);
         setOpenTemplateModal(false)
     }
@@ -373,7 +374,8 @@ export default function Page() {
                                         ...n.data, position: n.position
                                     }));
 
-                                    const result: IWorkflow = ({ ...workflow, flows })
+                                    const result: IWorkflow = ({ ...workflow, flows });
+                                    calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
 
                                     const res = (mode === 'add' ?
                                         await apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_CREATEFLOW}`, result) :
