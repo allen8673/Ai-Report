@@ -33,7 +33,7 @@ export default function WorkflowLayout({
 
                 if (!ifWorkflowIsCompleted(workflow?.flows)) {
                     showMessage({
-                        message: 'Cannot be saved as a template since the workflow is not completed.',
+                        message: `Cannot run '${workflow?.name}'(${workflow?.id}) since the workflow is not completed.`,
                         type: 'error'
                     })
                     return
