@@ -17,6 +17,7 @@ export interface ModalProps extends Omit<DialogProps,
     cancelByMask?: boolean;
     visible?: boolean;
     stickyContentOnClose?: boolean
+    footerClass?: string;
 }
 
 export default function Modal(props: React.PropsWithChildren<ModalProps>) {
@@ -31,15 +32,16 @@ export default function Modal(props: React.PropsWithChildren<ModalProps>) {
         visible,
         stickyContentOnClose,
         footer,
+        footerClass,
         ...others } = props
     return <Dialog
         header={title}
         onHide={() => { }}
         closable={false}
         footer={footer ||
-            <div className="flex justify-center">
-                {!!onCancel && <Button label={cancelLabel || 'Cancel'} severity='secondary' onClick={onCancel} />}
-                {!!onOk && <Button label={okLabel || 'OK'} onClick={onOk} />}
+            <div className={`flex gap-[7px] ${footerClass || 'justify-center'}`}>
+                {!!onCancel && <Button className="m-0" label={cancelLabel || 'Cancel'} severity='secondary' onClick={onCancel} />}
+                {!!onOk && <Button className="m-0" label={okLabel || 'OK'} onClick={onOk} />}
             </div>}
         visible={visible}
         className="w-4"
