@@ -333,7 +333,6 @@ export default function Page() {
 
     return <div className="flex h-full flex-row gap-std items-stretch">
         <div className="shrink grow flex flex-col gap-std">
-            <span className="text-white">{mode}</span>
             <TitlePane title={workflow?.name || 'New Workfow'} postContent={
                 <>
                     {inEdit ?
