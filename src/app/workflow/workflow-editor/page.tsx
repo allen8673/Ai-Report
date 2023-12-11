@@ -389,6 +389,8 @@ export default function Page() {
                                         })
                                         return;
                                     }
+                                    // TODO: If add success, then should set the wf id 
+
 
                                     setWorkflow(result);
                                     setInEdit(false);
