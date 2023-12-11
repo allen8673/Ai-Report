@@ -507,9 +507,9 @@ export default function Page() {
                                     // "x-rapidapi-host": "file-upload8.p.rapidapi.com",
                                     // "x-rapidapi-key": "your-rapidapi-key-here",
                                 },
-                            }).then((rep) => {
+                            }).then((res) => {
                                 showMessage({
-                                    message: rep.data.message || 'success',
+                                    message: res.data.message || 'success',
                                     type: 'success'
                                 })
                                 setOpenUpload(false);

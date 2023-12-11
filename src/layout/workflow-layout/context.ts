@@ -6,11 +6,13 @@ import { IWorkflow } from "@/interface/workflow";
 
 
 export interface WfLayoutStore {
-    runWorkflow: (wf: IWorkflow | string | undefined) => void
+    runWorkflow: (wf?: IWorkflow | string) => void;
+    viewReports: (workflowId: string) => void;
 }
 
 export const WfLayoutContext = React.createContext<WfLayoutStore>({
-    runWorkflow: () => { }
+    runWorkflow: () => { },
+    viewReports: () => { }
 });
 
 export const useWfLayoutContext = (): WfLayoutStore => useContext(WfLayoutContext);

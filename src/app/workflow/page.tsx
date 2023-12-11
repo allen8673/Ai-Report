@@ -30,7 +30,7 @@ interface FormData {
 export default function Page() {
     const router = useRouter();
     const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
-    const { runWorkflow } = useWfLayoutContext()
+    const { runWorkflow, viewReports } = useWfLayoutContext()
 
     const [workflows, setWorkflow] = useState<IWorkflowBase[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
@@ -76,8 +76,9 @@ export default function Page() {
                         label="Reports"
                         icon={
                             <FontAwesomeIcon icon={faEye} />
-                        } />
-
+                        }
+                        onClick={() => viewReports(row.id)}
+                    />
                 </div >
             }
         }
