@@ -32,7 +32,6 @@ export default function Page() {
     const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
     const { runWorkflow } = useWfLayoutContext()
 
-
     const [workflows, setWorkflow] = useState<IWorkflowBase[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<FormData>>()
