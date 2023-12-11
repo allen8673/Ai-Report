@@ -4,7 +4,6 @@ import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
 
 import { LayoutContext, ShowMessage } from './context';
-
 import SideMenu from './side-menu';
 
 import 'primereact/resources/themes/saga-purple/theme.css';
