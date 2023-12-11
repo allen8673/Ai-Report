@@ -1,7 +1,7 @@
 'use client'
 import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cloneDeep, filter, includes, map, remove, some } from "lodash";
+import { cloneDeep, filter, includes, map, remove, some, toString } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
@@ -30,19 +30,20 @@ type EditMode = 'add' | 'normal'
 
 export default function Page() {
     const searchParams = useSearchParams();
+    const router = useRouter();
+    const wfUrl = getFullUrl(RouterInfo.WORKFLOW);
     const paramObj = coverSearchParamsToObj<IEditWorkflow>(searchParams);
     const mode: EditMode = !!paramObj.id ? 'normal' : 'add';
-    const [workflow, setWorkflow] = useState<IWorkflow>();
     const { graphRef } = useGraphRef<IFlowNode, any>();
+    const { showMessage } = useLayoutContext();
+
+    const [workflow, setWorkflow] = useState<IWorkflow>();
     const [inEdit, setInEdit] = useState<boolean>();
     const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
     const [workflowMap, setWorkflowMap] = useState<IWorkflowMap>({})
     const [form, setForm] = useState<FormInstance<IWorkflow>>()
     const [openUpload, setOpenUpload] = useState<boolean>(false);
 
-    const { showMessage } = useLayoutContext();
-    const router = useRouter();
-    const wfUrl = getFullUrl(RouterInfo.WORKFLOW);
 
     useEffect(() => {
         initial()
@@ -175,7 +176,7 @@ export default function Page() {
     // }
     //#endregion
 
-    const saveNewTemplate = async (nodes: IFlowNode[], name: string) => {
+    const saveToNewTemplate = async (nodes: IFlowNode[], name: string) => {
         // assign new ids to nodes
         const id_trans: Record<string, string> = getNewIdTrans(nodes)
 
@@ -268,8 +269,6 @@ export default function Page() {
             _nodes.push(...wf_flows)
             remove(_nodes, ['id', ref_wf.id]);
         }
-
-
 
         /**
          * have to trans the node id before return
@@ -459,7 +458,7 @@ export default function Page() {
                     form?.submit()
                         .then(async ({ name }) => {
                             const nodes = await expandRefWF(workflow?.flows || [])
-                            await saveNewTemplate(nodes, name)
+                            await saveToNewTemplate(nodes, name)
                         })
                         .catch(() => {
                             // 
@@ -475,7 +474,7 @@ export default function Page() {
                     }}
                     onSubmit={async ({ name }) => {
                         const nodes = await expandRefWF(workflow?.flows || []);
-                        await saveNewTemplate(nodes, name)
+                        await saveToNewTemplate(nodes, name)
                     }}
                 >
                     {
@@ -489,10 +488,11 @@ export default function Page() {
                     }</Form>
             </Modal>
             <Modal
-                title="Upload your files"
+                title={`Upload files to Run '${workflow?.name}'(${workflow?.id})`}
                 visible={openUpload}
                 onOk={() => setOpenUpload(false)}
                 footerClass="flex justify-end"
+                okLabel="Cancel"
             >
                 <FileUploader
                     uploadLabel="Upload & Run"
@@ -513,6 +513,17 @@ export default function Page() {
                                     // "x-rapidapi-host": "file-upload8.p.rapidapi.com",
                                     // "x-rapidapi-key": "your-rapidapi-key-here",
                                 },
+                            }).then((rep) => {
+                                showMessage({
+                                    message: rep.data.message || 'success',
+                                    type: 'success'
+                                })
+                                setOpenUpload(false);
+                            }).catch((error) => {
+                                showMessage({
+                                    message: toString(error),
+                                    type: 'error'
+                                })
                             });
                         }
                     }}
