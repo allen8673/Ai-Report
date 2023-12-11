@@ -349,7 +349,7 @@ export default function Page() {
                                         icon: 'pi pi-info-circle',
                                         acceptClassName: 'p-button-danger',
                                         accept: async () => {
-                                            const rsp = await apiCaller.delete<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${workflow?.id || ''}`,);
+                                            const rsp = await apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_DISABLEFLOW}/${workflow?.id}`,);
                                             if (rsp.data.status === 'failure') return;
                                             router.push(wfUrl)
                                         },
