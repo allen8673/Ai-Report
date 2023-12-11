@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description: 'the Frontend startkit',
 };
 
-export default function RootLayout({
+export default function Layout({
   children,
 }: {
   children: React.ReactNode

@@ -1,7 +1,7 @@
 'use client'
 import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cloneDeep, filter, includes, map, remove, some, toString } from "lodash";
+import { cloneDeep, filter, includes, map, remove, toString } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
@@ -15,7 +15,7 @@ import FileUploader from "@/components/file-uploader";
 import FlowGraph from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
 import { IWorkflowMap } from "@/components/flow-editor/context";
-import { X_GAP, calculateDepth, getNewIdTrans, resetPosition_x, resetPosition_y } from "@/components/flow-editor/helper";
+import { X_GAP, calculateDepth, getNewIdTrans, ifWorkflowIsCompleted, resetPosition_x, resetPosition_y } from "@/components/flow-editor/helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
@@ -24,6 +24,7 @@ import TitlePane from "@/components/title-pane";
 import { ApiResult } from "@/interface/api";
 import { IEditWorkflow, IFlowNode, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/context";
+import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
 type EditMode = 'add' | 'normal'
@@ -36,6 +37,7 @@ export default function Page() {
     const mode: EditMode = !!paramObj.id ? 'normal' : 'add';
     const { graphRef } = useGraphRef<IFlowNode, any>();
     const { showMessage } = useLayoutContext();
+    const { runWorkflow } = useWfLayoutContext()
 
     const [workflow, setWorkflow] = useState<IWorkflow>();
     const [inEdit, setInEdit] = useState<boolean>();
@@ -284,16 +286,6 @@ export default function Page() {
         }, []);
     }
 
-    const ifWorkflowIsCompleted = (nodes: IFlowNode[] = []): boolean => {
-        for (const node of nodes) {
-            if (node.type === 'Output') {
-                if (!some(nodes, n => includes(n.forwards, node.id))) return false
-            } else {
-                if (!node.forwards?.length) return false;
-            }
-        }
-        return true
-    }
 
     // const mock_run = (forwards: string[]): void => {
     //     let next: string[] = [];
@@ -418,19 +410,15 @@ export default function Page() {
                                 tooltip="Run Flow"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
-                                    if (!ifWorkflowIsCompleted(workflow?.flows)) {
-                                        showMessage({
-                                            message: 'Cannot run the workflow since the workflow is not completed.',
-                                            type: 'error'
-                                        })
-                                        return
-                                    }
-                                    setOpenUpload(true);
-                                    // graphRef.current?.setNodes(pre => {
-                                    //     return { ...pre, data: { ...pre.data, status: 'none', running: false } }
-                                    // });
-                                    // await new Promise(resolve => setTimeout(resolve, 500));
-                                    // if (!!workflow?.rootNdeId) mock_run(workflow?.rootNdeId)
+                                    runWorkflow(workflow)
+                                    // if (!ifWorkflowIsCompleted(workflow?.flows)) {
+                                    //     showMessage({
+                                    //         message: 'Cannot run the workflow since the workflow is not completed.',
+                                    //         type: 'error'
+                                    //     })
+                                    //     return
+                                    // }
+                                    // setOpenUpload(true);
                                 }}
                             />
                             <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}

@@ -1,7 +1,6 @@
 'use client'
 import { faAdd, faEye, faPlayCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { toString } from 'lodash'
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
@@ -11,7 +10,6 @@ import { useEffect, useState } from 'react'
 
 import apiCaller from "@/api-helpers/api-caller";
 import { coverToQueryString } from "@/api-helpers/url-helper";
-import FileUploader from "@/components/file-uploader";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import Modal from "@/components/modal";
@@ -20,7 +18,7 @@ import { Column } from "@/components/table/table";
 import TitlePane from "@/components/title-pane";
 import { ApiResult } from "@/interface/api";
 import { IWorkflowBase } from "@/interface/workflow";
-import { useLayoutContext } from "@/layout/context";
+import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
 interface FormData {
@@ -32,15 +30,13 @@ interface FormData {
 export default function Page() {
     const router = useRouter();
     const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
-    const { showMessage } = useLayoutContext();
+    const { runWorkflow } = useWfLayoutContext()
+
 
     const [workflows, setWorkflow] = useState<IWorkflowBase[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<FormData>>()
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([])
-    const [runWorkflow, setRunWorkflow] = useState<IWorkflowBase>();
-
-
 
     const getAllData = async () => {
         const { workflow, template } = (await apiCaller.get<ApiResult<{
@@ -80,7 +76,7 @@ export default function Page() {
                         icon={
                             <FontAwesomeIcon icon={faPlayCircle} />
                         }
-                        onClick={() => setRunWorkflow(row)}
+                        onClick={() => runWorkflow(row.id)}
                     />
                 </div >
             }
@@ -115,9 +111,6 @@ export default function Page() {
                 form?.submit()
                     .then(({ name, template }) => {
                         const queries: { [key: string]: string | undefined } = { name, template }
-                        // if (!!template?.length) {
-                        //     queries.template = template.map(t => t.value).join(',')
-                        // }
                         router.push(`${editorUrl}${coverToQueryString(queries)}`);
                     }).catch(() => {
                         // 
@@ -183,48 +176,6 @@ export default function Page() {
                         </>
                     )
                 }</Form>
-        </Modal>
-        <Modal
-            title="Upload your files"
-            visible={!!runWorkflow}
-            onOk={() => setRunWorkflow(undefined)}
-            footerClass="flex justify-end"
-            okLabel="Cancel"
-        >
-            <FileUploader
-                uploadLabel="Upload & Run"
-                onUpload={e => {
-                    if (runWorkflow && e.files && e.files.length > 0) {
-                        const formData = new FormData();
-                        for (const i in e.files) {
-                            formData.append('files', e.files[i])
-                        }
-
-                        formData.append('userId', '23224');
-                        formData.append('workflowId', runWorkflow.id);
-                        formData.append('version', '1');
-
-                        apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_REPORT}/run`, formData, {
-                            headers: {
-                                "Content-Type": "multipart/form-data",
-                                // "x-rapidapi-host": "file-upload8.p.rapidapi.com",
-                                // "x-rapidapi-key": "your-rapidapi-key-here",
-                            },
-                        }).then((rep) => {
-                            showMessage({
-                                message: rep.data.message || 'success',
-                                type: 'success'
-                            })
-                            setRunWorkflow(undefined);
-                        }).catch((error) => {
-                            showMessage({
-                                message: toString(error),
-                                type: 'error'
-                            })
-                        });
-                    }
-                }}
-            />
         </Modal>
     </div >
 }
