@@ -23,7 +23,7 @@ import Modal from "@/components/modal";
 import TitlePane from "@/components/title-pane";
 import { ApiResult } from "@/interface/api";
 import { IEditWorkflow, IFlowNode, IWorkflow } from "@/interface/workflow";
-import { useLayoutContext } from "@/layout/context";
+import { useLayoutContext } from "@/layout/turbo-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
@@ -34,7 +34,7 @@ export default function Page() {
     const router = useRouter();
     const wfUrl = getFullUrl(RouterInfo.WORKFLOW);
     const paramObj = coverSearchParamsToObj<IEditWorkflow>(searchParams);
-    const mode: EditMode = !!paramObj.id ? 'normal' : 'add';
+    const [mode, setMode] = useState<EditMode>(!!paramObj.id ? 'normal' : 'add')
     const { graphRef } = useGraphRef<IFlowNode, any>();
     const { showMessage } = useLayoutContext();
     const { runWorkflow } = useWfLayoutContext()
@@ -80,7 +80,7 @@ export default function Page() {
         const id = '';
         const template: (IWorkflow | undefined) =
             (!!paramObj.template ?
-                (await apiCaller.get<IWorkflow>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${paramObj.template}`)).data :
+                (await apiCaller.get<ApiResult<IWorkflow>>(`${process.env.NEXT_PUBLIC_FLOW_API}/${paramObj.template}`)).data.data :
                 undefined);
 
         if (!!template) {
@@ -205,8 +205,7 @@ export default function Page() {
             flows: _nodes
         }
 
-        //TODO: call API to save the template
-        await apiCaller.post(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`, template);
+        const res = await apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_FLOW_API}`, template);
         setOpenTemplateModal(false)
     }
 
@@ -334,6 +333,7 @@ export default function Page() {
 
     return <div className="flex h-full flex-row gap-std items-stretch">
         <div className="shrink grow flex flex-col gap-std">
+            <span className="text-white">{mode}</span>
             <TitlePane title={workflow?.name || 'New Workfow'} postContent={
                 <>
                     {inEdit ?
@@ -369,23 +369,29 @@ export default function Page() {
                                 label="Save"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
+                                    if (!workflow) return;
                                     const flows: IFlowNode[] = map(graphRef.current?.getNodes() || [], n => ({
                                         ...n.data, position: n.position
                                     }));
-                                    // TODO: Call API to save the edit result
-                                    setWorkflow(pre => {
-                                        const result: (IWorkflow | undefined) = !!pre ? ({ ...pre, flows }) : pre
-                                        if (!result) return result;
-                                        calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
-                                        if (mode === 'add') {
-                                            apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_CREATEFLOW}`, result);
-                                        } else {
-                                            apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_UPDATEFLOW}`, result);
-                                        }
-                                        return result
-                                    });
 
-                                    setInEdit(false)
+                                    const result: IWorkflow = ({ ...workflow, flows })
+
+                                    const res = (mode === 'add' ?
+                                        await apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_CREATEFLOW}`, result) :
+                                        await apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_UPDATEFLOW}`, result)
+                                    )
+
+                                    if (res.data.status !== 'ok' && res.data.status !== 'success') {
+                                        showMessage({
+                                            message: res.data.message || 'Add failure',
+                                            type: 'error'
+                                        })
+                                        return;
+                                    }
+
+                                    setWorkflow(result);
+                                    setInEdit(false);
+                                    setMode('normal')
                                 }}
                             />
                         </> :
