@@ -78,7 +78,6 @@ export default function FileUploader({ name, onUpload, uploadLabel }: FileUpload
                     className="w-[18px] h-[18px] p-[3px]"
                     icon={faCloudUpload}
                 />,
-                // iconOnly: true,
                 label: uploadLabel,
                 className: 'custom-upload-btn p-button-rounded p-button-outlined border-2',
                 style: { color: '#2a8af6' }
@@ -95,26 +94,6 @@ export default function FileUploader({ name, onUpload, uploadLabel }: FileUpload
             multiple
             accept="*"
             uploadHandler={onUpload}
-        // uploadHandler={e => {
-        //     if (workflow && e.files && e.files.length > 0) {
-        //         const formData = new FormData();
-        //         for (const i in e.files) {
-        //             formData.append('files', e.files[i])
-        //         }
-
-        //         formData.append('userId', '23224');
-        //         formData.append('workflowId', workflow.id);
-        //         formData.append('version', '1');
-
-        //         apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_REPORT}/run`, formData, {
-        //             headers: {
-        //                 "Content-Type": "multipart/form-data",
-        //                 // "x-rapidapi-host": "file-upload8.p.rapidapi.com",
-        //                 // "x-rapidapi-key": "your-rapidapi-key-here",
-        //             },
-        //         });
-        //     }
-        // }}
         />
     </>
 }
