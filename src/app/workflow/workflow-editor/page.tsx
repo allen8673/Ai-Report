@@ -205,7 +205,7 @@ export default function Page() {
             flows: _nodes
         }
 
-        const res = await apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_FLOW_API}`, template);
+        await apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_FLOW_API}`, template);
         setOpenTemplateModal(false)
     }
 

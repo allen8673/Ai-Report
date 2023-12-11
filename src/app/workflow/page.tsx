@@ -61,22 +61,23 @@ export default function Page() {
                     role='presentation'
                     onClick={(e) => e.stopPropagation()}>
                     <Button
-                        className="py-0 px-[0px] "
-                        severity='info'
-                        tooltip="View the reports"
-                        tooltipOptions={{ position: 'left' }}
-                        icon={
-                            <FontAwesomeIcon icon={faEye} />
-                        } />
-                    <Button
-                        className="gap-[7px]"
+                        className="py-0 px-[0px]"
                         severity='success'
-                        label="Run"
+                        tooltip="Run workflow"
+                        tooltipOptions={{ position: 'left' }}
                         icon={
                             <FontAwesomeIcon icon={faPlayCircle} />
                         }
                         onClick={() => runWorkflow(row.id)}
                     />
+                    <Button
+                        className="gap-[7px]"
+                        severity='info'
+                        label="Reports"
+                        icon={
+                            <FontAwesomeIcon icon={faEye} />
+                        } />
+
                 </div >
             }
         }
