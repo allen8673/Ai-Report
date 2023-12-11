@@ -1,13 +1,11 @@
 'use client'
-import { faAdd, faCancel, faCloudUpload, faEraser, faFile, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cloneDeep, filter, includes, map, remove, some } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
-import { FileUpload } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
-import { Tooltip } from "primereact/tooltip";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
 
