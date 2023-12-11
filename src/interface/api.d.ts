@@ -1,5 +1,6 @@
 export interface ApiResult<T = any> {
-    status: 'success' | 'failure';
+    status: 'success' | 'failure' | 'ok';
     message?: string;
-    data?: T
+    data?: T,
+    message?: string
 }
