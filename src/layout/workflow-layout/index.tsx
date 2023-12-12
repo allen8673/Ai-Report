@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { map, toString } from 'lodash';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
-import { Fieldset } from 'primereact/fieldset';
 import { SelectItem } from 'primereact/selectitem';
 import React, { useEffect, useState } from 'react'
 
@@ -14,6 +13,7 @@ import { WfLayoutContext } from './context';
 
 import { getFlow } from '@/api-helpers/flow-api';
 import { downloadJob, getJobs, runReport } from '@/api-helpers/report-api';
+import CodeEditor from '@/components/code-editor';
 import EmptyPane from '@/components/empty-pane';
 import FileUploader from '@/components/file-uploader';
 import { ifWorkflowIsCompleted } from '@/components/flow-editor/helper';
@@ -35,7 +35,7 @@ function PreviewModal({ reportJobs, onClose }:
     }) {
 
     const { showMessage } = useLayoutContext();
-    const [jobContents, setJobContents] = useState<{ [id: string]: any }>({});
+    const [jobContents, setJobContents] = useState<{ [id: string]: string }>({});
     const [selectedJob, setSelectedJob] = useState<string>('');
 
     useEffect(() => {
@@ -44,13 +44,15 @@ function PreviewModal({ reportJobs, onClose }:
 
     useEffect(() => {
         if (!selectedJob || !!jobContents[selectedJob]) return;
+
         downloadJob(selectedJob)
             .then(data => {
                 if (data?.status_code === 404) {
                     throw (data.detail)
                 }
+
                 setJobContents(pre => {
-                    pre[selectedJob] = typeof data === 'string' ? data : JSON.stringify(data)
+                    pre[selectedJob] = typeof data === 'string' ? data : JSON.stringify(data, null, 4)
                     return { ...pre }
                 })
 
@@ -74,9 +76,9 @@ function PreviewModal({ reportJobs, onClose }:
             <Dropdown
                 className='grow'
                 value={selectedJob}
-                options={map<IJob, SelectItem>(reportJobs?.jobs || [], ({ JOB_ID }) => ({ label: JOB_ID, value: JOB_ID }))}
+                options={[{ label: 'test', value: 'test' }, ...map<IJob, SelectItem>(reportJobs?.jobs || [], ({ JOB_ID }) => ({ label: JOB_ID, value: JOB_ID }))]}
                 onChange={v => {
-                    setSelectedJob(v.value)
+                    setSelectedJob(v.value);
                 }}
             />
             <Button
@@ -91,10 +93,22 @@ function PreviewModal({ reportJobs, onClose }:
                 }}
             />
         </div>
-        {jobContents[selectedJob] ? <Fieldset legend="Preview your report" className="grow" >
-            {jobContents[selectedJob]}
-        </Fieldset> : <EmptyPane />}
+        {jobContents[selectedJob] ?
+            <CodeEditor
+                hiddenBar
+                language={'text'}
+                className='grow border-solid border-light-weak rounded-std-sm'
+                value={typeof jobContents[selectedJob] === 'string' ? jobContents[selectedJob] : JSON.stringify(jobContents[selectedJob], null, 4)}
+                options={{
+                    readOnly: true,
+                    automaticLayout: true,
+                }}
 
+            /> :
+            <EmptyPane />}
+        {/* {jobContents[selectedJob] ? <Fieldset legend="Preview your report" className="grow" >
+            {jobContents[selectedJob]}
+        </Fieldset> : <EmptyPane />} */}
     </Modal>
 
 }
