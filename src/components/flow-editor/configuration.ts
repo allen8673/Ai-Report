@@ -1,4 +1,4 @@
-import { IconDefinition, faUpload, faDownload, faBrain, faCloud, faComment, faCloudDownload, faShareNodes } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition, faUpload, faDownload, faBrain, faCloud, faComment, faCloudDownload, faShareNodes, faFileLines } from '@fortawesome/free-solid-svg-icons'
 import { Edge, MarkerType } from 'reactflow';
 
 import { FlowTyep, IFlowNodeBase } from '@/interface/workflow';
@@ -22,6 +22,11 @@ export const REPORT_ITEMS: IFlowNodeBase[] = [
         name: 'Workflow',
         type: 'Workflow'
     },
+    {
+        id: 'report',
+        name: 'Report',
+        type: 'Report'
+    }
     // {
     //     id: 'file-upload',
     //     name: 'Upload',
@@ -98,5 +103,18 @@ export const flowInfoMap: {
             label: 'there are filed can be download',
             interactable: true
         },
+    },
+    'Report': {
+        nodeType: '',
+        icon: faFileLines,
+        actIcon: {
+            icon: faCloud,
+            label: 'the report is set up.'
+        },
+        editIcon: {
+            icon: faComment,
+            label: 'set the prompt.',
+            interactable: true
+        }
     }
 }

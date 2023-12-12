@@ -22,7 +22,7 @@ export interface IWorkflow extends IWorkflowBase {
     flows: IFlowNode[];
 }
 
-export type FlowTyep = 'Input' | 'Output' | 'Normal' | 'Workflow';
+export type FlowTyep = 'Input' | 'Output' | 'Normal' | 'Workflow' | 'Report';
 export type FlowStatus = 'none' | 'success' | 'failure' | 'warning';
 export interface IFlowNodeBase {
     id: string;
@@ -39,5 +39,6 @@ export interface IFlowNode extends IFlowNodeBase {
     report?: any;
     running?: boolean;
     status?: FlowStatus;
+    fileName?: string;
 }
 

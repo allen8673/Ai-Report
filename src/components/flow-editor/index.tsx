@@ -52,6 +52,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
     const [promptForm, setPromptForm] = useState<FormInstance<IFlowNode>>()
     const [tempForm, setTempForm] = useState<FormInstance<IFlowNode>>()
+    const [reportForm, setReportForm] = useState<FormInstance<IFlowNode>>()
     const { graphRef } = useGraphRef<IFlowNode, any>(ref);
     const [openModal, setOpenModal] = useState<IFlowNode>();
 
@@ -69,6 +70,13 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
         const val = tempForm?.getValues();
         if (!val) return
         graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, workflowid: val.workflowid } }))
+        setOpenModal(undefined);
+    }
+
+    const setReport = () => {
+        const val = reportForm?.getValues();
+        if (!val) return
+        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, prompt: val.prompt, name: val.name, fileName: val.fileName } }))
         setOpenModal(undefined);
     }
 
@@ -204,7 +212,6 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                     }
                 </Form>
             </Modal>
-
             <Modal
                 className="preview-doc-modal"
                 onOk={() => setOpenModal(undefined)}
@@ -239,6 +246,31 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                                 <Dropdown options={map<IWorkflowMap, SelectItem>(workflowMap, (v, k) => ({ label: v, value: k }))} />
                             </Item>
                         </>)
+                    }
+                </Form>
+            </Modal>
+            <Modal
+                title="Set the report link"
+                onOk={setReport}
+                onCancel={closeModal}
+                visible={openModal?.type === 'Report'}
+            >
+                <Form
+                    defaultValues={openModal}
+                    onLoad={form => setReportForm(form)}
+                    onDestroyed={() => setReportForm(undefined)}>{
+                        ({ Item }) =>
+                            <>
+                                <Item name='fileName' label="File" >
+                                    <Dropdown options={['file_1', 'file_2']} />
+                                </Item>
+                                <Item name='name' label="Name" >
+                                    <InputText />
+                                </Item>
+                                <Item name='prompt' label="Prompt" >
+                                    <InputTextarea className="w-full min-h-[100px]" />
+                                </Item>
+                            </>
                     }
                 </Form>
             </Modal>
