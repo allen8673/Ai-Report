@@ -27,16 +27,6 @@ interface ViewReports {
     jobs: IJob[];
 }
 
-const mock: IJob = {
-    JOB_ID: '7daf04d4-482a-47e7-b6c7-e8b680549ea4',
-    WORKFLOW_ID: '',
-    VERSION: 0,
-    Create_User: '',
-    Create_Time: '',
-    Modify_User: '',
-    Modify_Time: '',
-    STATUS: 'fihish'
-}
 
 function PreviewModal({ reportJobs, onClose }:
     {
@@ -139,7 +129,7 @@ export default function WorkflowLayout({
             .then(res => {
                 setReportJobs(() => {
                     return {
-                        workflowId, jobs: [mock, ...(res.data.data || [])]
+                        workflowId, jobs: (res.data.data || [])
                     };
                 })
             }).catch((error) => {

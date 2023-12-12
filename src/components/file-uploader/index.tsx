@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FileUpload, FileUploadHandlerEvent } from "primereact/fileupload";
 import { Tooltip } from "primereact/tooltip";
 
+import EmptyPane from "../empty-pane";
+
 
 export interface FileUploaderProps {
     name?: string;
@@ -40,7 +42,7 @@ export default function FileUploader({ name, onUpload, uploadLabel }: FileUpload
                 </div>
             }}
             customUpload
-            emptyTemplate={<p className="m-0">Drag and drop files to here to upload.</p>}
+            emptyTemplate={<EmptyPane className="border-dashed" title="Drag and drop files to here to upload" />}
             itemTemplate={(file: any, opts) => {
                 const _file = (file as File);
                 return (

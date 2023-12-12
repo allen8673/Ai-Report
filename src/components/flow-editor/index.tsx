@@ -110,8 +110,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
             left-[22px] 
             right-[22px] 
             rounded-std 
-            bg-opacity-50 
-            bg-deep-weak`} >
+            bg-deep-weak/[.5]`} >
                 <Tooltip target={'.report-item'} position='top' />
                 <DndList
                     className="rounded-std"
