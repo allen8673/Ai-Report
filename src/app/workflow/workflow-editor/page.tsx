@@ -1,5 +1,5 @@
 'use client'
-import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCancel, faEye, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cloneDeep, filter, includes, map, remove, toString } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -37,7 +37,7 @@ export default function Page() {
     const [mode, setMode] = useState<EditMode>(!!paramObj.id ? 'normal' : 'add')
     const { graphRef } = useGraphRef<IFlowNode, any>();
     const { showMessage } = useLayoutContext();
-    const { runWorkflow } = useWfLayoutContext()
+    const { runWorkflow, viewReports } = useWfLayoutContext()
 
     const [workflow, setWorkflow] = useState<IWorkflow>();
     const [inEdit, setInEdit] = useState<boolean>();
@@ -397,7 +397,7 @@ export default function Page() {
                         </> :
                         <>
                             <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
-                                severity='info'
+                                severity='secondary'
                                 tooltip="Save as template"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={() => {
@@ -413,18 +413,23 @@ export default function Page() {
                             />
                             <Button icon={<FontAwesomeIcon icon={faPlayCircle} />}
                                 severity='success'
-                                tooltip="Run Flow"
+                                tooltip="Run Workflow"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
                                     runWorkflow(workflow)
-                                    // if (!ifWorkflowIsCompleted(workflow?.flows)) {
-                                    //     showMessage({
-                                    //         message: 'Cannot run the workflow since the workflow is not completed.',
-                                    //         type: 'error'
-                                    //     })
-                                    //     return
-                                    // }
-                                    // setOpenUpload(true);
+                                }}
+                            />
+                            <Button
+                                severity='info'
+                                tooltip="View Reports"
+                                tooltipOptions={{ position: 'bottom' }}
+                                disabled={!workflow?.id}
+                                icon={
+                                    <FontAwesomeIcon icon={faEye} />
+                                }
+                                onClick={() => {
+                                    if (!workflow?.id) return;
+                                    viewReports(workflow?.id)
                                 }}
                             />
                             <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}

@@ -63,7 +63,7 @@ export default function Page() {
                     <Button
                         className="py-0 px-[0px]"
                         severity='success'
-                        tooltip="Run workflow"
+                        tooltip="Run Workflow"
                         tooltipOptions={{ position: 'left' }}
                         icon={
                             <FontAwesomeIcon icon={faPlayCircle} />
