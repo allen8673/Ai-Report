@@ -76,7 +76,7 @@ function PreviewModal({ reportJobs, onClose }:
             <Dropdown
                 className='grow'
                 value={selectedJob}
-                options={[{ label: 'test', value: 'test' }, ...map<IJob, SelectItem>(reportJobs?.jobs || [], ({ JOB_ID }) => ({ label: JOB_ID, value: JOB_ID }))]}
+                options={map<IJob, SelectItem>(reportJobs?.jobs || [], ({ JOB_ID }) => ({ label: JOB_ID, value: JOB_ID }))}
                 onChange={v => {
                     setSelectedJob(v.value);
                 }}
