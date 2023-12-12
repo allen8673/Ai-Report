@@ -6,13 +6,12 @@ import { confirmDialog } from 'primereact/confirmdialog';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import { useEffect, useState } from 'react';
 
-import apiCaller from '@/api-helpers/api-caller';
+import { deleteFlow, getFlow, getFlows } from '@/api-helpers/flow-api';
 import FlowGraph from '@/components/flow-editor';
 import { useGraphRef } from '@/components/graph/helper';
 import Table from '@/components/table';
 import { Column } from '@/components/table/table';
 import TitlePane from '@/components/title-pane';
-import { ApiResult } from '@/interface/api';
 import { IFlowNode, IWorkflow, IWorkflowBase } from '@/interface/workflow';
 
 export default function Page() {
@@ -32,12 +31,11 @@ export default function Page() {
                         e.stopPropagation();
                         confirmDialog({
                             message: `Do you want to delete ${row?.name || 'this template'}?`,
-                            header: `Delete Workflow`,
+                            header: `Delete Template`,
                             icon: 'pi pi-info-circle',
                             acceptClassName: 'p-button-danger',
                             accept: async () => {
-                                // TODO: Call API to delete template
-                                const rsp = await apiCaller.delete<ApiResult>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${row?.id || ''}`);
+                                const rsp = await deleteFlow(row?.id);
                                 if (rsp.data.status === 'failure') return;
                                 await fetchTemplates();
                                 setSelection(pre => pre?.id === row.id ? undefined : pre)
@@ -52,7 +50,7 @@ export default function Page() {
     ];
 
     const fetchTemplates = async () => {
-        const tmps = (await apiCaller.get<ApiResult<IWorkflowBase[]>>(`${process.env.NEXT_PUBLIC_FLOWS_API}/TEMPLATE`)).data.data || [];
+        const tmps = await getFlows('TEMPLATE');
         setTemplates(tmps)
     }
 
@@ -70,7 +68,7 @@ export default function Page() {
                         label='Add New Template'
                         tooltipOptions={{ position: 'left' }}
                         onClick={() => {
-                            //    
+
                         }}
                     />
                 </>}
@@ -102,7 +100,7 @@ export default function Page() {
                     first={0}
                     totalRecords={5}
                     onSelectionChange={async e => {
-                        const tmp = await (await apiCaller.get<ApiResult<IWorkflow>>(`${process.env.NEXT_PUBLIC_FLOW_API}/${e.value.id}`)).data.data
+                        const tmp = await getFlow(e.value.id)
                         setSelection(tmp);
                     }}
                     selection={selection}

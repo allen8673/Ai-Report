@@ -42,3 +42,7 @@ export interface IFlowNode extends IFlowNodeBase {
     fileName?: string;
 }
 
+export interface ISaveFlow {
+    workflowid?: string
+}
+

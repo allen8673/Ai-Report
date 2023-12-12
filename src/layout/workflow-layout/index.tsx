@@ -13,6 +13,7 @@ import { useLayoutContext } from '../turbo-layout/context';
 import { WfLayoutContext } from './context';
 
 import apiCaller from '@/api-helpers/api-caller';
+import { getFlow } from '@/api-helpers/flow-api';
 import EmptyPane from '@/components/empty-pane';
 import FileUploader from '@/components/file-uploader';
 import { ifWorkflowIsCompleted } from '@/components/flow-editor/helper';
@@ -110,9 +111,7 @@ export default function WorkflowLayout({
 
     const runWorkflow = async (wf?: IWorkflow | string) => {
         if (!wf) return;
-        const workflow: IWorkflow | undefined = typeof wf === 'string' ?
-            await (await apiCaller.get<ApiResult<IWorkflow>>(`${process.env.NEXT_PUBLIC_FLOW_API}/${wf}`)).data.data
-            : wf
+        const workflow: IWorkflow | undefined = typeof wf === 'string' ? await getFlow(wf) : wf
 
         if (!ifWorkflowIsCompleted(workflow?.flows)) {
             showMessage({

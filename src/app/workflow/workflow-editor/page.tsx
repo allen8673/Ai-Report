@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { v4 } from "uuid";
 
 import apiCaller from "@/api-helpers/api-caller";
+import { addFlow, deleteFlow, getFlow, getFlows, updateFlow } from "@/api-helpers/flow-api";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FileUploader from "@/components/file-uploader";
 import FlowGraph from "@/components/flow-editor";
@@ -62,7 +63,7 @@ export default function Page() {
     }
 
     const fetchAllWorflowData = async () => {
-        const wfs = (await apiCaller.get<ApiResult<IWorkflow[]>>(`${process.env.NEXT_PUBLIC_FLOWS_API}/WORKFLOW`)).data.data;
+        const wfs = await getFlows()
         if (!wfs) return;
 
         setWorkflowMap(wfs.reduce<{ [id: string]: string }>((pre, wf) => {
@@ -72,16 +73,14 @@ export default function Page() {
     }
 
     const fetchWorkflow = async (id: string) => {
-        const wf = await (await apiCaller.get<ApiResult<IWorkflow>>(`${process.env.NEXT_PUBLIC_FLOW_API}/${id}`)).data.data
+        const wf = await getFlow(id)
         setWorkflow(wf);
     }
 
     const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
         const id = '';
         const template: (IWorkflow | undefined) =
-            (!!paramObj.template ?
-                (await apiCaller.get<ApiResult<IWorkflow>>(`${process.env.NEXT_PUBLIC_FLOW_API}/${paramObj.template}`)).data.data :
-                undefined);
+            (!!paramObj.template ? await getFlow(paramObj.template) : undefined);
 
         if (!!template) {
             /**
@@ -205,8 +204,7 @@ export default function Page() {
             flows: _nodes
         }
 
-        // TODO: Call API to add template
-        await apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_FLOW_API}`, template);
+        await addFlow(template)
         setOpenTemplateModal(false)
     }
 
@@ -222,7 +220,7 @@ export default function Page() {
          * and use the workflows instead of all reference nodes. 
          */
         for (const ref_wf of ref_wfs) {
-            const wf = await (await apiCaller.get<ApiResult<IWorkflow>>(`${process.env.NEXT_PUBLIC_FLOW_API}/${ref_wf.workflowid}`)).data.data;
+            const wf = await getFlow(ref_wf.workflowid)
             if (!wf) continue;
 
             /**
@@ -349,7 +347,7 @@ export default function Page() {
                                         icon: 'pi pi-info-circle',
                                         acceptClassName: 'p-button-danger',
                                         accept: async () => {
-                                            const rsp = await apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_DISABLEFLOW}/${workflow?.id}`,);
+                                            const rsp = await deleteFlow(workflow?.id);
                                             if (rsp.data.status === 'failure') return;
                                             router.push(wfUrl)
                                         },
@@ -377,10 +375,7 @@ export default function Page() {
                                     const result: IWorkflow = ({ ...workflow, flows });
                                     calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
 
-                                    const res = (mode === 'add' ?
-                                        await apiCaller.post<ApiResult<{ workflowid?: string }>>(`${process.env.NEXT_PUBLIC_CREATEFLOW}`, result) :
-                                        await apiCaller.post<ApiResult<{ workflowid?: string }>>(`${process.env.NEXT_PUBLIC_UPDATEFLOW}`, result)
-                                    ).data
+                                    const res = await (await (mode === 'add' ? addFlow : updateFlow)(result)).data
 
                                     if (res.status !== 'ok' && res.status !== 'success') {
                                         showMessage({

@@ -8,7 +8,7 @@ import { InputText } from "primereact/inputtext";
 import { SelectItem } from "primereact/selectitem";
 import { useEffect, useState } from 'react'
 
-import apiCaller from "@/api-helpers/api-caller";
+import { getAll } from "@/api-helpers/flow-api";
 import { coverToQueryString } from "@/api-helpers/url-helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
@@ -16,7 +16,6 @@ import Modal from "@/components/modal";
 import Table from "@/components/table";
 import { Column } from "@/components/table/table";
 import TitlePane from "@/components/title-pane";
-import { ApiResult } from "@/interface/api";
 import { IWorkflowBase } from "@/interface/workflow";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
@@ -38,10 +37,7 @@ export default function Page() {
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([])
 
     const getAllData = async () => {
-        const { workflow, template } = (await apiCaller.get<ApiResult<{
-            workflow: IWorkflowBase[],
-            template: IWorkflowBase[]
-        }>>(`${process.env.NEXT_PUBLIC_FLOWS_API}/ALL`)).data.data || {};
+        const { workflow, template } = await getAll() || {};
         setWorkflow(workflow || []);
         setTemplateOpts(template?.map(t => ({ label: t.name, value: t.id })) || [])
     }
