@@ -1,7 +1,7 @@
 'use client'
 import { faCancel, faEye, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cloneDeep, filter, includes, map, remove, toString } from "lodash";
+import { cloneDeep, filter, includes, map, remove } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
@@ -9,10 +9,8 @@ import { InputText } from "primereact/inputtext";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
 
-import apiCaller from "@/api-helpers/api-caller";
 import { addFlow, deleteFlow, getFlow, getFlows, updateFlow } from "@/api-helpers/flow-api";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
-import FileUploader from "@/components/file-uploader";
 import FlowGraph from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
 import { IWorkflowMap } from "@/components/flow-editor/context";
@@ -22,7 +20,6 @@ import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/title-pane";
-import { ApiResult } from "@/interface/api";
 import { IEditWorkflow, IFlowNode, IWorkflow } from "@/interface/workflow";
 import { useLayoutContext } from "@/layout/turbo-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
@@ -45,8 +42,6 @@ export default function Page() {
     const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
     const [workflowMap, setWorkflowMap] = useState<IWorkflowMap>({})
     const [form, setForm] = useState<FormInstance<IWorkflow>>()
-    const [openUpload, setOpenUpload] = useState<boolean>(false);
-
 
     useEffect(() => {
         initial()
@@ -480,48 +475,6 @@ export default function Page() {
                             </>
                         )
                     }</Form>
-            </Modal>
-            <Modal
-                title={`Upload files to Run '${workflow?.name}'(${workflow?.id})`}
-                visible={openUpload}
-                onOk={() => setOpenUpload(false)}
-                footerClass="flex justify-end"
-                okLabel="Cancel"
-            >
-                <FileUploader
-                    uploadLabel="Upload & Run"
-                    onUpload={e => {
-                        if (workflow && e.files && e.files.length > 0) {
-                            const formData = new FormData();
-                            for (const i in e.files) {
-                                formData.append('files', e.files[i])
-                            }
-
-                            formData.append('userId', '23224');
-                            formData.append('workflowId', workflow.id);
-                            formData.append('version', '1');
-
-                            apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_REPORT}/run`, formData, {
-                                headers: {
-                                    "Content-Type": "multipart/form-data",
-                                    // "x-rapidapi-host": "file-upload8.p.rapidapi.com",
-                                    // "x-rapidapi-key": "your-rapidapi-key-here",
-                                },
-                            }).then((res) => {
-                                showMessage({
-                                    message: res.data.message || 'success',
-                                    type: 'success'
-                                })
-                                setOpenUpload(false);
-                            }).catch((error) => {
-                                showMessage({
-                                    message: toString(error),
-                                    type: 'error'
-                                })
-                            });
-                        }
-                    }}
-                />
             </Modal>
         </div>
     </div>

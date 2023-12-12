@@ -12,13 +12,12 @@ import { useLayoutContext } from '../turbo-layout/context';
 
 import { WfLayoutContext } from './context';
 
-import apiCaller from '@/api-helpers/api-caller';
 import { getFlow } from '@/api-helpers/flow-api';
+import { downloadJob, getJobs, runReport } from '@/api-helpers/report-api';
 import EmptyPane from '@/components/empty-pane';
 import FileUploader from '@/components/file-uploader';
 import { ifWorkflowIsCompleted } from '@/components/flow-editor/helper';
 import Modal from '@/components/modal';
-import { ApiResult } from '@/interface/api';
 import { IJob } from '@/interface/job';
 import { IWorkflow } from '@/interface/workflow';
 import { downloadString } from '@/utils';
@@ -45,13 +44,13 @@ function PreviewModal({ reportJobs, onClose }:
 
     useEffect(() => {
         if (!selectedJob || !!jobContents[selectedJob]) return;
-        apiCaller.get(`${process.env.NEXT_PUBLIC_DOWNLOAD}/${selectedJob}`)
-            .then(res => {
-                if (res.data?.status_code === 404) {
-                    throw (res.data.detail)
+        downloadJob(selectedJob)
+            .then(data => {
+                if (data?.status_code === 404) {
+                    throw (data.detail)
                 }
                 setJobContents(pre => {
-                    pre[selectedJob] = typeof res.data === 'string' ? res.data : JSON.stringify(res.data)
+                    pre[selectedJob] = typeof data === 'string' ? data : JSON.stringify(data)
                     return { ...pre }
                 })
 
@@ -124,11 +123,11 @@ export default function WorkflowLayout({
     }
     const viewReports = (workflowId: string) => {
         setReportJobs({ workflowId, jobs: [] });
-        apiCaller.get<ApiResult<IJob[]>>(`${process.env.NEXT_PUBLIC_GET_JOBS}/${workflowId}/1`)
+        getJobs(workflowId)
             .then(res => {
                 setReportJobs(() => {
                     return {
-                        workflowId, jobs: (res.data.data || [])
+                        workflowId, jobs: (res.data || [])
                     };
                 })
             }).catch((error) => {
@@ -165,15 +164,9 @@ export default function WorkflowLayout({
                             formData.append('workflowId', runningWF.id);
                             formData.append('version', '1');
 
-                            apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_REPORT}/run`, formData, {
-                                headers: {
-                                    "Content-Type": "multipart/form-data",
-                                    // "x-rapidapi-host": "file-upload8.p.rapidapi.com",
-                                    // "x-rapidapi-key": "your-rapidapi-key-here",
-                                },
-                            }).then((res) => {
+                            runReport(formData).then((res) => {
                                 showMessage({
-                                    message: res.data.message || 'success',
+                                    message: res.message || 'success',
                                     type: 'success'
                                 })
                                 setRunningWF(undefined);
