@@ -1,5 +1,4 @@
 'use client'
-import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { faDownload } from '@fortawesome/free-solid-svg-icons/faDownload';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { map, toString } from 'lodash';
@@ -14,16 +13,100 @@ import { useLayoutContext } from '../turbo-layout/context';
 import { WfLayoutContext } from './context';
 
 import apiCaller from '@/api-helpers/api-caller';
+import EmptyPane from '@/components/empty-pane';
 import FileUploader from '@/components/file-uploader';
 import { ifWorkflowIsCompleted } from '@/components/flow-editor/helper';
 import Modal from '@/components/modal';
 import { ApiResult } from '@/interface/api';
 import { IJob } from '@/interface/job';
 import { IWorkflow } from '@/interface/workflow';
+import { downloadString } from '@/utils';
 
 interface ViewReports {
     workflowId: string;
     jobs: IJob[];
+}
+
+const mock: IJob = {
+    JOB_ID: '7daf04d4-482a-47e7-b6c7-e8b680549ea4',
+    WORKFLOW_ID: '',
+    VERSION: 0,
+    Create_User: '',
+    Create_Time: '',
+    Modify_User: '',
+    Modify_Time: '',
+    STATUS: 'fihish'
+}
+
+function PreviewModal({ reportJobs, onClose }:
+    {
+        reportJobs: ViewReports,
+        onClose: () => void
+    }) {
+
+    const { showMessage } = useLayoutContext();
+    const [jobContents, setJobContents] = useState<{ [id: string]: any }>({});
+    const [selectedJob, setSelectedJob] = useState<string>('');
+
+    useEffect(() => {
+        setSelectedJob(reportJobs.jobs?.[0]?.JOB_ID || '')
+    }, [reportJobs])
+
+    useEffect(() => {
+        if (!selectedJob || !!jobContents[selectedJob]) return;
+        apiCaller.get(`${process.env.NEXT_PUBLIC_DOWNLOAD}/${selectedJob}`)
+            .then(res => {
+                if (res.data?.status_code === 404) {
+                    throw (res.data.detail)
+                }
+                setJobContents(pre => {
+                    pre[selectedJob] = res.data
+                    return { ...pre }
+                })
+
+            }).catch((error) => {
+                showMessage({
+                    message: toString(error),
+                    type: 'error'
+                })
+            });
+    }, [selectedJob])
+
+    return <Modal
+        className="preview-doc-moda min-w-[50%] min-h-[50%] max-w-[70%]"
+        onOk={onClose}
+        okLabel="Close"
+        visible={!!true}
+        contentClassName="flex flex-col gap-[22px]"
+        footerClass="flex justify-end"
+    >
+        <div className='flex gap-[7px] p'>
+            <Dropdown
+                className='grow'
+                value={selectedJob}
+                options={map<IJob, SelectItem>(reportJobs?.jobs || [], ({ JOB_ID }) => ({ label: JOB_ID, value: JOB_ID }))}
+                onChange={v => {
+                    setSelectedJob(v.value)
+                }}
+            />
+            <Button
+                className="gap-[7px]"
+                severity='info'
+                label={'Download'}
+                disabled={!jobContents[selectedJob]}
+                icon={<FontAwesomeIcon icon={faDownload} />}
+                onClick={(): void => {
+                    if (!jobContents[selectedJob]) return
+                    downloadString(jobContents[selectedJob], selectedJob, 'txt')
+                }}
+            />
+        </div>
+        {jobContents[selectedJob] ? <Fieldset legend="Preview your report" className="grow" >
+            {jobContents[selectedJob]}
+        </Fieldset> : <EmptyPane />}
+
+    </Modal>
+
 }
 
 export default function WorkflowLayout({
@@ -32,10 +115,8 @@ export default function WorkflowLayout({
     children: React.ReactNode
 }) {
     const { showMessage } = useLayoutContext();
-
     const [runningWF, setRunningWF] = useState<IWorkflow>();
     const [reportJobs, setReportJobs] = useState<ViewReports>();
-    const [selectedJob, setSelectedJob] = useState<{ id: string, contenet?: any }>();
 
     const runWorkflow = async (wf?: IWorkflow | string) => {
         if (!wf) return;
@@ -56,10 +137,10 @@ export default function WorkflowLayout({
         setReportJobs({ workflowId, jobs: [] });
         apiCaller.get<ApiResult<IJob[]>>(`${process.env.NEXT_PUBLIC_GET_JOBS}/${workflowId}/1`)
             .then(res => {
-                setSelectedJob({ id: res.data.data?.[0]?.JOB_ID || '' })
-                // setSelectedJob(() => res.data.data?.[0]?.JOB_ID)
                 setReportJobs(() => {
-                    return { workflowId, jobs: res.data.data || [] };
+                    return {
+                        workflowId, jobs: [mock, ...(res.data.data || [])]
+                    };
                 })
             }).catch((error) => {
                 showMessage({
@@ -68,19 +149,6 @@ export default function WorkflowLayout({
                 })
             })
     }
-    useEffect(() => {
-        if (!selectedJob?.id) return;
-        apiCaller.get<ApiResult<IJob[]>>(`${process.env.NEXT_PUBLIC_DOWNLOAD}/${selectedJob.id}/`)
-            .then(res => {
-                console.log(res)
-            }).catch((error) => {
-                showMessage({
-                    message: toString(error),
-                    type: 'error'
-                })
-            })
-
-    }, [selectedJob?.id])
 
     return (
         <WfLayoutContext.Provider value={{
@@ -130,28 +198,7 @@ export default function WorkflowLayout({
                     }}
                 />
             </Modal>
-            <Modal
-                className="preview-doc-moda min-w-[50%] min-h-[50%]"
-                onOk={() => setReportJobs(undefined)}
-                okLabel="Close"
-                visible={!!reportJobs}
-                contentClassName="flex flex-col gap-[22px] ovre"
-                footerClass="flex justify-end"
-            >
-                <div className='flex gap-[7px]'>
-                    <Dropdown
-                        className='grow'
-                        value={selectedJob}
-                        options={map<IJob, SelectItem>(reportJobs?.jobs || [], ({ JOB_ID }) => ({ label: JOB_ID, value: JOB_ID }))}
-                        onChange={v => { setSelectedJob(v.value) }}
-                    />
-                    <Button severity='info' label={'Preview'} icon={<FontAwesomeIcon icon={faEye} />} />
-                    <Button label={'Download'} icon={<FontAwesomeIcon icon={faDownload} />} />
-                </div>
-                <Fieldset legend="Preview your report" className="grow" >
-                    {/* {openModal?.report || ''} */}
-                </Fieldset>
-            </Modal>
+            {reportJobs && <PreviewModal reportJobs={reportJobs} onClose={() => setReportJobs(undefined)} />}
         </WfLayoutContext.Provider>
     )
 }

@@ -33,6 +33,7 @@ export default function Modal(props: React.PropsWithChildren<ModalProps>) {
         stickyContentOnClose,
         footer,
         footerClass,
+        contentClassName,
         ...others } = props
     return <Dialog
         header={title}
@@ -47,6 +48,7 @@ export default function Modal(props: React.PropsWithChildren<ModalProps>) {
         className="w-4"
         modal
         onMaskClick={cancelByMask ? onCancel : undefined}
+        contentClassName={`py-2 ${contentClassName || ''}`}
         {...others}
     >
         {(visible || stickyContentOnClose) && children}
