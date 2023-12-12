@@ -12,7 +12,7 @@ export default function EmptyPane({ title }: EmptyPaneProps) {
         w-full h-full 
         flex flex-col grow justify-center items-center 
         border-solid border-light-weak rounded-std-sm `}>
-            <FontAwesomeIcon className='w-16 h-16' icon={faInbox} />
+            <FontAwesomeIcon className='!w-16 !h-16' icon={faInbox} />
             <p className='my-0'>{title || 'No Data'}</p>
         </div>)
 }
