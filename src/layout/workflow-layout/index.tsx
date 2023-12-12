@@ -50,7 +50,7 @@ function PreviewModal({ reportJobs, onClose }:
                     throw (res.data.detail)
                 }
                 setJobContents(pre => {
-                    pre[selectedJob] = res.data
+                    pre[selectedJob] = typeof res.data === 'string' ? res.data : JSON.stringify(res.data)
                     return { ...pre }
                 })
 
