@@ -27,30 +27,30 @@ export default function CodeEditor({
     const _path: string = path || 'default';
 
     const [editor, setEditor] = useState<monacoEditor.editor.IStandaloneCodeEditor>();
-    const [isPartialCode, setIsPartialCode] = useState<boolean>(false);
+    // const [isPartialCode, setIsPartialCode] = useState<boolean>(false);
     const [codeChanging, setCodeChanging] = useState<boolean>();
 
     const [codes, setCodes] = useState<Record<string, string>>({ [_path]: defaultValue || value || '' });
-    const [execCode, setExecCode] = useState<string>(defaultValue || value || '');
+    // const [execCode, setExecCode] = useState<string>(defaultValue || value || '');
 
-    const getExecuteCode = (editor: monacoEditor.editor.IStandaloneCodeEditor): void => {
-        const selection = editor?.getSelection();
-        let val: string = editor?.getValue() || '';
+    // const getExecuteCode = (editor: monacoEditor.editor.IStandaloneCodeEditor): void => {
+    //     const selection = editor?.getSelection();
+    //     let val: string = editor?.getValue() || '';
 
-        setIsPartialCode(() => {
-            if (!!selection && !selection?.isEmpty()) {
-                val = editor?.getModel()?.getValueInRange(selection) || val;
-                return true;
-            }
-            return false;
-        });
+    //     setIsPartialCode(() => {
+    //         if (!!selection && !selection?.isEmpty()) {
+    //             val = editor?.getModel()?.getValueInRange(selection) || val;
+    //             return true;
+    //         }
+    //         return false;
+    //     });
 
-        setExecCode(val);
-    };
+    //     setExecCode(val);
+    // };
 
-    const handleEditorOnMount: OnMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: Monaco): void => {
+    const handleEditorOnMount: OnMount = (editor: monacoEditor.editor.IStandaloneCodeEditor): void => {
         setEditor(editor);
-        editor.onDidChangeCursorSelection(debounce((e) => getExecuteCode(editor), 300));
+        // editor.onDidChangeCursorSelection(debounce((e) => getExecuteCode(editor), 300));
     };
 
     const handleBeforeMount: BeforeMount = (monaco: Monaco): void => {
@@ -115,9 +115,9 @@ export default function CodeEditor({
             // pre[_path] = value;
             return { ...pre, [_path]: value };
         });
-        if (!!editor) {
-            getExecuteCode(editor);
-        }
+        // if (!!editor) {
+        //     getExecuteCode(editor);
+        // }
     }, [value]);
 
     useEffect(() => {
