@@ -58,7 +58,7 @@ export default function Page() {
     }
 
     const fetchAllWorflowData = async () => {
-        const wfs = await getFlows()
+        const wfs = await getFlows('WORKFLOW')
         if (!wfs) return;
 
         setWorkflowMap(wfs.reduce<{ [id: string]: string }>((pre, wf) => {
