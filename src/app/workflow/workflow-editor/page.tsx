@@ -344,7 +344,13 @@ export default function Page() {
                                         acceptClassName: 'p-button-danger',
                                         accept: async () => {
                                             const rsp = await deleteFlow(workflow?.id);
-                                            if (rsp.data.status === 'failure') return;
+                                            if (rsp.data.status === 'failure' || rsp.data.status === 'NG') {
+                                                if (rsp.data.message) showMessage({
+                                                    message: rsp.data.message,
+                                                    type: 'error'
+                                                })
+                                                return;
+                                            }
                                             router.push(wfUrl)
                                         },
                                     });
