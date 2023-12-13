@@ -1,13 +1,11 @@
-import _, { includes, map } from "lodash";
-import { Button } from "primereact/button";
+import { find, forEach, includes, map } from "lodash";
 import { Dropdown } from "primereact/dropdown";
-import { Fieldset } from "primereact/fieldset";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { SelectItem } from "primereact/selectitem";
 import { Tooltip } from "primereact/tooltip";
 import { useEffect, useState } from "react";
-import { Connection, Edge, Node } from 'reactflow'
+import { Connection, Edge, Node, NodeRemoveChange } from 'reactflow'
 import { v4 } from "uuid";
 
 import DndList from "../dnd-list";
@@ -85,9 +83,9 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
 
     useEffect(() => {
         const edges: Edge[] = [];
-        const nodes = _.map<IFlowNode, Node<IFlowNode>>(flows, flow => {
+        const nodes = map<IFlowNode, Node<IFlowNode>>(flows, flow => {
             const { id, position, forwards } = flow;
-            _.forEach(forwards, fw => {
+            forEach(forwards, fw => {
                 edges.push({ id: `${flow.id}-${fw}`, source: flow.id, target: fw, deletable: inEdit })
             })
             return ({
@@ -110,7 +108,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
     }, [inEdit]);
 
     return <ErrorBoundary>
-        <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, workflowMap }}>
+        <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, workflowMap, graphRef }}>
             <div className="flow-editor h-full w-full relative">
                 {inEdit && <div className={`absolute 
             z-20 
@@ -164,16 +162,17 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                             return pre
                         })
                     }}
-                    onNodesDelete={(n) => {
-                        const node = n[0];
-                        if (!node) return;
-                        const { id } = node;
-                        graphRef.current.setNodes(pre => {
-                            if (!pre.data.forwards?.includes(id)) return pre;
-                            const idx = pre.data.forwards.indexOf(id);
-                            pre.data.forwards.splice(idx, 1);
-                            return pre
-                        })
+                    onNodesChange={(changes) => {
+                        const change = find(changes, ['type', 'remove'])
+                        if (!!change) {
+                            const { id } = change as NodeRemoveChange;
+                            graphRef.current.setNodes(pre => {
+                                if (!pre.data.forwards?.includes(id)) return pre;
+                                const idx = pre.data.forwards.indexOf(id);
+                                pre.data.forwards.splice(idx, 1);
+                                return pre
+                            })
+                        }
                     }}
                     onMouseUp={(e, position) => {
                         if (!onDragItem || !position) return;
@@ -199,37 +198,21 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                     visible={openModal?.type === 'Normal'}
                 >
                     <Form
+                        readonly={!inEdit}
                         defaultValues={openModal}
                         onLoad={form => setPromptForm(form)}
                         onDestroyed={() => setPromptForm(undefined)}>{
                             ({ Item }) =>
                                 <>
                                     <Item name='name' label="Name" >
-                                        <InputText />
+                                        <InputText readOnly />
                                     </Item>
                                     <Item name='prompt' label="Prompt" >
-                                        <InputTextarea className="w-full min-h-[100px]" />
+                                        <InputTextarea readOnly className="w-full min-h-[100px]" />
                                     </Item>
                                 </>
                         }
                     </Form>
-                </Modal>
-                <Modal
-                    className="preview-doc-modal"
-                    onOk={() => setOpenModal(undefined)}
-                    okLabel="Close"
-                    visible={openModal?.type === 'Output'}
-                    contentClassName="flex"
-                    footer={<div className="flex justify-center">
-                        {<Button label='Download' severity='secondary' onClick={() => {
-                            // download
-                        }} />}
-                        {<Button label='Close' onClick={() => setOpenModal(undefined)} />}
-                    </div>}
-                >
-                    <Fieldset legend="Preview your report" className="w-full" >
-                        {openModal?.report || ''}
-                    </Fieldset>
                 </Modal>
                 <Modal
                     title="Workflow Reference"
@@ -238,6 +221,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                     visible={openModal?.type === 'Workflow'}
                 >
                     <Form
+                        readonly={!inEdit}
                         defaultValues={openModal}
                         onLoad={form => setTempForm(form)}
                         onDestroyed={() => setTempForm(undefined)}>
@@ -245,7 +229,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                             ({ Item }) =>
                             (<>
                                 <Item name='workflowid' label="Select a reference workflow" >
-                                    <Dropdown options={map<IWorkflowMap, SelectItem>(workflowMap, (v, k) => ({ label: v, value: k }))} />
+                                    <Dropdown disabled options={map<IWorkflowMap, SelectItem>(workflowMap, (v, k) => ({ label: v, value: k }))} />
                                 </Item>
                             </>)
                         }
@@ -258,6 +242,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                     visible={openModal?.type === 'Report'}
                 >
                     <Form
+                        readonly={!inEdit}
                         defaultValues={openModal}
                         onLoad={form => setReportForm(form)}
                         onDestroyed={() => setReportForm(undefined)}>{

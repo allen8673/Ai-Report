@@ -27,7 +27,8 @@ export interface FormProps<T extends Record<string, any>> {
     onLoad?: (formInstance: FormInstance<T>) => void;
     onDestroyed?: () => void
     className?: string;
-    onSubmit?: (data: T) => void
+    onSubmit?: (data: T) => void;
+    readonly?: boolean;
 }
 
 export interface FormInstance<T extends FormValue> {
@@ -38,6 +39,7 @@ export interface FormInstance<T extends FormValue> {
 }
 export interface GetItemProps<T extends FormValue> {
     formCore: FormCoreInstance<T>;
+    readonly?: boolean;
 }
 
 export interface FormItemChildren<T extends FormValue> {

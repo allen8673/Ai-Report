@@ -27,7 +27,7 @@ function GetList<T extends FormValue>({ formCore }: GetItemProps<T>) {
     }
 }
 
-function GetItem<T extends FormValue>({ formCore }: GetItemProps<T>) {
+function GetItem<T extends FormValue>({ formCore, readonly }: GetItemProps<T>) {
     const { control, formState: { errors } } = formCore;
     const getFormErrorMessage = (name: Path<T>): React.ReactNode => {
         const msg: string = errors[name]?.message as string || ''
@@ -48,6 +48,8 @@ function GetItem<T extends FormValue>({ formCore }: GetItemProps<T>) {
                                 React.cloneElement(children, {
                                     id: field.name,
                                     ...field,
+                                    readonly,
+                                    disabled: readonly,
                                     [valuePropName]: field.value,
                                     className: `${classNames({ 'p-invalid': fieldState.invalid, })} ${children?.props?.className || 'w-full'}`
                                 })
@@ -75,13 +77,14 @@ export default function Form<T extends Record<string, any>>(props: FormProps<T>)
         onLoad,
         className,
         onDestroyed,
-        onSubmit
+        onSubmit,
+        readonly
     } = props;
 
     const { form: formInstance } = useForm<T>(form, defaultValues);
     const { formCore, submit } = formInstance
 
-    const FormItem = GetItem({ formCore: formInstance.formCore });
+    const FormItem = GetItem({ formCore: formInstance.formCore, readonly });
     const FormList = GetList({ formCore: formInstance.formCore })
     useEffect(() => {
         onLoad?.(formInstance);

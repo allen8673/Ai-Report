@@ -1,4 +1,4 @@
-import { IconDefinition, faUpload, faDownload, faBrain, faCloud, faComment, faCloudDownload, faShareNodes, faFileLines } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition, faUpload, faDownload, faBrain, faShareNodes, faFileLines } from '@fortawesome/free-solid-svg-icons'
 import { Edge, MarkerType } from 'reactflow';
 
 import { FlowTyep, IFlowNodeBase } from '@/interface/workflow';
@@ -27,94 +27,41 @@ export const REPORT_ITEMS: IFlowNodeBase[] = [
         name: 'Report',
         type: 'Report'
     }
-    // {
-    //     id: 'file-upload',
-    //     name: 'Upload',
-    //     type: 'file-upload'
-    // },
-    // {
-    //     id: 'file-download',
-    //     name: 'Done',
-    //     type: 'file-download'
-    // },
 ]
 
-export interface IconInfo {
-    icon: IconDefinition;
-    label?: string;
-    interactable?: boolean;
-}
 
 export const flowInfoMap: {
     [type in FlowTyep]: {
         nodeType: '' | 'start' | 'end';
         nodeName?: string;
         icon: IconDefinition;
-        actIcon?: IconInfo;
-        editIcon?: IconInfo;
+        editable?: boolean
     }
 } = {
     'Input': {
         nodeType: 'start',
         icon: faUpload,
         nodeName: 'Upload',
-        // actIcon: {
-        //     icon: faCloudUpload,
-        //     label: 'the files has uploaded.'
-        // },
-        // editIcon: {
-        //     icon: faFileArrowUp,
-        //     label: 'upload your files.',
-        //     interactable: true
-        // }
-    },
-    'Normal': {
-        nodeType: '',
-        icon: faBrain,
-        actIcon: {
-            icon: faCloud,
-            label: 'the prompt is set up.'
-        },
-        editIcon: {
-            icon: faComment,
-            label: 'set the prompt.',
-            interactable: true
-        }
-    },
-    'Workflow': {
-        nodeType: '',
-        icon: faShareNodes,
-        actIcon: {
-            icon: faCloud,
-            label: 'the prompt is set up.'
-        },
-        editIcon: {
-            icon: faComment,
-            label: 'set the prompt.',
-            interactable: true
-        }
     },
     'Output': {
         nodeType: 'end',
         nodeName: 'Done',
         icon: faDownload,
-        actIcon: {
-            icon: faCloudDownload,
-            label: 'there are filed can be download',
-            interactable: true
-        },
     },
+    'Normal': {
+        nodeType: '',
+        icon: faBrain,
+        editable: true
+    },
+    'Workflow': {
+        nodeType: '',
+        icon: faShareNodes,
+        editable: true
+    },
+
     'Report': {
         nodeType: '',
         icon: faFileLines,
-        actIcon: {
-            icon: faCloud,
-            label: 'the report is set up.'
-        },
-        editIcon: {
-            icon: faComment,
-            label: 'set the prompt.',
-            interactable: true
-        }
+        editable: true
     }
 }
