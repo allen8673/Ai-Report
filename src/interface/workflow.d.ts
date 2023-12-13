@@ -7,18 +7,22 @@ export interface IEditWorkflow {
     template?: string;
 }
 
+export interface IWorkflowBase {
+    id: string;
+    name: string;
+    used?: string[]
+}
+
 /**
  * the interface for the diagram of AI report
  */
-export interface IWorkflow {
+export interface IWorkflow extends IWorkflowBase {
     type: 'workflow' | 'template',
-    id: string;
-    name: string;
     rootNdeId: string[];
     flows: IFlowNode[];
 }
 
-export type FlowTyep = 'Input' | 'Output' | 'Normal' | 'Workflow';
+export type FlowTyep = 'Input' | 'Output' | 'Normal' | 'Workflow' | 'Report';
 export type FlowStatus = 'none' | 'success' | 'failure' | 'warning';
 export interface IFlowNodeBase {
     id: string;
@@ -30,10 +34,15 @@ export interface IFlowNode extends IFlowNodeBase {
     forwards: string[];
     prompt?: string;
     depth?: number;
-    workflowId?: string;
+    workflowid?: string;
     file?: any;
     report?: any;
     running?: boolean;
     status?: FlowStatus;
+    fileName?: string;
+}
+
+export interface ISaveFlow {
+    workflowid?: string
 }
 

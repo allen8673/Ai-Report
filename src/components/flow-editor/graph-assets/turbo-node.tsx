@@ -1,10 +1,11 @@
-import { IconDefinition, faCheck, faExclamation, faQuestion, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faCheck, faCloud, faExclamation, faQuestion, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { confirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import React, { ReactNode } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 
-import { IconInfo, flowInfoMap } from "../configuration";
+import { flowInfoMap } from "../configuration";
 import { useFlowGrapContext } from '../context';
 
 import { FlowStatus, IFlowNode } from '@/interface/workflow';
@@ -45,35 +46,42 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
 function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
     const { id, data, } = elm;
     const { running } = data || {}
-    const { nodeType, icon, editIcon, actIcon, nodeName } = flowInfoMap[data.type] || {}
-    const { inEdit, clickOnSetting, workflowMap } = useFlowGrapContext();
+    const { nodeType, icon, nodeName, editable } = flowInfoMap[data.type] || {}
+    const { inEdit, clickOnSetting, workflowMap, graphRef } = useFlowGrapContext();
     const iconHighlight = !!data.prompt || !!data.file || !!data.report
+    const deletable = editable
+    const clickable = inEdit;
 
-    const _clickOnSetting = (icon: IconInfo): void => {
-        if (!icon.interactable || (!inEdit && !iconHighlight)) return;
-        clickOnSetting?.(data);
+    const removeNode = () => {
+        if (!inEdit) return;
+        confirmDialog({
+            position: 'top',
+            message: `Do you want to remove ${data?.name || 'this node'}?`,
+            header: `Remove Node`,
+            icon: 'pi pi-info-circle',
+            acceptClassName: 'p-button-danger',
+            accept: () => {
+                graphRef?.current?.removeNode(id)
+            },
+        });
     }
-
-    const iconInfo = inEdit ? editIcon : actIcon;
-    const openable = inEdit || iconHighlight;
 
     return (
         <>
-            <Tooltip target={'.tip-icon'} mouseTrack position='left' />
+            {/* <Tooltip target={'.tip-icon'} mouseTrack position='left' /> */}
             <Tooltip target={'.wf-name'} mouseTrack position='top' />
-            {!!iconInfo &&
-                <div className={`tip-icon icon gradient ${openable ? "cursor-pointer" : ''}
+            {!!editable &&
+                <div className={`tip-icon icon gradient ${clickable ? "cursor-pointer" : ''}
                     ${iconHighlight ? 'text-light' : 'text-light-weak'} 
-                    ${(inEdit && iconInfo.interactable) ? `hover:text-light ` : ''}
-                    `}
-                    data-pr-tooltip={(inEdit || iconHighlight) ? iconInfo.label : ''}>
+                    ${(inEdit && deletable) ? `hover:text-light ` : ''}
+                    `}>
                     <div className='bg-deep-weak flex-center'
                         role='presentation'
-                        onClick={() => _clickOnSetting(iconInfo)}
+                        onClick={removeNode}
                     >
                         <FontAwesomeIcon
                             className='h-[16px] w-[16px] flex-center '
-                            icon={iconInfo.icon}
+                            icon={inEdit ? faXmark : faCloud}
                         />
                     </div>
                 </div >}
@@ -87,7 +95,8 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
             flex-col 
             gap-[5px]
             ${running ? "running" : ''}`} >
-                <div className={`inner relative flex rounded-std-sm bg-deep-weak`}>
+                <div role='presentation' className={`inner relative flex rounded-std-sm bg-deep-weak`}
+                    onClick={() => { clickOnSetting?.(data) }}>
                     <div className={`py-[16px] px-[20px] min-w-[190px] max-w-[260px]`}>
                         <div className={`flex items-center rounded-std-sm text-light`}>
                             <FontAwesomeIcon className='h-[30px] w-[30px] mr-[8px] mt-[2px]' icon={icon} color={'white'} />
@@ -95,7 +104,7 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
                                 <div className="text-[20px] mb-[2px] leading-1 ellipsis wf-name"
                                     data-pr-tooltip={data.name}
                                 >
-                                    {(data.type === 'Workflow' ? workflowMap[data.workflowId || ''] : (nodeName || data.name))
+                                    {(data.type === 'Workflow' ? workflowMap[data.workflowid || ''] : (nodeName || data.name))
                                         || <span className='italic'>N / A</span>}
                                 </div>
                                 <div className="text-[16px] text-light-weak">{data.type}</div>

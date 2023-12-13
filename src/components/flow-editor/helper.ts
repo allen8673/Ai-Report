@@ -45,3 +45,14 @@ export const getNewIdTrans = (nodes: IFlowNode[]): Record<string, string> => {
         return result
     }, {});
 }
+
+export const ifWorkflowIsCompleted = (nodes: IFlowNode[] = []): boolean => {
+    for (const node of nodes) {
+        if (node.type === 'Output') {
+            if (!some(nodes, n => includes(n.forwards, node.id))) return false
+        } else {
+            if (!node.forwards?.length) return false;
+        }
+    }
+    return true
+}

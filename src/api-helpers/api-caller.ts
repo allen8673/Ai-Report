@@ -28,6 +28,7 @@ const apiCaller = Axios.create({
     timeout: Number(process.env.REACT_APP_API_TIMEOUT ?? 30000),
     headers: {
         'Cache-Control': 'no-cache',
+        // 'Access-Control-Allow-Origin': '*'
     },
 });
 

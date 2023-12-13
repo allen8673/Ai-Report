@@ -1,7 +1,6 @@
 'use client'
-import { faAdd } from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faEye, faPlayCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { map } from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
@@ -9,53 +8,76 @@ import { InputText } from "primereact/inputtext";
 import { SelectItem } from "primereact/selectitem";
 import { useEffect, useState } from 'react'
 
-import apiCaller from "@/api-helpers/api-caller";
+import { getAll } from "@/api-helpers/flow-api";
 import { coverToQueryString } from "@/api-helpers/url-helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import Modal from "@/components/modal";
+import TitlePane from "@/components/panes/title";
 import Table from "@/components/table";
 import { Column } from "@/components/table/table";
-import TitlePane from "@/components/title-pane";
-import { IWorkflow } from "@/interface/workflow";
+import { IWorkflowBase } from "@/interface/workflow";
+import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
 interface FormData {
     id?: string;
     name?: string;
     template?: string
-    // template?: { value: string }[];
 }
 
 export default function Page() {
+    const router = useRouter();
+    const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
+    const { runWorkflow, viewReports } = useWfLayoutContext()
 
-    const [workflows, setWorkflow] = useState<IWorkflow[]>([]);
+    const [workflows, setWorkflow] = useState<IWorkflowBase[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<FormData>>()
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([])
 
-    const router = useRouter();
-    const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
-
-    const getTemplateOpts = async () => {
-        const res = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
-        const opts = map<IWorkflow, SelectItem>(res.data || [], t => ({ label: t.name, value: t.id }))
-        setTemplateOpts(opts)
-    }
-
-    const getWorkflows = async () => {
-        const rsp = await apiCaller.get<IWorkflow[]>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`);
-        setWorkflow(rsp.data)
+    const getAllData = async () => {
+        const { workflow, template } = await getAll() || {};
+        setWorkflow(workflow || []);
+        setTemplateOpts(template?.map(t => ({ label: t.name, value: t.id })) || [])
     }
 
     useEffect(() => {
-        getWorkflows()
-        getTemplateOpts()
+        getAllData();
     }, [])
 
-    const columns: Column<IWorkflow>[] = [
+    const columns: Column<IWorkflowBase>[] = [
         { key: 'id', title: 'ID', style: { width: '25%' } },
-        { key: 'name', title: 'Name' }
+        { key: 'name', title: 'Name' },
+        {
+            style: { width: 80, padding: 0 },
+            format: (row) => {
+                return <div
+                    className="flex gap-[7px] px-[12px]"
+                    role='presentation'
+                    onClick={(e) => e.stopPropagation()}>
+                    <Button
+                        className="py-0 px-[0px]"
+                        severity='success'
+                        tooltip="Run Workflow"
+                        tooltipOptions={{ position: 'left' }}
+                        icon={
+                            <FontAwesomeIcon icon={faPlayCircle} />
+                        }
+                        onClick={() => runWorkflow(row.id)}
+                    />
+                    <Button
+                        className="gap-[7px]"
+                        severity='info'
+                        label="Reports"
+                        icon={
+                            <FontAwesomeIcon icon={faEye} />
+                        }
+                        onClick={() => viewReports(row.id)}
+                    />
+                </div >
+            }
+        }
     ]
 
     return <div className="flex h-full flex-col gap-std items-stretch text-light">
@@ -86,9 +108,6 @@ export default function Page() {
                 form?.submit()
                     .then(({ name, template }) => {
                         const queries: { [key: string]: string | undefined } = { name, template }
-                        // if (!!template?.length) {
-                        //     queries.template = template.map(t => t.value).join(',')
-                        // }
                         router.push(`${editorUrl}${coverToQueryString(queries)}`);
                     }).catch(() => {
                         // 
@@ -153,7 +172,8 @@ export default function Page() {
                             </List> */}
                         </>
                     )
-                }</Form>
+                }
+            </Form>
         </Modal>
     </div >
 }

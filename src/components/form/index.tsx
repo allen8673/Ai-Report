@@ -2,6 +2,8 @@ import { classNames } from "primereact/utils";
 import React, { useEffect } from "react";
 import { Controller, Path, useFieldArray, } from "react-hook-form";
 
+import ErrorBoundary from "../error-boundary";
+
 import { FormItemProps, FormListProps, FormProps, FormValue, GetItemProps } from "./form";
 import { useForm } from "./helper";
 
@@ -25,7 +27,7 @@ function GetList<T extends FormValue>({ formCore }: GetItemProps<T>) {
     }
 }
 
-function GetItem<T extends FormValue>({ formCore }: GetItemProps<T>) {
+function GetItem<T extends FormValue>({ formCore, readonly }: GetItemProps<T>) {
     const { control, formState: { errors } } = formCore;
     const getFormErrorMessage = (name: Path<T>): React.ReactNode => {
         const msg: string = errors[name]?.message as string || ''
@@ -41,6 +43,7 @@ function GetItem<T extends FormValue>({ formCore }: GetItemProps<T>) {
                         name={name}
                         control={control}
                         rules={rules}
+                        disabled={readonly}
                         render={typeof children === 'function' ? children : ({ field, fieldState }) => {
                             return (
                                 React.cloneElement(children, {
@@ -73,26 +76,30 @@ export default function Form<T extends Record<string, any>>(props: FormProps<T>)
         onLoad,
         className,
         onDestroyed,
-        onSubmit
+        onSubmit,
+        readonly
     } = props;
 
     const { form: formInstance } = useForm<T>(form, defaultValues);
     const { formCore, submit } = formInstance
 
-    const FormItem = GetItem({ formCore: formInstance.formCore });
+    const FormItem = GetItem({ formCore: formInstance.formCore, readonly });
     const FormList = GetList({ formCore: formInstance.formCore })
     useEffect(() => {
         onLoad?.(formInstance);
         return onDestroyed
     }, [])
 
-    return <form className={`zd-form text-deep ${className}`}
-        onSubmit={formCore.handleSubmit(async () => {
-            const data = await submit();
-            await onSubmit?.(data);
-        })}>
-        {children({ Item: FormItem, List: FormList })}
-    </form>
+    return <ErrorBoundary>
+        <form className={`zd-form text-deep ${className}`}
+            onSubmit={formCore.handleSubmit(async () => {
+                const data = await submit();
+                await onSubmit?.(data);
+            })}>
+            {children({ Item: FormItem, List: FormList })}
+        </form>
+    </ErrorBoundary>
+
 }
 
 

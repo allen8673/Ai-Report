@@ -1,7 +1,7 @@
 'use client'
-import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCancel, faEye, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cloneDeep, debounce, filter, includes, map, range, remove, some, uniq } from "lodash";
+import { cloneDeep, filter, includes, map, remove } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
@@ -9,38 +9,39 @@ import { InputText } from "primereact/inputtext";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
 
-import apiCaller from "@/api-helpers/api-caller";
+import { addFlow, deleteFlow, getFlow, getFlows, updateFlow } from "@/api-helpers/flow-api";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowGraph from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
 import { IWorkflowMap } from "@/components/flow-editor/context";
-import { X_GAP, calculateDepth, getNewIdTrans, resetPosition_x, resetPosition_y } from "@/components/flow-editor/helper";
+import { X_GAP, calculateDepth, getNewIdTrans, ifWorkflowIsCompleted, resetPosition_x, resetPosition_y } from "@/components/flow-editor/helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
-import TitlePane from "@/components/title-pane";
-import { ApiResult } from "@/interface/api";
-import { FlowStatus, IEditWorkflow, IFlowNode, IWorkflow } from "@/interface/workflow";
-import { useLayoutContext } from "@/layout/context";
+import TitlePane from "@/components/panes/title";
+import { IEditWorkflow, IFlowNode, IWorkflow } from "@/interface/workflow";
+import { useLayoutContext } from "@/layout/turbo-layout/context";
+import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
 type EditMode = 'add' | 'normal'
 
 export default function Page() {
     const searchParams = useSearchParams();
+    const router = useRouter();
+    const wfUrl = getFullUrl(RouterInfo.WORKFLOW);
     const paramObj = coverSearchParamsToObj<IEditWorkflow>(searchParams);
-    const mode: EditMode = !!paramObj.id ? 'normal' : 'add';
-    const [workflow, setWorkflow] = useState<IWorkflow>();
+    const [mode, setMode] = useState<EditMode>(!!paramObj.id ? 'normal' : 'add')
     const { graphRef } = useGraphRef<IFlowNode, any>();
+    const { showMessage } = useLayoutContext();
+    const { runWorkflow, viewReports } = useWfLayoutContext()
+
+    const [workflow, setWorkflow] = useState<IWorkflow>();
     const [inEdit, setInEdit] = useState<boolean>();
     const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
     const [workflowMap, setWorkflowMap] = useState<IWorkflowMap>({})
     const [form, setForm] = useState<FormInstance<IWorkflow>>()
-
-    const { showMessage } = useLayoutContext();
-    const router = useRouter();
-    const wfUrl = getFullUrl(RouterInfo.WORKFLOW);
 
     useEffect(() => {
         initial()
@@ -57,7 +58,7 @@ export default function Page() {
     }
 
     const fetchAllWorflowData = async () => {
-        const wfs = (await apiCaller.get<IWorkflow[]>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`)).data;
+        const wfs = await getFlows('WORKFLOW')
         if (!wfs) return;
 
         setWorkflowMap(wfs.reduce<{ [id: string]: string }>((pre, wf) => {
@@ -67,17 +68,14 @@ export default function Page() {
     }
 
     const fetchWorkflow = async (id: string) => {
-        // TODO: call API to fetch the workflow
-        const wf = await (await apiCaller.get(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${id}`)).data
+        const wf = await getFlow(id)
         setWorkflow(wf);
     }
 
     const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
         const id = '';
         const template: (IWorkflow | undefined) =
-            (!!paramObj.template ?
-                (await apiCaller.get<IWorkflow>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${paramObj.template}`)).data :
-                undefined);
+            (!!paramObj.template ? await getFlow(paramObj.template) : undefined);
 
         if (!!template) {
             /**
@@ -174,7 +172,7 @@ export default function Page() {
     // }
     //#endregion
 
-    const saveNewTemplate = async (nodes: IFlowNode[], name: string) => {
+    const saveToNewTemplate = async (nodes: IFlowNode[], name: string) => {
         // assign new ids to nodes
         const id_trans: Record<string, string> = getNewIdTrans(nodes)
 
@@ -201,8 +199,7 @@ export default function Page() {
             flows: _nodes
         }
 
-        //TODO: call API to save the template
-        await apiCaller.post(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`, template);
+        await addFlow(template)
         setOpenTemplateModal(false)
     }
 
@@ -218,7 +215,7 @@ export default function Page() {
          * and use the workflows instead of all reference nodes. 
          */
         for (const ref_wf of ref_wfs) {
-            const wf = await (await apiCaller.get<IWorkflow>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${ref_wf.workflowId}`)).data;
+            const wf = await getFlow(ref_wf.workflowid)
             if (!wf) continue;
 
             /**
@@ -282,61 +279,51 @@ export default function Page() {
         }, []);
     }
 
-    const ifWorkflowIsCompleted = (nodes: IFlowNode[] = []): boolean => {
-        for (const node of nodes) {
-            if (node.type === 'Output') {
-                if (!some(nodes, n => includes(n.forwards, node.id))) return false
-            } else {
-                if (!node.forwards?.length) return false;
-            }
-        }
-        return true
-    }
 
-    const mock_run = (forwards: string[]): void => {
-        let next: string[] = [];
-        graphRef.current?.setNodes(pre => {
-            if (includes(forwards, pre.id)) {
-                next = uniq(next.concat(pre.data.forwards || []))
-                return { ...pre, data: { ...pre.data, running: true } }
-            }
-            return pre
-        });
+    // const mock_run = (forwards: string[]): void => {
+    //     let next: string[] = [];
+    //     graphRef.current?.setNodes(pre => {
+    //         if (includes(forwards, pre.id)) {
+    //             next = uniq(next.concat(pre.data.forwards || []))
+    //             return { ...pre, data: { ...pre.data, running: true } }
+    //         }
+    //         return pre
+    //     });
 
-        debounce(async () => {
-            graphRef.current?.setNodes(pre => {
-                if (includes(forwards, pre.id)) {
-                    let status: FlowStatus = 'success';
-                    let report: any = undefined;
-                    if (pre.id == 'f-2') status = 'failure';
-                    else if (pre.id == 'f-5') status = 'warning';
+    //     debounce(async () => {
+    //         graphRef.current?.setNodes(pre => {
+    //             if (includes(forwards, pre.id)) {
+    //                 let status: FlowStatus = 'success';
+    //                 let report: any = undefined;
+    //                 if (pre.id == 'f-2') status = 'failure';
+    //                 else if (pre.id == 'f-5') status = 'warning';
 
-                    if (pre.data.type === 'Output') {
-                        report = <>{map(range(0, 30), () => (<p>
-                            <p className="m-0">
-                                Next.js is a React framework for building full-stack web applications. You use React Components to build user interfaces, and Next.js for additional features and optimizations.
-                            </p>
-                            <p className="m-0">
-                                Under the hood, Next.js also abstracts and automatically configures tooling needed for React, like bundling, compiling, and more. This allows you to focus on building your application instead of spending time with configuration.
-                            </p>
-                            <p className="m-0">
-                                Whether you re an individual developer or part of a larger team, Next.js can help you build interactive, dynamic, and fast React applications.
-                            </p>
-                        </p>))}</>
-                    }
+    //                 if (pre.data.type === 'Output') {
+    //                     report = <>{map(range(0, 30), () => (<p>
+    //                         <p className="m-0">
+    //                             Next.js is a React framework for building full-stack web applications. You use React Components to build user interfaces, and Next.js for additional features and optimizations.
+    //                         </p>
+    //                         <p className="m-0">
+    //                             Under the hood, Next.js also abstracts and automatically configures tooling needed for React, like bundling, compiling, and more. This allows you to focus on building your application instead of spending time with configuration.
+    //                         </p>
+    //                         <p className="m-0">
+    //                             Whether you re an individual developer or part of a larger team, Next.js can help you build interactive, dynamic, and fast React applications.
+    //                         </p>
+    //                     </p>))}</>
+    //                 }
 
-                    return { ...pre, data: { ...pre.data, status: status, running: false, report } }
-                }
-                return pre
-            });
-            debounce(() => {
-                if (!!next.length) mock_run(next);
-                else {
-                    showMessage('workflow is done')
-                }
-            }, 500)()
-        }, 3000)()
-    }
+    //                 return { ...pre, data: { ...pre.data, status: status, running: false, report } }
+    //             }
+    //             return pre
+    //         });
+    //         debounce(() => {
+    //             if (!!next.length) mock_run(next);
+    //             else {
+    //                 showMessage('workflow is done')
+    //             }
+    //         }, 500)()
+    //     }, 3000)()
+    // }
 
     return <div className="flex h-full flex-row gap-std items-stretch">
         <div className="shrink grow flex flex-col gap-std">
@@ -350,14 +337,20 @@ export default function Page() {
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
                                     confirmDialog({
+                                        position: 'top',
                                         message: `Do you want to delete ${workflow?.name || 'this workflow'}?`,
                                         header: `Delete Workflow`,
                                         icon: 'pi pi-info-circle',
                                         acceptClassName: 'p-button-danger',
                                         accept: async () => {
-                                            // TODO: Call API to delete this workflow
-                                            const rsp = await apiCaller.delete<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}?id=${workflow?.id || ''}`,);
-                                            if (rsp.data.status === 'failure') return;
+                                            const rsp = await deleteFlow(workflow?.id);
+                                            if (rsp.data.status === 'failure' || rsp.data.status === 'NG') {
+                                                if (rsp.data.message) showMessage({
+                                                    message: rsp.data.message,
+                                                    type: 'error'
+                                                })
+                                                return;
+                                            }
                                             router.push(wfUrl)
                                         },
                                     });
@@ -376,29 +369,32 @@ export default function Page() {
                                 label="Save"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
+                                    if (!workflow) return;
                                     const flows: IFlowNode[] = map(graphRef.current?.getNodes() || [], n => ({
                                         ...n.data, position: n.position
                                     }));
-                                    // TODO: Call API to save the edit result
-                                    setWorkflow(pre => {
-                                        const result: (IWorkflow | undefined) = !!pre ? ({ ...pre, flows }) : pre
-                                        if (!result) return result;
-                                        calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
-                                        if (mode === 'add') {
-                                            apiCaller.post<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, result);
-                                        } else {
-                                            apiCaller.put<ApiResult>(`${process.env.NEXT_PUBLIC_WORKFLOW_API}`, result);
-                                        }
-                                        return result
-                                    });
 
-                                    setInEdit(false)
+                                    const result: IWorkflow = ({ ...workflow, flows });
+                                    calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
+
+                                    const res = await (await (mode === 'add' ? addFlow : updateFlow)(result)).data
+
+                                    if (res.status !== 'ok' && res.status !== 'success') {
+                                        showMessage({
+                                            message: res.message || 'Add failure',
+                                            type: 'error'
+                                        })
+                                        return;
+                                    }
+                                    setWorkflow({ ...result, id: res.data?.workflowid || workflow.id });
+                                    setInEdit(false);
+                                    setMode('normal')
                                 }}
                             />
                         </> :
                         <>
                             <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
-                                severity='info'
+                                severity='secondary'
                                 tooltip="Save as template"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={() => {
@@ -414,21 +410,23 @@ export default function Page() {
                             />
                             <Button icon={<FontAwesomeIcon icon={faPlayCircle} />}
                                 severity='success'
-                                tooltip="Run Flow"
+                                tooltip="Run Workflow"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
-                                    if (!ifWorkflowIsCompleted(workflow?.flows)) {
-                                        showMessage({
-                                            message: 'Cannot run the workflow since the workflow is not completed.',
-                                            type: 'error'
-                                        })
-                                        return
-                                    }
-                                    graphRef.current?.setNodes(pre => {
-                                        return { ...pre, data: { ...pre.data, status: 'none', running: false } }
-                                    });
-                                    await new Promise(resolve => setTimeout(resolve, 500));
-                                    if (!!workflow?.rootNdeId) mock_run(workflow?.rootNdeId)
+                                    runWorkflow(workflow)
+                                }}
+                            />
+                            <Button
+                                severity='info'
+                                tooltip="View Reports"
+                                tooltipOptions={{ position: 'bottom' }}
+                                disabled={!workflow?.id}
+                                icon={
+                                    <FontAwesomeIcon icon={faEye} />
+                                }
+                                onClick={() => {
+                                    if (!workflow?.id) return;
+                                    viewReports(workflow?.id)
                                 }}
                             />
                             <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}
@@ -456,7 +454,7 @@ export default function Page() {
                     form?.submit()
                         .then(async ({ name }) => {
                             const nodes = await expandRefWF(workflow?.flows || [])
-                            await saveNewTemplate(nodes, name)
+                            await saveToNewTemplate(nodes, name)
                         })
                         .catch(() => {
                             // 
@@ -472,7 +470,7 @@ export default function Page() {
                     }}
                     onSubmit={async ({ name }) => {
                         const nodes = await expandRefWF(workflow?.flows || []);
-                        await saveNewTemplate(nodes, name)
+                        await saveToNewTemplate(nodes, name)
                     }}
                 >
                     {

@@ -115,7 +115,7 @@ export const mock_workflows: IWorkflow[] = [
                 "forwards": [
                     "tmp_c1087289-be9c-40c3-ac31-ba94aa6e1ba2"
                 ],
-                "workflowId": "d521066f-7f61-4be0-a9b9-a4517edfc825",
+                "workflowid": "d521066f-7f61-4be0-a9b9-a4517edfc825",
                 "depth": 3
             },
             {
@@ -236,7 +236,7 @@ export const mock_workflows: IWorkflow[] = [
                 "forwards": [
                     "tmp_2b2b8a36-eb42-4164-8f13-071806b8bce7"
                 ],
-                "workflowId": "46fa59de-1acc-4e7d-9149-7756f828e73a",
+                "workflowid": "46fa59de-1acc-4e7d-9149-7756f828e73a",
                 "depth": 1
             },
             {
@@ -250,7 +250,7 @@ export const mock_workflows: IWorkflow[] = [
                 "forwards": [
                     "tmp_2b2b8a36-eb42-4164-8f13-071806b8bce7"
                 ],
-                "workflowId": "46fa59de-1acc-4e7d-9149-7756f828e73a",
+                "workflowid": "46fa59de-1acc-4e7d-9149-7756f828e73a",
                 "depth": 2
             },
             {
@@ -264,7 +264,7 @@ export const mock_workflows: IWorkflow[] = [
                 "forwards": [
                     "tmp_e4ec56d8-5416-427a-8827-f766f364cc25"
                 ],
-                "workflowId": "d521066f-7f61-4be0-a9b9-a4517edfc825",
+                "workflowid": "d521066f-7f61-4be0-a9b9-a4517edfc825",
                 "depth": 1
             },
             {

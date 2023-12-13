@@ -6,22 +6,21 @@ import { confirmDialog } from 'primereact/confirmdialog';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import { useEffect, useState } from 'react';
 
-import apiCaller from '@/api-helpers/api-caller';
+import { deleteFlow, getFlow, getFlows } from '@/api-helpers/flow-api';
 import FlowGraph from '@/components/flow-editor';
 import { useGraphRef } from '@/components/graph/helper';
+import TitlePane from '@/components/panes/title';
 import Table from '@/components/table';
 import { Column } from '@/components/table/table';
-import TitlePane from '@/components/title-pane';
-import { ApiResult } from '@/interface/api';
-import { IFlowNode, IWorkflow } from '@/interface/workflow';
+import { IFlowNode, IWorkflow, IWorkflowBase } from '@/interface/workflow';
 
 export default function Page() {
 
-    const [templates, setTemplates] = useState<IWorkflow[]>([]);
+    const [templates, setTemplates] = useState<IWorkflowBase[]>([]);
     const [selection, setSelection] = useState<IWorkflow>();
 
     const { graphRef } = useGraphRef<IFlowNode, any>();
-    const columns: Column<IWorkflow>[] = [
+    const columns: Column<IWorkflowBase>[] = [
         { key: 'id', title: 'ID', style: { width: '25%' } },
         { key: 'name', title: 'Name' },
         {
@@ -31,17 +30,16 @@ export default function Page() {
                     onClick={async (e) => {
                         e.stopPropagation();
                         confirmDialog({
+                            position: 'top',
                             message: `Do you want to delete ${row?.name || 'this template'}?`,
-                            header: `Delete Workflow`,
+                            header: `Delete Template`,
                             icon: 'pi pi-info-circle',
                             acceptClassName: 'p-button-danger',
                             accept: async () => {
-                                // TODO: Call API to delete template
-                                const rsp = await apiCaller.delete<ApiResult>(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${row?.id || ''}`);
+                                const rsp = await deleteFlow(row?.id);
                                 if (rsp.data.status === 'failure') return;
                                 await fetchTemplates();
                                 setSelection(pre => pre?.id === row.id ? undefined : pre)
-
                             },
                         });
                     }}
@@ -52,8 +50,8 @@ export default function Page() {
     ];
 
     const fetchTemplates = async () => {
-        const rsp = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}`);
-        setTemplates(rsp.data)
+        const tmps = await getFlows('TEMPLATE');
+        setTemplates(tmps)
     }
 
     useEffect(() => {
@@ -70,7 +68,7 @@ export default function Page() {
                         label='Add New Template'
                         tooltipOptions={{ position: 'left' }}
                         onClick={() => {
-                            //    
+
                         }}
                     />
                 </>}
@@ -102,8 +100,8 @@ export default function Page() {
                     first={0}
                     totalRecords={5}
                     onSelectionChange={async e => {
-                        const rsp = await apiCaller.get(`${process.env.NEXT_PUBLIC_TEMPLATE_API}?id=${e.value.id}`)
-                        setSelection(rsp.data);
+                        const tmp = await getFlow(e.value.id)
+                        setSelection(tmp);
                     }}
                     selection={selection}
                 />
