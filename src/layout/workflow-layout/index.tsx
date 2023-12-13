@@ -98,7 +98,7 @@ function PreviewModal({ reportJobs, onClose }:
                 hiddenBar
                 language={'text'}
                 className='grow border-solid border-light-weak rounded-std-sm'
-                value={typeof jobContents[selectedJob] === 'string' ? jobContents[selectedJob] : JSON.stringify(jobContents[selectedJob], null, 4)}
+                value={jobContents[selectedJob]}
                 options={{
                     readOnly: true,
                     automaticLayout: true,

@@ -13,7 +13,7 @@ function Fallback({ error, }: FallbackProps) {
     return (
         <div className={`
         w-full h-full p-3 bg-red-800/[.2] 
-        flex flex-col items-center 
+        flex flex-col items-center grow
         rounded-std-sm border-solid border-red-800
         `} role="alert">
             <p className={`
