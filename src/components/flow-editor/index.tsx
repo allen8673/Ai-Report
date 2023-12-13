@@ -209,7 +209,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                                         <InputText />
                                     </Item>
                                     <Item name='prompt' label="Prompt" >
-                                        <InputTextarea className="w-full min-h-[100px]" />
+                                        <InputTextarea autoResize className="w-full min-h-[100px]" />
                                     </Item>
                                 </>
                         }
@@ -258,7 +258,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                                         <InputText />
                                     </Item>
                                     <Item name='prompt' label="Prompt" >
-                                        <InputTextarea className="w-full min-h-[100px]" />
+                                        <InputTextarea autoResize className="w-full min-h-[100px]" />
                                     </Item>
                                 </>
                         }
