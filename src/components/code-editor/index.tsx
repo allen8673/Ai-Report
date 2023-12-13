@@ -4,6 +4,8 @@ import { debounce, forEach, includes, keys } from 'lodash';
 import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
 import { useState, useEffect, useMemo, } from 'react';
 
+import ErrorBoundary from '../error-boundary';
+
 import langMapping from './lang-mapping';
 import { CodeEditorProps } from './type';
 
@@ -128,57 +130,59 @@ export default function CodeEditor({
     }, [_path]);
 
     return (
-        <div className={`flex flex-col relative h-full w-full bg-deep ${className}`} style={style}>
-            {!hiddenBar && (
-                <div className='flex justify-between px-[20px] py-[5px]'>
-                    <span className="grow text-light font-bold">{title}</span>
-                </div>
-            )}
-            <div className="relative h-full w-full grow shrink">
-                <div className="absolute top-0 left-0 h-full w-full">
-                    <MonacoEditorReact
-                        options={{
-                            automaticLayout: true,
-                            minimap: { enabled: true },
-                            ...options,
-                        }}
-                        value={codes[_path] || ''}
-                        path={_path}
-                        {...props}
-                        beforeMount={(monaco: Monaco): void => {
-                            handleBeforeMount(monaco);
-                            if (props.beforeMount) props.beforeMount(monaco);
-                        }}
-                        onMount={(editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: Monaco): void => {
-                            handleEditorOnMount(editor, monaco);
-                            if (!!runCodeFn && !!runCodeShortcutFn) {
-                                editor.addAction({
-                                    id: 'run-code-hk',
-                                    label: 'run code hotkey',
-                                    keybindings: [monaco.KeyCode.F8, monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
-                                    run: runCodeShortcutFn,
-                                });
-                            }
+        <ErrorBoundary>
+            <div className={`flex flex-col relative h-full w-full bg-deep ${className}`} style={style}>
+                {!hiddenBar && (
+                    <div className='flex justify-between px-[20px] py-[5px]'>
+                        <span className="grow text-light font-bold">{title}</span>
+                    </div>
+                )}
+                <div className="relative h-full w-full grow shrink">
+                    <div className="absolute top-0 left-0 h-full w-full">
+                        <MonacoEditorReact
+                            options={{
+                                automaticLayout: true,
+                                minimap: { enabled: true },
+                                ...options,
+                            }}
+                            value={codes[_path] || ''}
+                            path={_path}
+                            {...props}
+                            beforeMount={(monaco: Monaco): void => {
+                                handleBeforeMount(monaco);
+                                if (props.beforeMount) props.beforeMount(monaco);
+                            }}
+                            onMount={(editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: Monaco): void => {
+                                handleEditorOnMount(editor, monaco);
+                                if (!!runCodeFn && !!runCodeShortcutFn) {
+                                    editor.addAction({
+                                        id: 'run-code-hk',
+                                        label: 'run code hotkey',
+                                        keybindings: [monaco.KeyCode.F8, monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
+                                        run: runCodeShortcutFn,
+                                    });
+                                }
 
-                            if (props.onMount) props.onMount(editor, monaco);
-                        }}
-                        theme={idh_lang?.theme?.id || 'vs-dark'}
-                        language={idh_lang?.language || language}
-                        onChange={(val): void => {
-                            setCodes((pre) => ({ ...pre, [_path]: val || '' }));
-                            setCodeChanging(true);
-                            _onChange(val || '', _path);
-                        }}
-                    />
+                                if (props.onMount) props.onMount(editor, monaco);
+                            }}
+                            theme={idh_lang?.theme?.id || 'vs-dark'}
+                            language={idh_lang?.language || language}
+                            onChange={(val): void => {
+                                setCodes((pre) => ({ ...pre, [_path]: val || '' }));
+                                setCodeChanging(true);
+                                _onChange(val || '', _path);
+                            }}
+                        />
+                    </div>
                 </div>
+                {codeChanging && (
+                    <div className="px-2 flex items-center  gap-2">
+                        <i className="pi pi-spin pi-spinner" ></i>
+                        <span className="message">Caching content...</span>
+                    </div>
+                )}
             </div>
-            {codeChanging && (
-                <div className="px-2 flex items-center  gap-2">
-                    <i className="pi pi-spin pi-spinner" ></i>
-                    <span className="message">Caching content...</span>
-                </div>
-            )}
-        </div>
+        </ErrorBoundary>
     );
 };
 

@@ -18,6 +18,8 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { v4 } from "uuid";
 
+import ErrorBoundary from "../error-boundary";
+
 import { EventType, GraphInstance, GraphProps } from "./graph";
 
 
@@ -331,38 +333,40 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
         });
     };
 
-    return <div id='graph' className={`w-full h-full p-std-min ${className}`} ref={rfWrapper}>
-        <ReactFlow
-            nodes={!!normalizeNode ? _.map(nodes, (n) => normalizeNode(n)) : nodes}
-            edges={!!normalizeEdge ? _.map(edges, (e) => normalizeEdge(e)) : edges}
-            minZoom={0.1}
-            onInit={_onInit}
-            onEdgeUpdate={!readonly && edgeEditable ? _onEdgeUpdate : undefined}
-            onNodesChange={_onNodesChange}
-            onEdgesChange={_onEdgesChange}
-            onSelectionChange={_onSelectionChange}
-            onDragOver={_onElementsDragOver}
-            onDrop={_onElementsDrop}
-            onMouseDown={_onMouseDown}
-            onMouseUp={_onMouseUp}
-            snapToGrid={true}
-            snapGrid={[10, 10]}
-            onNodeContextMenu={(e, node): void => {
-                onDiagramsContextMenu?.(e, node as Node<NNormal>);
-                onNodeContextMenu?.(e, node);
-            }}
-            onEdgeContextMenu={(e, edge): void => {
-                onDiagramsContextMenu?.(e, edge as Edge<ENormal>);
-                onEdgeContextMenu?.(e, edge);
-            }}
-            onNodeMouseMove={_onNodeMouseMove}
-            nodesDraggable={!readonly}
-            {...others}
-        >
-            {children}
-            {!hideMiniMap && <MiniMap nodeBorderRadius={2} />}
-            {!hideCtrls && <Controls />}
-            <Background gap={16} />
-        </ReactFlow>
-    </div>
+    return <ErrorBoundary>
+        <div id='graph' className={`w-full h-full p-std-min ${className}`} ref={rfWrapper}>
+            <ReactFlow
+                nodes={!!normalizeNode ? _.map(nodes, (n) => normalizeNode(n)) : nodes}
+                edges={!!normalizeEdge ? _.map(edges, (e) => normalizeEdge(e)) : edges}
+                minZoom={0.1}
+                onInit={_onInit}
+                onEdgeUpdate={!readonly && edgeEditable ? _onEdgeUpdate : undefined}
+                onNodesChange={_onNodesChange}
+                onEdgesChange={_onEdgesChange}
+                onSelectionChange={_onSelectionChange}
+                onDragOver={_onElementsDragOver}
+                onDrop={_onElementsDrop}
+                onMouseDown={_onMouseDown}
+                onMouseUp={_onMouseUp}
+                snapToGrid={true}
+                snapGrid={[10, 10]}
+                onNodeContextMenu={(e, node): void => {
+                    onDiagramsContextMenu?.(e, node as Node<NNormal>);
+                    onNodeContextMenu?.(e, node);
+                }}
+                onEdgeContextMenu={(e, edge): void => {
+                    onDiagramsContextMenu?.(e, edge as Edge<ENormal>);
+                    onEdgeContextMenu?.(e, edge);
+                }}
+                onNodeMouseMove={_onNodeMouseMove}
+                nodesDraggable={!readonly}
+                {...others}
+            >
+                {children}
+                {!hideMiniMap && <MiniMap nodeBorderRadius={2} />}
+                {!hideCtrls && <Controls />}
+                <Background gap={16} />
+            </ReactFlow>
+        </div>
+    </ErrorBoundary>
 }

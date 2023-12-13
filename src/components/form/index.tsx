@@ -2,6 +2,8 @@ import { classNames } from "primereact/utils";
 import React, { useEffect } from "react";
 import { Controller, Path, useFieldArray, } from "react-hook-form";
 
+import ErrorBoundary from "../error-boundary";
+
 import { FormItemProps, FormListProps, FormProps, FormValue, GetItemProps } from "./form";
 import { useForm } from "./helper";
 
@@ -86,13 +88,16 @@ export default function Form<T extends Record<string, any>>(props: FormProps<T>)
         return onDestroyed
     }, [])
 
-    return <form className={`zd-form text-deep ${className}`}
-        onSubmit={formCore.handleSubmit(async () => {
-            const data = await submit();
-            await onSubmit?.(data);
-        })}>
-        {children({ Item: FormItem, List: FormList })}
-    </form>
+    return <ErrorBoundary>
+        <form className={`zd-form text-deep ${className}`}
+            onSubmit={formCore.handleSubmit(async () => {
+                const data = await submit();
+                await onSubmit?.(data);
+            })}>
+            {children({ Item: FormItem, List: FormList })}
+        </form>
+    </ErrorBoundary>
+
 }
 
 

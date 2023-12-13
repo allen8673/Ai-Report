@@ -11,6 +11,7 @@ import { Connection, Edge, Node } from 'reactflow'
 import { v4 } from "uuid";
 
 import DndList from "../dnd-list";
+import ErrorBoundary from "../error-boundary";
 import Form from "../form";
 import { FormInstance } from "../form/form";
 import Graph from "../graph";
@@ -108,9 +109,10 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
         graphRef.current.setEdges(e => ({ ...e, deletable: inEdit, selected: false, }));
     }, [inEdit]);
 
-    return <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, workflowMap }}>
-        <div className="flow-editor h-full w-full relative">
-            {inEdit && <div className={`absolute 
+    return <ErrorBoundary>
+        <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, workflowMap }}>
+            <div className="flow-editor h-full w-full relative">
+                {inEdit && <div className={`absolute 
             z-20 
             top-[22px] 
             px-[7px] 
@@ -119,162 +121,163 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
             right-[22px] 
             rounded-std 
             bg-deep-weak/[.5]`} >
-                <Tooltip target={'.report-item'} position='top' />
-                <DndList
-                    className="rounded-std"
-                    items={REPORT_ITEMS}
-                    disableChangeOrder
-                    renderContent={(data) => <ReportItem
-                        {...data}
-                    />}
-                    onDragStart={(init, item): void => {
-                        setOnDragItem(() => item)
-                    }}
-                    direction='horizontal'
-                />
-            </div>}
-            <Graph
-                initialEdges={initialEdges}
-                initialNodes={initialNodes}
-                className="rounded-std bg-deep"
-                nodeTypes={{ turbo: TurboNode }}
-                defaultEdgeOptions={EDGE_DEF_SETTING}
-                readonly={!inEdit}
-                graphRef={graphRef}
-                onConnect={(connection: Connection) => {
-                    const { source, target } = connection
-                    if (!source || !target) return;
-                    const id = `${source}=${target}`
-                    graphRef?.current?.addEdge({ id, source, target, ...EDGE_DEF_SETTING });
-                    graphRef?.current?.setNode(source, (pre) => {
-                        pre.data.forwards?.push(target);
-                        return pre
-                    })
-                }}
-                onEdgesDelete={(e) => {
-                    const edge = e[0];
-                    if (!edge) return;
-                    const { source, target } = edge;
-                    graphRef.current.setNode(source, pre => {
-                        if (!pre.data.forwards) return pre
-                        const idx = pre.data.forwards?.indexOf(target);
-                        pre.data.forwards.splice(idx, 1);
-                        return pre
-                    })
-                }}
-                onNodesDelete={(n) => {
-                    const node = n[0];
-                    if (!node) return;
-                    const { id } = node;
-                    graphRef.current.setNodes(pre => {
-                        if (!pre.data.forwards?.includes(id)) return pre;
-                        const idx = pre.data.forwards.indexOf(id);
-                        pre.data.forwards.splice(idx, 1);
-                        return pre
-                    })
-                }}
-                onMouseUp={(e, position) => {
-                    if (!onDragItem || !position) return;
-                    const id = `tmp_${v4()}`;
-                    graphRef.current?.addNode({
-                        id, position,
-                        data: {
-                            ...onDragItem,
-                            id, position, forwards: []
-                        }, type: 'turbo'
-                    });
-                    setOnDragItem(() => undefined);
-                }}
-                fitView
-                {...others}
-            >
-                <TurboEdgeAsset />
-            </Graph>
-            <Modal
-                title="Set the prompt"
-                onOk={setPrompt}
-                onCancel={closeModal}
-                visible={openModal?.type === 'Normal'}
-            >
-                <Form
-                    defaultValues={openModal}
-                    onLoad={form => setPromptForm(form)}
-                    onDestroyed={() => setPromptForm(undefined)}>{
-                        ({ Item }) =>
-                            <>
-                                <Item name='name' label="Name" >
-                                    <InputText />
-                                </Item>
-                                <Item name='prompt' label="Prompt" >
-                                    <InputTextarea className="w-full min-h-[100px]" />
-                                </Item>
-                            </>
-                    }
-                </Form>
-            </Modal>
-            <Modal
-                className="preview-doc-modal"
-                onOk={() => setOpenModal(undefined)}
-                okLabel="Close"
-                visible={openModal?.type === 'Output'}
-                contentClassName="flex"
-                footer={<div className="flex justify-center">
-                    {<Button label='Download' severity='secondary' onClick={() => {
-                        // download
-                    }} />}
-                    {<Button label='Close' onClick={() => setOpenModal(undefined)} />}
+                    <Tooltip target={'.report-item'} position='top' />
+                    <DndList
+                        className="rounded-std"
+                        items={REPORT_ITEMS}
+                        disableChangeOrder
+                        renderContent={(data) => <ReportItem
+                            {...data}
+                        />}
+                        onDragStart={(init, item): void => {
+                            setOnDragItem(() => item)
+                        }}
+                        direction='horizontal'
+                    />
                 </div>}
-            >
-                <Fieldset legend="Preview your report" className="w-full" >
-                    {openModal?.report || ''}
-                </Fieldset>
-            </Modal>
-            <Modal
-                title="Workflow Reference"
-                onOk={setTemplate}
-                onCancel={closeModal}
-                visible={openModal?.type === 'Workflow'}
-            >
-                <Form
-                    defaultValues={openModal}
-                    onLoad={form => setTempForm(form)}
-                    onDestroyed={() => setTempForm(undefined)}>
-                    {
-                        ({ Item }) =>
-                        (<>
-                            <Item name='workflowid' label="Select a reference workflow" >
-                                <Dropdown options={map<IWorkflowMap, SelectItem>(workflowMap, (v, k) => ({ label: v, value: k }))} />
-                            </Item>
-                        </>)
-                    }
-                </Form>
-            </Modal>
-            <Modal
-                title="Set the report link"
-                onOk={setReport}
-                onCancel={closeModal}
-                visible={openModal?.type === 'Report'}
-            >
-                <Form
-                    defaultValues={openModal}
-                    onLoad={form => setReportForm(form)}
-                    onDestroyed={() => setReportForm(undefined)}>{
-                        ({ Item }) =>
-                            <>
-                                <Item name='fileName' label="File" >
-                                    <Dropdown options={['file_1', 'file_2']} />
+                <Graph
+                    initialEdges={initialEdges}
+                    initialNodes={initialNodes}
+                    className="rounded-std bg-deep"
+                    nodeTypes={{ turbo: TurboNode }}
+                    defaultEdgeOptions={EDGE_DEF_SETTING}
+                    readonly={!inEdit}
+                    graphRef={graphRef}
+                    onConnect={(connection: Connection) => {
+                        const { source, target } = connection
+                        if (!source || !target) return;
+                        const id = `${source}=${target}`
+                        graphRef?.current?.addEdge({ id, source, target, ...EDGE_DEF_SETTING });
+                        graphRef?.current?.setNode(source, (pre) => {
+                            pre.data.forwards?.push(target);
+                            return pre
+                        })
+                    }}
+                    onEdgesDelete={(e) => {
+                        const edge = e[0];
+                        if (!edge) return;
+                        const { source, target } = edge;
+                        graphRef.current.setNode(source, pre => {
+                            if (!pre.data.forwards) return pre
+                            const idx = pre.data.forwards?.indexOf(target);
+                            pre.data.forwards.splice(idx, 1);
+                            return pre
+                        })
+                    }}
+                    onNodesDelete={(n) => {
+                        const node = n[0];
+                        if (!node) return;
+                        const { id } = node;
+                        graphRef.current.setNodes(pre => {
+                            if (!pre.data.forwards?.includes(id)) return pre;
+                            const idx = pre.data.forwards.indexOf(id);
+                            pre.data.forwards.splice(idx, 1);
+                            return pre
+                        })
+                    }}
+                    onMouseUp={(e, position) => {
+                        if (!onDragItem || !position) return;
+                        const id = `tmp_${v4()}`;
+                        graphRef.current?.addNode({
+                            id, position,
+                            data: {
+                                ...onDragItem,
+                                id, position, forwards: []
+                            }, type: 'turbo'
+                        });
+                        setOnDragItem(() => undefined);
+                    }}
+                    fitView
+                    {...others}
+                >
+                    <TurboEdgeAsset />
+                </Graph>
+                <Modal
+                    title="Set the prompt"
+                    onOk={setPrompt}
+                    onCancel={closeModal}
+                    visible={openModal?.type === 'Normal'}
+                >
+                    <Form
+                        defaultValues={openModal}
+                        onLoad={form => setPromptForm(form)}
+                        onDestroyed={() => setPromptForm(undefined)}>{
+                            ({ Item }) =>
+                                <>
+                                    <Item name='name' label="Name" >
+                                        <InputText />
+                                    </Item>
+                                    <Item name='prompt' label="Prompt" >
+                                        <InputTextarea className="w-full min-h-[100px]" />
+                                    </Item>
+                                </>
+                        }
+                    </Form>
+                </Modal>
+                <Modal
+                    className="preview-doc-modal"
+                    onOk={() => setOpenModal(undefined)}
+                    okLabel="Close"
+                    visible={openModal?.type === 'Output'}
+                    contentClassName="flex"
+                    footer={<div className="flex justify-center">
+                        {<Button label='Download' severity='secondary' onClick={() => {
+                            // download
+                        }} />}
+                        {<Button label='Close' onClick={() => setOpenModal(undefined)} />}
+                    </div>}
+                >
+                    <Fieldset legend="Preview your report" className="w-full" >
+                        {openModal?.report || ''}
+                    </Fieldset>
+                </Modal>
+                <Modal
+                    title="Workflow Reference"
+                    onOk={setTemplate}
+                    onCancel={closeModal}
+                    visible={openModal?.type === 'Workflow'}
+                >
+                    <Form
+                        defaultValues={openModal}
+                        onLoad={form => setTempForm(form)}
+                        onDestroyed={() => setTempForm(undefined)}>
+                        {
+                            ({ Item }) =>
+                            (<>
+                                <Item name='workflowid' label="Select a reference workflow" >
+                                    <Dropdown options={map<IWorkflowMap, SelectItem>(workflowMap, (v, k) => ({ label: v, value: k }))} />
                                 </Item>
-                                <Item name='name' label="Name" >
-                                    <InputText />
-                                </Item>
-                                <Item name='prompt' label="Prompt" >
-                                    <InputTextarea className="w-full min-h-[100px]" />
-                                </Item>
-                            </>
-                    }
-                </Form>
-            </Modal>
-        </div>
-    </FlowGrapContext.Provider>
+                            </>)
+                        }
+                    </Form>
+                </Modal>
+                <Modal
+                    title="Set the report link"
+                    onOk={setReport}
+                    onCancel={closeModal}
+                    visible={openModal?.type === 'Report'}
+                >
+                    <Form
+                        defaultValues={openModal}
+                        onLoad={form => setReportForm(form)}
+                        onDestroyed={() => setReportForm(undefined)}>{
+                            ({ Item }) =>
+                                <>
+                                    <Item name='fileName' label="File" >
+                                        <Dropdown options={['file_1', 'file_2']} />
+                                    </Item>
+                                    <Item name='name' label="Name" >
+                                        <InputText />
+                                    </Item>
+                                    <Item name='prompt' label="Prompt" >
+                                        <InputTextarea className="w-full min-h-[100px]" />
+                                    </Item>
+                                </>
+                        }
+                    </Form>
+                </Modal>
+            </div>
+        </FlowGrapContext.Provider>
+    </ErrorBoundary>
 }
 
