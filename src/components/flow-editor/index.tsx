@@ -50,7 +50,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
     const [promptForm, setPromptForm] = useState<FormInstance<IFlowNode>>()
-    const [tempForm, setTempForm] = useState<FormInstance<IFlowNode>>()
+    const [wfRefForm, setWfRefForm] = useState<FormInstance<IFlowNode>>()
     const [reportForm, setReportForm] = useState<FormInstance<IFlowNode>>()
     const { graphRef } = useGraphRef<IFlowNode, any>(ref);
     const [openModal, setOpenModal] = useState<IFlowNode>();
@@ -65,10 +65,10 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
         setOpenModal(undefined);
     }
 
-    const setTemplate = () => {
-        const val = tempForm?.getValues();
+    const setWorkflowRef = () => {
+        const val = wfRefForm?.getValues();
         if (!val) return
-        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, workflowid: val.workflowid } }))
+        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, workflowid: val.workflowid, workflowstatus: 'enable' } }))
         setOpenModal(undefined);
     }
 
@@ -217,7 +217,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                 </Modal>
                 <Modal
                     title="Workflow Reference"
-                    onOk={inEdit ? setTemplate : undefined}
+                    onOk={inEdit ? setWorkflowRef : undefined}
                     onCancel={closeModal}
                     cancelLabel={inEdit ? undefined : 'Close'}
                     visible={openModal?.type === 'Workflow'}
@@ -225,8 +225,8 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                     <Form
                         readonly={!inEdit}
                         defaultValues={openModal}
-                        onLoad={form => setTempForm(form)}
-                        onDestroyed={() => setTempForm(undefined)}>
+                        onLoad={form => setWfRefForm(form)}
+                        onDestroyed={() => setWfRefForm(undefined)}>
                         {
                             ({ Item }) =>
                             (<>

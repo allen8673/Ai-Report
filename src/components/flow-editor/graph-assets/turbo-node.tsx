@@ -1,4 +1,4 @@
-import { IconDefinition, faCheck, faCloud, faExclamation, faQuestion, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faCheck, faCloud, faExclamation, faQuestion, faWarning, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { confirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
@@ -45,12 +45,14 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
 
 function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
     const { id, data, } = elm;
-    const { running } = data || {}
+    const { running, workflowstatus } = data || {}
     const { nodeType, icon, nodeName, editable } = flowInfoMap[data.type] || {}
     const { inEdit, clickOnSetting, workflowMap, graphRef } = useFlowGrapContext();
     const iconHighlight = !!data.prompt || !!data.file || !!data.report
     const deletable = editable
     const clickable = inEdit;
+
+    const warning = workflowstatus === 'disable'
 
     const removeNode = () => {
         if (!inEdit) return;
@@ -98,6 +100,15 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
                 <div role='presentation' className={`inner relative flex rounded-std-sm bg-deep-weak`}
                     onClick={() => { clickOnSetting?.(data) }}>
                     <div className={`py-[16px] px-[20px] min-w-[190px] max-w-[260px]`}>
+                        {warning &&
+                            <div className={`
+                            absolute inset-0 px-[12px] bg-orange-900 opacity-40
+                            flex items-center flex-row-reverse 
+                            `}>
+                                <FontAwesomeIcon className={`font-medium text-5xl text-yellow-500`} icon={faWarning} />
+                                {/* <i className="pi pi-exclamation-triangle font-medium text-5xl text-yellow-500" /> */}
+                            </div>
+                        }
                         <div className={`flex items-center rounded-std-sm text-light`}>
                             <FontAwesomeIcon className='h-[30px] w-[30px] mr-[8px] mt-[2px]' icon={icon} color={'white'} />
                             <div className='grow shrink overflow-hidden'>
