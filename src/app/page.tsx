@@ -1,4 +1,4 @@
-import AatrixAnimationPanel from "@/components/matrix-animation-panel";
+import MatrixAnimationPanel from "@/components/panes/matrix-animation";
 
 export default function Home() {
   return (
@@ -10,7 +10,7 @@ export default function Home() {
       text-shadow-center
       shadow-turbo-deep
       `}>Welcome AI Report</h1>
-      <AatrixAnimationPanel
+      <MatrixAnimationPanel
         text="NATIONAL INSTITUTE FOR CYBER SECURITY "
         randomPermutaion={false} fontColor="#95679e" />
     </div>

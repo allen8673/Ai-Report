@@ -10,7 +10,7 @@ export interface AatrixAnimationPanelProps {
     size?: number
 }
 
-export default function AatrixAnimationPanel({
+export default function MatrixAnimationPanel({
     className,
     fontColor = '#A226EF',
     text = 'abcdefghijklmnopqrstuvwxyz',

@@ -5,7 +5,7 @@ import { Button } from "primereact/button";
 import { FileUpload, FileUploadHandlerEvent, FileUploadHeaderTemplateOptions, FileUploadOptions, ItemTemplateOptions } from "primereact/fileupload";
 import { Tooltip } from "primereact/tooltip";
 
-import EmptyPane from "../empty-pane";
+import EmptyPane from "../panes/empty";
 
 export interface FileUploaderProps {
     name?: string;

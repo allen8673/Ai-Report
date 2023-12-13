@@ -9,9 +9,9 @@ import { useEffect, useState } from 'react';
 import { deleteFlow, getFlow, getFlows } from '@/api-helpers/flow-api';
 import FlowGraph from '@/components/flow-editor';
 import { useGraphRef } from '@/components/graph/helper';
+import TitlePane from '@/components/panes/title';
 import Table from '@/components/table';
 import { Column } from '@/components/table/table';
-import TitlePane from '@/components/title-pane';
 import { IFlowNode, IWorkflow, IWorkflowBase } from '@/interface/workflow';
 
 export default function Page() {
