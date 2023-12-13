@@ -30,6 +30,7 @@ export default function Page() {
                     onClick={async (e) => {
                         e.stopPropagation();
                         confirmDialog({
+                            position: 'top',
                             message: `Do you want to delete ${row?.name || 'this template'}?`,
                             header: `Delete Template`,
                             icon: 'pi pi-info-circle',
@@ -39,7 +40,6 @@ export default function Page() {
                                 if (rsp.data.status === 'failure') return;
                                 await fetchTemplates();
                                 setSelection(pre => pre?.id === row.id ? undefined : pre)
-
                             },
                         });
                     }}

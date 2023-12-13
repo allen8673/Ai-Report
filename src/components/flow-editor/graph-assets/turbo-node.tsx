@@ -1,5 +1,6 @@
 import { IconDefinition, faCheck, faCloud, faExclamation, faQuestion, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { confirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import React, { ReactNode } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
@@ -53,7 +54,16 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
 
     const removeNode = () => {
         if (!inEdit) return;
-        graphRef?.current?.removeNode(id)
+        confirmDialog({
+            position: 'top',
+            message: `Do you want to remove ${data?.name || 'this node'}?`,
+            header: `Remove Node`,
+            icon: 'pi pi-info-circle',
+            acceptClassName: 'p-button-danger',
+            accept: () => {
+                graphRef?.current?.removeNode(id)
+            },
+        });
     }
 
     return (

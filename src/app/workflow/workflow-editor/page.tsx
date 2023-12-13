@@ -337,6 +337,7 @@ export default function Page() {
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
                                     confirmDialog({
+                                        position: 'top',
                                         message: `Do you want to delete ${workflow?.name || 'this workflow'}?`,
                                         header: `Delete Workflow`,
                                         icon: 'pi pi-info-circle',

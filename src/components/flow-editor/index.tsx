@@ -193,8 +193,9 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                 </Graph>
                 <Modal
                     title="Set the prompt"
-                    onOk={setPrompt}
+                    onOk={inEdit ? setPrompt : undefined}
                     onCancel={closeModal}
+                    cancelLabel={inEdit ? undefined : 'Close'}
                     visible={openModal?.type === 'Normal'}
                 >
                     <Form
@@ -205,10 +206,10 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                             ({ Item }) =>
                                 <>
                                     <Item name='name' label="Name" >
-                                        <InputText readOnly />
+                                        <InputText />
                                     </Item>
                                     <Item name='prompt' label="Prompt" >
-                                        <InputTextarea readOnly className="w-full min-h-[100px]" />
+                                        <InputTextarea className="w-full min-h-[100px]" />
                                     </Item>
                                 </>
                         }
@@ -216,8 +217,9 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                 </Modal>
                 <Modal
                     title="Workflow Reference"
-                    onOk={setTemplate}
+                    onOk={inEdit ? setTemplate : undefined}
                     onCancel={closeModal}
+                    cancelLabel={inEdit ? undefined : 'Close'}
                     visible={openModal?.type === 'Workflow'}
                 >
                     <Form
@@ -237,8 +239,9 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                 </Modal>
                 <Modal
                     title="Set the report link"
-                    onOk={setReport}
+                    onOk={inEdit ? setReport : undefined}
                     onCancel={closeModal}
+                    cancelLabel={inEdit ? undefined : 'Close'}
                     visible={openModal?.type === 'Report'}
                 >
                     <Form
@@ -263,6 +266,6 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                 </Modal>
             </div>
         </FlowGrapContext.Provider>
-    </ErrorBoundary>
+    </ErrorBoundary >
 }
 
