@@ -1,7 +1,10 @@
 import { IconDefinition, faUpload, faDownload, faBrain, faShareNodes, faFileLines } from '@fortawesome/free-solid-svg-icons'
+import { filter } from 'lodash';
 import { Edge, MarkerType } from 'reactflow';
 
-import { FlowTyep, IFlowNodeBase } from '@/interface/workflow';
+import { FlowGraphProps } from '.';
+
+import { FlowTyep, IFlowNodeBase } from '@/interface/flow';
 
 export const EDGE_DEF_SETTING: Partial<Edge> = {
     // type: 'smoothstep',
@@ -11,23 +14,32 @@ export const EDGE_DEF_SETTING: Partial<Edge> = {
     interactionWidth: 20,
 }
 
-export const REPORT_ITEMS: IFlowNodeBase[] = [
-    {
-        id: 'custom-prompt',
-        name: 'Custom Prompt',
-        type: 'Normal'
-    },
-    {
-        id: 'workflow',
-        name: 'Workflow',
-        type: 'Workflow'
-    },
-    {
-        id: 'report',
-        name: 'Report',
-        type: 'Report'
+export const GET_REPORT_ITEMS = ({ flowNameMapper }: FlowGraphProps): IFlowNodeBase[] => {
+
+    const items: IFlowNodeBase[] = [
+        {
+            id: 'custom-prompt',
+            name: 'Custom Prompt',
+            type: 'Normal'
+        },
+        {
+            id: 'workflow',
+            name: 'Workflow',
+            type: 'Workflow'
+        },
+        {
+            id: 'report',
+            name: 'Report',
+            type: 'Report'
+        }
+    ]
+
+    const disableItms: { [key in FlowTyep]?: boolean } = {
+        'Workflow': !flowNameMapper
     }
-]
+
+    return filter(items, i => !disableItms[i.type])
+}
 
 
 export const flowInfoMap: {

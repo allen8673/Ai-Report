@@ -5,7 +5,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { SelectItem } from "primereact/selectitem";
 import { Tooltip } from "primereact/tooltip";
 import { useEffect, useState } from "react";
-import { Connection, Edge, Node, NodeRemoveChange } from 'reactflow'
+import { Connection, Edge, Node, NodeRemoveChange, NodeTypes } from 'reactflow'
 import { v4 } from "uuid";
 
 import DndList from "../dnd-list";
@@ -17,18 +17,18 @@ import { GraphProps } from "../graph/graph";
 import { useGraphRef } from "../graph/helper";
 import Modal from "../modal";
 
-import { EDGE_DEF_SETTING, REPORT_ITEMS } from "./configuration";
-import { FlowGrapContext, IWorkflowMap } from "./context";
+import { EDGE_DEF_SETTING, GET_REPORT_ITEMS } from "./configuration";
+import { FlowGrapContext, FlowNameMapper } from "./context";
 import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import ReportItem from "./report-item";
 
-import { FlowTyep, IFlowNode, IFlowNodeBase } from "@/interface/workflow";
+import { FlowTyep, IFlowNode, IFlowNodeBase } from "@/interface/flow";
 
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
 
-interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
+export interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     'initialNodes' |
     'initialEdges' |
     'nodeTypes' |
@@ -39,18 +39,20 @@ interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     'readonly'> {
     flows: IFlowNode[];
     inEdit?: boolean;
-    workflowMap: IWorkflowMap
+    flowNameMapper?: FlowNameMapper;
+    delayRender?: number
 }
 
+const nodeType: NodeTypes = { turbo: TurboNode }
 const UNREMOVABLE_TYPES: FlowTyep[] = ['Input', 'Output']
 
-export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workflowMap, ...others }: FlowGraphProps) {
-
+export default function FlowEditor(props: FlowGraphProps) {
+    const { flows, inEdit = false, graphRef: ref, flowNameMapper, delayRender, ...others } = props
     const [onDragItem, setOnDragItem] = useState<IFlowNodeBase>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
     const [promptForm, setPromptForm] = useState<FormInstance<IFlowNode>>()
-    const [tempForm, setTempForm] = useState<FormInstance<IFlowNode>>()
+    const [wfRefForm, setWfRefForm] = useState<FormInstance<IFlowNode>>()
     const [reportForm, setReportForm] = useState<FormInstance<IFlowNode>>()
     const { graphRef } = useGraphRef<IFlowNode, any>(ref);
     const [openModal, setOpenModal] = useState<IFlowNode>();
@@ -65,10 +67,10 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
         setOpenModal(undefined);
     }
 
-    const setTemplate = () => {
-        const val = tempForm?.getValues();
+    const setWorkflowRef = () => {
+        const val = wfRefForm?.getValues();
         if (!val) return
-        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, workflowid: val.workflowid } }))
+        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, workflowid: val.workflowid, workflowstatus: 'enable' } }))
         setOpenModal(undefined);
     }
 
@@ -99,7 +101,9 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
         });
         setInitialEdges(edges);
         setInitialNodes(nodes);
-        graphRef.current.resetAllElements(nodes, edges);
+        setTimeout(() => {
+            graphRef.current.resetAllElements(nodes, edges);
+        }, delayRender);
     }, [flows]);
 
     useEffect(() => {
@@ -108,21 +112,16 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
     }, [inEdit]);
 
     return <ErrorBoundary>
-        <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, workflowMap, graphRef }}>
+        <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, flowNameMapper, graphRef }}>
             <div className="flow-editor h-full w-full relative">
-                {inEdit && <div className={`absolute 
-            z-20 
-            top-[22px] 
-            px-[7px] 
-            py-[3px] 
-            left-[22px] 
-            right-[22px] 
-            rounded-std 
-            bg-deep-weak/[.5]`} >
+                {inEdit && <div className={`
+                absolute z-20  
+                top-[22px] left-[22px] right-[22px] px-[7px] py-[3px] 
+                rounded-std bg-deep-weak/[.5]`} >
                     <Tooltip target={'.report-item'} position='top' />
                     <DndList
                         className="rounded-std"
-                        items={REPORT_ITEMS}
+                        items={GET_REPORT_ITEMS(props)}
                         disableChangeOrder
                         renderContent={(data) => <ReportItem
                             {...data}
@@ -137,7 +136,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                     initialEdges={initialEdges}
                     initialNodes={initialNodes}
                     className="rounded-std bg-deep"
-                    nodeTypes={{ turbo: TurboNode }}
+                    nodeTypes={nodeType}
                     defaultEdgeOptions={EDGE_DEF_SETTING}
                     readonly={!inEdit}
                     graphRef={graphRef}
@@ -217,7 +216,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                 </Modal>
                 <Modal
                     title="Workflow Reference"
-                    onOk={inEdit ? setTemplate : undefined}
+                    onOk={inEdit ? setWorkflowRef : undefined}
                     onCancel={closeModal}
                     cancelLabel={inEdit ? undefined : 'Close'}
                     visible={openModal?.type === 'Workflow'}
@@ -225,13 +224,13 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                     <Form
                         readonly={!inEdit}
                         defaultValues={openModal}
-                        onLoad={form => setTempForm(form)}
-                        onDestroyed={() => setTempForm(undefined)}>
+                        onLoad={form => setWfRefForm(form)}
+                        onDestroyed={() => setWfRefForm(undefined)}>
                         {
                             ({ Item }) =>
                             (<>
                                 <Item name='workflowid' label="Select a reference workflow" >
-                                    <Dropdown disabled options={map<IWorkflowMap, SelectItem>(workflowMap, (v, k) => ({ label: v, value: k }))} />
+                                    <Dropdown disabled options={map<FlowNameMapper, SelectItem>(flowNameMapper, (v, k) => ({ label: v, value: k }))} />
                                 </Item>
                             </>)
                         }

@@ -20,3 +20,7 @@ export const runReport = async (formData: FormData) => {
 export const downloadJob = async (jobId: string) => {
     return (await apiCaller.get(`${process.env.NEXT_PUBLIC_REPORT}/download/${jobId}`)).data
 }
+
+export const checkJob = async (flowid: string) => {
+    return (await apiCaller.get<ApiResult>(`${process.env.NEXT_PUBLIC_REPORT}/check/${flowid}`)).data
+}

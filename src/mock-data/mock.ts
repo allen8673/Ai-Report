@@ -1,8 +1,8 @@
 
-import { IWorkflow } from "@/interface/workflow";
+import { IFlow } from "@/interface/flow";
 
 
-export const mock_workflows: IWorkflow[] = [
+export const mock_workflows: IFlow[] = [
     {
         type: 'workflow',
         "id": "d521066f-7f61-4be0-a9b9-a4517edfc825",
@@ -299,7 +299,7 @@ export const mock_workflows: IWorkflow[] = [
     }
 ]
 
-export const mock_templates: IWorkflow[] = [
+export const mock_templates: IFlow[] = [
     {
         type: 'template',
         id: 'dde9c1d8-15eb-45b1-9cc5-f5c8a12df64d',

@@ -1,7 +1,7 @@
 import { filter, find, includes, max, some } from "lodash";
 import { v4 } from "uuid";
 
-import { IFlowNode } from "@/interface/workflow";
+import { IFlowNode } from "@/interface/flow";
 
 export const calculateDepth = (nodes: IFlowNode[], fullFlows: IFlowNode[], deep = 0): void => {
     nodes.forEach(node => {

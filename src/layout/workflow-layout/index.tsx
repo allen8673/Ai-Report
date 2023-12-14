@@ -12,14 +12,14 @@ import { useLayoutContext } from '../turbo-layout/context';
 import { WfLayoutContext } from './context';
 
 import { getFlow } from '@/api-helpers/flow-api';
-import { downloadJob, getJobs, runReport } from '@/api-helpers/report-api';
+import { checkJob, downloadJob, getJobs, runReport } from '@/api-helpers/report-api';
 import CodeEditor from '@/components/code-editor';
 import FileUploader from '@/components/file-uploader';
 import { ifWorkflowIsCompleted } from '@/components/flow-editor/helper';
 import Modal from '@/components/modal';
 import EmptyPane from '@/components/panes/empty';
+import { IFlow } from '@/interface/flow';
 import { IJob } from '@/interface/job';
-import { IWorkflow } from '@/interface/workflow';
 import { downloadString } from '@/utils';
 
 interface ViewReports {
@@ -119,12 +119,21 @@ export default function WorkflowLayout({
     children: React.ReactNode
 }) {
     const { showMessage } = useLayoutContext();
-    const [runningWF, setRunningWF] = useState<IWorkflow>();
+    const [runningWF, setRunningWF] = useState<IFlow>();
     const [reportJobs, setReportJobs] = useState<ViewReports>();
 
-    const runWorkflow = async (wf?: IWorkflow | string) => {
+    const runWorkflow = async (wf?: IFlow | string) => {
         if (!wf) return;
-        const workflow: IWorkflow | undefined = typeof wf === 'string' ? await getFlow(wf) : wf
+        const workflow: IFlow | undefined = typeof wf === 'string' ? await getFlow(wf) : wf
+
+        const check_res = await checkJob(workflow?.id || '')
+        if (check_res.status === 'NG') {
+            showMessage({
+                message: check_res.message || '',
+                type: 'error'
+            })
+            return
+        }
 
         if (!ifWorkflowIsCompleted(workflow?.flows)) {
             showMessage({

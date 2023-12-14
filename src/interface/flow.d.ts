@@ -1,25 +1,16 @@
 import { XYPosition } from "reactflow";
 
-
-export interface IEditWorkflow {
-    id?: string;
-    name?: string;
-    template?: string;
-}
-
-export interface IWorkflowBase {
+export interface IFlowBase {
     id: string;
     name: string;
     used?: string[]
 }
 
-/**
- * the interface for the diagram of AI report
- */
-export interface IWorkflow extends IWorkflowBase {
+export interface IFlow extends IFlowBase {
     type: 'workflow' | 'template',
     rootNdeId: string[];
     flows: IFlowNode[];
+
 }
 
 export type FlowTyep = 'Input' | 'Output' | 'Normal' | 'Workflow' | 'Report';
@@ -29,6 +20,7 @@ export interface IFlowNodeBase {
     type: FlowTyep;
     name?: string;
 }
+
 export interface IFlowNode extends IFlowNodeBase {
     position: XYPosition;
     forwards: string[];
@@ -40,6 +32,13 @@ export interface IFlowNode extends IFlowNodeBase {
     running?: boolean;
     status?: FlowStatus;
     fileName?: string;
+    workflowstatus?: 'disable' | 'enable' | ''
+}
+
+export interface IEditFlow {
+    id?: string;
+    name?: string;
+    template?: string;
 }
 
 export interface ISaveFlow {

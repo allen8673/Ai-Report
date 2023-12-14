@@ -25,7 +25,7 @@ export default function Layout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body suppressHydrationWarning={true} className={inter.className}>
         <PrimeReactProvider>
           <TurboLayout>
             {children}
