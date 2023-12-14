@@ -18,8 +18,8 @@ import FileUploader from '@/components/file-uploader';
 import { ifWorkflowIsCompleted } from '@/components/flow-editor/helper';
 import Modal from '@/components/modal';
 import EmptyPane from '@/components/panes/empty';
-import { IJob } from '@/interface/job';
 import { IFlow } from '@/interface/flow';
+import { IJob } from '@/interface/job';
 import { downloadString } from '@/utils';
 
 interface ViewReports {
