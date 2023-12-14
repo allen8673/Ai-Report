@@ -39,14 +39,15 @@ export interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     'readonly'> {
     flows: IFlowNode[];
     inEdit?: boolean;
-    flowNameMapper?: FlowNameMapper
+    flowNameMapper?: FlowNameMapper;
+    delayRender?: number
 }
 
 const nodeType: NodeTypes = { turbo: TurboNode }
 const UNREMOVABLE_TYPES: FlowTyep[] = ['Input', 'Output']
 
 export default function FlowEditor(props: FlowGraphProps) {
-    const { flows, inEdit = false, graphRef: ref, flowNameMapper, ...others } = props
+    const { flows, inEdit = false, graphRef: ref, flowNameMapper, delayRender, ...others } = props
     const [onDragItem, setOnDragItem] = useState<IFlowNodeBase>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
@@ -100,7 +101,9 @@ export default function FlowEditor(props: FlowGraphProps) {
         });
         setInitialEdges(edges);
         setInitialNodes(nodes);
-        graphRef.current.resetAllElements(nodes, edges);
+        setTimeout(() => {
+            graphRef.current.resetAllElements(nodes, edges);
+        }, delayRender);
     }, [flows]);
 
     useEffect(() => {

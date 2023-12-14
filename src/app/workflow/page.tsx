@@ -57,7 +57,7 @@ export default function Page() {
                     role='presentation'
                     onClick={(e) => e.stopPropagation()}>
                     <Button
-                        className="py-0 px-[0px]"
+                        className="py-0 px-[0px] h-[40px]"
                         severity='success'
                         tooltip="Run Workflow"
                         tooltipOptions={{ position: 'left' }}
@@ -67,7 +67,7 @@ export default function Page() {
                         onClick={() => runWorkflow(row.id)}
                     />
                     <Button
-                        className="gap-[7px]"
+                        className="gap-[7px] h-[40px]"
                         severity='info'
                         label="Reports"
                         icon={

@@ -198,8 +198,19 @@ export default function Page() {
             flows: _nodes
         }
 
-        await addFlow(template)
-        setOpenTemplateModal(false)
+        const res = await addFlow(template);
+        if (res.data.status === 'ok') {
+            showMessage({
+                type: 'success',
+                message: res.data.message || 'Success',
+            });
+            setOpenTemplateModal(false)
+        } else {
+            showMessage({
+                type: 'error',
+                message: res.data.message || 'error',
+            });
+        }
     }
 
     const expandRefWF = async (nodes: IFlowNode[]) => {
@@ -379,7 +390,7 @@ export default function Page() {
                                         ...n.data, position: n.position
                                     }));
 
-                                    const result: IFlow = ({ ...workflow, flows });
+                                    const result: IFlow = ({ ...workflow, type: 'workflow', flows });
                                     calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
 
                                     const res = await (await (mode === 'add' ? addFlow : updateFlow)(result)).data
