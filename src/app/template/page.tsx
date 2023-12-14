@@ -1,4 +1,5 @@
 'use client'
+import { faPaperPlane } from '@fortawesome/free-regular-svg-icons';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { confirmDialog } from 'primereact/confirmdialog';
@@ -80,7 +81,7 @@ export default function Page() {
                             graphRef.current.reactFlowInstance?.fitView({ duration: 500 })
                         }
                     }}
-                /> : <EmptyPane title='Select a template to show the graph' />}
+                /> : <EmptyPane icon={faPaperPlane} title='Select a template to show the graph' />}
             </SplitterPanel>
             <SplitterPanel className="overflow-auto px-[7px]" size={60}>
                 <Table className='h-full w-full'
