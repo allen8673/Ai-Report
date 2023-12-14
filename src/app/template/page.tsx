@@ -125,7 +125,7 @@ export default function Page() {
         <EditTemplateModal
             editTemp={editTemp}
             onOk={async (result) => {
-                const res = await updateFlow({ ...result, type: 'template' });
+                const res = await updateFlow(result);
                 if (res.data.status === 'ok') {
                     showMessage({
                         type: 'success',
