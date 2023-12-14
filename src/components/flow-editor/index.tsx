@@ -18,7 +18,7 @@ import { useGraphRef } from "../graph/helper";
 import Modal from "../modal";
 
 import { EDGE_DEF_SETTING, REPORT_ITEMS } from "./configuration";
-import { FlowGrapContext, IWorkflowMap } from "./context";
+import { FlowGrapContext, FlowNameMapper } from "./context";
 import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import ReportItem from "./report-item";
@@ -39,12 +39,12 @@ interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     'readonly'> {
     flows: IFlowNode[];
     inEdit?: boolean;
-    workflowMap: IWorkflowMap
+    flowNameMapper: FlowNameMapper
 }
 
 const UNREMOVABLE_TYPES: FlowTyep[] = ['Input', 'Output']
 
-export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workflowMap, ...others }: FlowGraphProps) {
+export default function FlowGraph({ flows, inEdit = false, graphRef: ref, flowNameMapper, ...others }: FlowGraphProps) {
 
     const [onDragItem, setOnDragItem] = useState<IFlowNodeBase>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
@@ -108,7 +108,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
     }, [inEdit]);
 
     return <ErrorBoundary>
-        <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, workflowMap, graphRef }}>
+        <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, flowNameMapper: flowNameMapper, graphRef }}>
             <div className="flow-editor h-full w-full relative">
                 {inEdit && <div className={`absolute 
             z-20 
@@ -231,7 +231,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, workfl
                             ({ Item }) =>
                             (<>
                                 <Item name='workflowid' label="Select a reference workflow" >
-                                    <Dropdown disabled options={map<IWorkflowMap, SelectItem>(workflowMap, (v, k) => ({ label: v, value: k }))} />
+                                    <Dropdown disabled options={map<FlowNameMapper, SelectItem>(flowNameMapper, (v, k) => ({ label: v, value: k }))} />
                                 </Item>
                             </>)
                         }

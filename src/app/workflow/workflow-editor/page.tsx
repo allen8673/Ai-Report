@@ -13,7 +13,7 @@ import { addFlow, deleteFlow, getFlow, getFlows, updateFlow } from "@/api-helper
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowGraph from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
-import { IWorkflowMap } from "@/components/flow-editor/context";
+import { FlowNameMapper } from "@/components/flow-editor/context";
 import { X_GAP, calculateDepth, getNewIdTrans, ifWorkflowIsCompleted, resetPosition_x, resetPosition_y } from "@/components/flow-editor/helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
@@ -40,7 +40,7 @@ export default function Page() {
     const [workflow, setWorkflow] = useState<IWorkflow>();
     const [inEdit, setInEdit] = useState<boolean>();
     const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
-    const [workflowMap, setWorkflowMap] = useState<IWorkflowMap>({})
+    const [flowNameMapper, setFlowNameMapper] = useState<FlowNameMapper>({})
     const [form, setForm] = useState<FormInstance<IWorkflow>>()
 
     useEffect(() => {
@@ -60,8 +60,7 @@ export default function Page() {
     const fetchAllWorflowData = async () => {
         const wfs = await getFlows('WORKFLOW')
         if (!wfs) return;
-
-        setWorkflowMap(wfs.reduce<{ [id: string]: string }>((pre, wf) => {
+        setFlowNameMapper(wfs.reduce<{ [id: string]: string }>((pre, wf) => {
             if (wf.id !== paramObj?.id) pre[wf.id] = wf.name
             return pre;
         }, {}))
@@ -445,7 +444,7 @@ export default function Page() {
                 graphRef={graphRef}
                 hideMiniMap
                 inEdit={inEdit}
-                workflowMap={workflowMap}
+                flowNameMapper={flowNameMapper}
             />
             <Modal
                 title='Save as Template'

@@ -1,7 +1,6 @@
 'use client'
-import { faAdd, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button } from 'primereact/button';
 import { confirmDialog } from 'primereact/confirmdialog';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import { useEffect, useState } from 'react';
@@ -63,14 +62,7 @@ export default function Page() {
             title='Template List'
             postContent={
                 <>
-                    <Button icon={<FontAwesomeIcon className='mr-[7px]' icon={faAdd} />}
-                        severity="success"
-                        label='Add New Template'
-                        tooltipOptions={{ position: 'left' }}
-                        onClick={() => {
 
-                        }}
-                    />
                 </>}
         />
         <Splitter className='h-full' style={{ height: '300px' }} layout="vertical">
@@ -88,7 +80,7 @@ export default function Page() {
                             graphRef.current.reactFlowInstance?.fitView({ duration: 500 })
                         }
                     }}
-                    workflowMap={{}}
+                    flowNameMapper={{}}
                 />
             </SplitterPanel>
             <SplitterPanel className="overflow-auto px-[7px]" size={60}>

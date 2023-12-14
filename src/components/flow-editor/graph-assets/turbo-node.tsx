@@ -47,7 +47,7 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
     const { id, data, } = elm;
     const { running, workflowstatus } = data || {}
     const { nodeType, icon, nodeName, editable } = flowInfoMap[data.type] || {}
-    const { inEdit, clickOnSetting, workflowMap, graphRef } = useFlowGrapContext();
+    const { inEdit, clickOnSetting, flowNameMapper, graphRef } = useFlowGrapContext();
     const iconHighlight = !!data.prompt || !!data.file || !!data.report
     const deletable = editable
     const clickable = inEdit;
@@ -115,7 +115,7 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
                                 <div className="text-[20px] mb-[2px] leading-1 ellipsis wf-name"
                                     data-pr-tooltip={data.name}
                                 >
-                                    {(data.type === 'Workflow' ? workflowMap[data.workflowid || ''] : (nodeName || data.name))
+                                    {(data.type === 'Workflow' ? flowNameMapper[data.workflowid || ''] : (nodeName || data.name))
                                         || <span className='italic'>N / A</span>}
                                 </div>
                                 <div className="text-[16px] text-light-weak">{data.type}</div>
