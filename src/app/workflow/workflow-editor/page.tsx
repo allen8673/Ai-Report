@@ -357,7 +357,6 @@ export default function Page() {
                                 tooltip="Cancel"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
-
                                     confirmDialog({
                                         position: 'top',
                                         message: `Are you sure you want to cancel without saving? You will lose every modification.`,
@@ -369,8 +368,6 @@ export default function Page() {
                                             setInEdit(false)
                                         },
                                     });
-
-
                                 }}
                             />
                             <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faSave} />}
