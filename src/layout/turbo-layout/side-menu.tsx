@@ -10,19 +10,22 @@ import RouterInfo, { getFullUrl } from '@/settings/router-setting';
 export default function SideMenu() {
     const pathname = usePathname()
     const navigations = _.filter(RouterInfo, ['isNavigation', true])
-    return <div className={`w-[60px] min-w-[60px] bg-deep rounded-std flex flex-col items-center py-std gap-std`}>
-        <FontAwesomeIcon className='h-[30px] w-[30px]' icon={faFire} color={'white'} />
+    return <div className={`
+    bg-deep rounded-std
+    w-[60px] min-w-[60px] py-std
+    flex flex-col items-center gap-std`}>
+        <FontAwesomeIcon className='text-[30px]' icon={faFire} color={'white'} />
         <div className='flex flex-col grow shrink gap-[6px]'>
             {_.map(navigations, n => {
                 const url = getFullUrl(n);
                 const onselected = (!n.folder && pathname === '/') || (!!n.folder && _.includes(pathname, n.folder))
                 return (
                     <Link key={n.title} className={`flex-center p-[7px] ${onselected ? "text-light border-solid rounded-std-sm rounded-light" : 'text-light-weak'}`} href={url || "/"}>
-                        <FontAwesomeIcon className={`flex-center h-[20px] w-[20px]  hover:text-light`} icon={n.icon || faQuestion} />
+                        <FontAwesomeIcon className={`flex-center text-[20px]  hover:text-light`} icon={n.icon || faQuestion} />
                     </Link>
                 )
             })}
         </div>
-        <FontAwesomeIcon className='h-[30px] w-[30px]' icon={faUser} color={'white'} />
+        <FontAwesomeIcon className='text-[30px]' icon={faUser} color={'white'} />
     </div>
 }
