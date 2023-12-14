@@ -1,12 +1,12 @@
 import { useContext } from "react";
 import React from "react";
 
-import { IWorkflow } from "@/interface/workflow";
+import { IFlow } from "@/interface/flow";
 
 
 
 export interface WfLayoutStore {
-    runWorkflow: (wf?: IWorkflow | string) => void;
+    runWorkflow: (wf?: IFlow | string) => void;
     viewReports: (workflowId: string) => void;
 }
 

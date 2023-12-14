@@ -19,7 +19,7 @@ import { ifWorkflowIsCompleted } from '@/components/flow-editor/helper';
 import Modal from '@/components/modal';
 import EmptyPane from '@/components/panes/empty';
 import { IJob } from '@/interface/job';
-import { IWorkflow } from '@/interface/workflow';
+import { IFlow } from '@/interface/flow';
 import { downloadString } from '@/utils';
 
 interface ViewReports {
@@ -119,12 +119,12 @@ export default function WorkflowLayout({
     children: React.ReactNode
 }) {
     const { showMessage } = useLayoutContext();
-    const [runningWF, setRunningWF] = useState<IWorkflow>();
+    const [runningWF, setRunningWF] = useState<IFlow>();
     const [reportJobs, setReportJobs] = useState<ViewReports>();
 
-    const runWorkflow = async (wf?: IWorkflow | string) => {
+    const runWorkflow = async (wf?: IFlow | string) => {
         if (!wf) return;
-        const workflow: IWorkflow | undefined = typeof wf === 'string' ? await getFlow(wf) : wf
+        const workflow: IFlow | undefined = typeof wf === 'string' ? await getFlow(wf) : wf
 
         const check_res = await checkJob(workflow?.id || '')
         if (check_res.status === 'NG') {

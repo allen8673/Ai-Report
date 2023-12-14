@@ -8,7 +8,7 @@ import { Handle, NodeProps, Position } from "reactflow";
 import { flowInfoMap } from "../configuration";
 import { useFlowGrapContext } from '../context';
 
-import { FlowStatus, IFlowNode } from '@/interface/workflow';
+import { FlowStatus, IFlowNode } from '@/interface/flow';
 
 const getStatusIcon = (status?: FlowStatus): ReactNode => {
     if (!status || status === 'none') return <></>
@@ -115,7 +115,7 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
                                 <div className="text-[20px] mb-[2px] leading-1 ellipsis wf-name"
                                     data-pr-tooltip={data.name}
                                 >
-                                    {(data.type === 'Workflow' ? flowNameMapper[data.workflowid || ''] : (nodeName || data.name))
+                                    {(data.type === 'Workflow' ? flowNameMapper?.[data.workflowid || ''] : (nodeName || data.name))
                                         || <span className='italic'>N / A</span>}
                                 </div>
                                 <div className="text-[16px] text-light-weak">{data.type}</div>

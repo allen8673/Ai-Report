@@ -5,7 +5,7 @@ import React from 'react';
 
 import { flowInfoMap } from '../configuration';
 
-import { IFlowNodeBase } from '@/interface/workflow';
+import { IFlowNodeBase } from '@/interface/flow';
 import './report-item.css';
 
 export interface ReportItemProps extends IFlowNodeBase {

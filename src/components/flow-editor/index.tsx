@@ -23,7 +23,7 @@ import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import ReportItem from "./report-item";
 
-import { FlowTyep, IFlowNode, IFlowNodeBase } from "@/interface/workflow";
+import { FlowTyep, IFlowNode, IFlowNodeBase } from "@/interface/flow";
 
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
@@ -39,12 +39,12 @@ interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     'readonly'> {
     flows: IFlowNode[];
     inEdit?: boolean;
-    flowNameMapper: FlowNameMapper
+    flowNameMapper?: FlowNameMapper
 }
 
 const UNREMOVABLE_TYPES: FlowTyep[] = ['Input', 'Output']
 
-export default function FlowGraph({ flows, inEdit = false, graphRef: ref, flowNameMapper, ...others }: FlowGraphProps) {
+export default function FlowEditor({ flows, inEdit = false, graphRef: ref, flowNameMapper, ...others }: FlowGraphProps) {
 
     const [onDragItem, setOnDragItem] = useState<IFlowNodeBase>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
@@ -108,7 +108,7 @@ export default function FlowGraph({ flows, inEdit = false, graphRef: ref, flowNa
     }, [inEdit]);
 
     return <ErrorBoundary>
-        <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, flowNameMapper: flowNameMapper, graphRef }}>
+        <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, flowNameMapper, graphRef }}>
             <div className="flow-editor h-full w-full relative">
                 {inEdit && <div className={`absolute 
             z-20 

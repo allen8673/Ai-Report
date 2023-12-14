@@ -6,20 +6,20 @@ import { Splitter, SplitterPanel } from 'primereact/splitter';
 import { useEffect, useState } from 'react';
 
 import { deleteFlow, getFlow, getFlows } from '@/api-helpers/flow-api';
-import FlowGraph from '@/components/flow-editor';
+import FlowEditor from '@/components/flow-editor';
 import { useGraphRef } from '@/components/graph/helper';
 import TitlePane from '@/components/panes/title';
 import Table from '@/components/table';
 import { Column } from '@/components/table/table';
-import { IFlowNode, IWorkflow, IWorkflowBase } from '@/interface/workflow';
+import { IFlowNode, IFlow, IFlowBase } from '@/interface/flow';
 
 export default function Page() {
 
-    const [templates, setTemplates] = useState<IWorkflowBase[]>([]);
-    const [selection, setSelection] = useState<IWorkflow>();
+    const [templates, setTemplates] = useState<IFlowBase[]>([]);
+    const [selection, setSelection] = useState<IFlow>();
 
     const { graphRef } = useGraphRef<IFlowNode, any>();
-    const columns: Column<IWorkflowBase>[] = [
+    const columns: Column<IFlowBase>[] = [
         { key: 'id', title: 'ID', style: { width: '25%' } },
         { key: 'name', title: 'Name' },
         {
@@ -67,7 +67,7 @@ export default function Page() {
         />
         <Splitter className='h-full' style={{ height: '300px' }} layout="vertical">
             <SplitterPanel className="px-[7px] " size={40}>
-                <FlowGraph
+                <FlowEditor
                     className="rounded-std bg-deep"
                     flows={selection?.flows || []}
                     graphRef={graphRef}
@@ -80,7 +80,6 @@ export default function Page() {
                             graphRef.current.reactFlowInstance?.fitView({ duration: 500 })
                         }
                     }}
-                    flowNameMapper={{}}
                 />
             </SplitterPanel>
             <SplitterPanel className="overflow-auto px-[7px]" size={60}>

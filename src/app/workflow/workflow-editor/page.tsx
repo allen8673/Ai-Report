@@ -11,7 +11,7 @@ import { v4 } from "uuid";
 
 import { addFlow, deleteFlow, getFlow, getFlows, updateFlow } from "@/api-helpers/flow-api";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
-import FlowGraph from "@/components/flow-editor";
+import FlowEditor from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
 import { FlowNameMapper } from "@/components/flow-editor/context";
 import { X_GAP, calculateDepth, getNewIdTrans, ifWorkflowIsCompleted, resetPosition_x, resetPosition_y } from "@/components/flow-editor/helper";
@@ -20,7 +20,7 @@ import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/panes/title";
-import { IEditWorkflow, IFlowNode, IWorkflow } from "@/interface/workflow";
+import { IEditFlow, IFlowNode, IFlow } from "@/interface/flow";
 import { useLayoutContext } from "@/layout/turbo-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
@@ -31,17 +31,17 @@ export default function Page() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const wfUrl = getFullUrl(RouterInfo.WORKFLOW);
-    const paramObj = coverSearchParamsToObj<IEditWorkflow>(searchParams);
+    const paramObj = coverSearchParamsToObj<IEditFlow>(searchParams);
     const [mode, setMode] = useState<EditMode>(!!paramObj.id ? 'normal' : 'add')
     const { graphRef } = useGraphRef<IFlowNode, any>();
     const { showMessage } = useLayoutContext();
     const { runWorkflow, viewReports } = useWfLayoutContext()
 
-    const [workflow, setWorkflow] = useState<IWorkflow>();
+    const [workflow, setWorkflow] = useState<IFlow>();
     const [inEdit, setInEdit] = useState<boolean>();
     const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
     const [flowNameMapper, setFlowNameMapper] = useState<FlowNameMapper>({})
-    const [form, setForm] = useState<FormInstance<IWorkflow>>()
+    const [form, setForm] = useState<FormInstance<IFlow>>()
 
     useEffect(() => {
         initial()
@@ -71,9 +71,9 @@ export default function Page() {
         setWorkflow(wf);
     }
 
-    const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
+    const prepareNewWorkflow = async (paramObj: IEditFlow) => {
         const id = '';
-        const template: (IWorkflow | undefined) =
+        const template: (IFlow | undefined) =
             (!!paramObj.template ? await getFlow(paramObj.template) : undefined);
 
         if (!!template) {
@@ -190,7 +190,7 @@ export default function Page() {
         }, []);
 
         calculateDepth(_nodes.filter(n => n.type === 'Input'), _nodes);
-        const template: IWorkflow = {
+        const template: IFlow = {
             type: 'template',
             id: '', //v4(),
             rootNdeId: [],
@@ -288,7 +288,6 @@ export default function Page() {
     //         }
     //         return pre
     //     });
-
     //     debounce(async () => {
     //         graphRef.current?.setNodes(pre => {
     //             if (includes(forwards, pre.id)) {
@@ -296,7 +295,6 @@ export default function Page() {
     //                 let report: any = undefined;
     //                 if (pre.id == 'f-2') status = 'failure';
     //                 else if (pre.id == 'f-5') status = 'warning';
-
     //                 if (pre.data.type === 'Output') {
     //                     report = <>{map(range(0, 30), () => (<p>
     //                         <p className="m-0">
@@ -310,7 +308,6 @@ export default function Page() {
     //                         </p>
     //                     </p>))}</>
     //                 }
-
     //                 return { ...pre, data: { ...pre.data, status: status, running: false, report } }
     //             }
     //             return pre
@@ -373,7 +370,7 @@ export default function Page() {
                                         ...n.data, position: n.position
                                     }));
 
-                                    const result: IWorkflow = ({ ...workflow, flows });
+                                    const result: IFlow = ({ ...workflow, flows });
                                     calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
 
                                     const res = await (await (mode === 'add' ? addFlow : updateFlow)(result)).data
@@ -438,7 +435,7 @@ export default function Page() {
                         </>}
                 </>}
             />
-            <FlowGraph
+            <FlowEditor
                 className="rounded-std bg-deep"
                 flows={workflow?.flows || []}
                 graphRef={graphRef}
@@ -463,7 +460,7 @@ export default function Page() {
                     setOpenTemplateModal(false)
                 }}>
                 <Form
-                    onLoad={(form: FormInstance<IWorkflow>) => setForm(form)}
+                    onLoad={(form: FormInstance<IFlow>) => setForm(form)}
                     onDestroyed={() => {
                         setForm(undefined)
                     }}

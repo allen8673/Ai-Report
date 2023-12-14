@@ -1,7 +1,7 @@
 import { IconDefinition, faUpload, faDownload, faBrain, faShareNodes, faFileLines } from '@fortawesome/free-solid-svg-icons'
 import { Edge, MarkerType } from 'reactflow';
 
-import { FlowTyep, IFlowNodeBase } from '@/interface/workflow';
+import { FlowTyep, IFlowNodeBase } from '@/interface/flow';
 
 export const EDGE_DEF_SETTING: Partial<Edge> = {
     // type: 'smoothstep',

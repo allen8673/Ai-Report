@@ -16,7 +16,7 @@ import Modal from "@/components/modal";
 import TitlePane from "@/components/panes/title";
 import Table from "@/components/table";
 import { Column } from "@/components/table/table";
-import { IWorkflowBase } from "@/interface/workflow";
+import { IFlowBase } from "@/interface/flow";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
 
@@ -31,7 +31,7 @@ export default function Page() {
     const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
     const { runWorkflow, viewReports } = useWfLayoutContext()
 
-    const [workflows, setWorkflow] = useState<IWorkflowBase[]>([]);
+    const [workflows, setWorkflow] = useState<IFlowBase[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<FormData>>()
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([])
@@ -46,7 +46,7 @@ export default function Page() {
         getAllData();
     }, [])
 
-    const columns: Column<IWorkflowBase>[] = [
+    const columns: Column<IFlowBase>[] = [
         { key: 'id', title: 'ID', style: { width: '25%' } },
         { key: 'name', title: 'Name' },
         {
