@@ -102,11 +102,11 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
                     <div className={`py-[16px] px-[20px] min-w-[190px] max-w-[260px]`}>
                         {warning &&
                             <div className={`
-                            absolute inset-0 px-[12px] bg-orange-900 opacity-40
+                            absolute inset-0 px-[12px] bg-warning-deep opacity-30
                             flex items-center flex-row-reverse 
                             `}>
-                                <FontAwesomeIcon className={`font-medium text-5xl text-yellow-500`} icon={faWarning} />
-                                {/* <i className="pi pi-exclamation-triangle font-medium text-5xl text-yellow-500" /> */}
+                                <FontAwesomeIcon className={`font-medium text-5xl text-warning-light`} icon={faWarning} />
+                                {/* <i className="pi pi-exclamation-triangle font-medium text-5xl text-warning-light" /> */}
                             </div>
                         }
                         <div className={`flex items-center rounded-std-sm text-light`}>

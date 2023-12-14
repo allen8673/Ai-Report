@@ -60,19 +60,19 @@ const config: Config = {
           },
         },
         success: {
-          light: 'rgba(16, 185, 129, 0.4)',
+          light: 'rgba(16, 185, 129)',
           DEFAULT: 'rgba(4, 119, 86, 1)',
-          deep: 'rgba(6, 78, 59, 0.4)',
+          deep: 'rgba(6, 78, 59)',
         },
         failure: {
-          light: 'rgba(239, 68, 68, 0.4)',
+          light: 'rgba(239, 68, 68)',
           DEFAULT: 'rgba(185, 28, 28, 1)',
-          deep: 'rgba(127, 29, 29, 0.4)',
+          deep: 'rgba(127, 29, 29)',
         },
         warning: {
-          light: 'rgba(234, 179, 8, 0.4)',
+          light: 'rgba(234, 179, 8)',
           DEFAULT: 'rgba(161, 98, 7, 1)',
-          deep: 'rgba(113, 63, 18, 0.4)',
+          deep: 'rgba(113, 63, 18)',
         },
       },
       spacing: {

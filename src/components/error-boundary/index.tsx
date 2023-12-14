@@ -12,14 +12,14 @@ function Fallback({ error, }: FallbackProps) {
 
     return (
         <div className={`
-        w-full h-full p-3 bg-red-800/[.2] 
+        w-full h-full p-3 bg-failure/[.2] 
         flex flex-col items-center grow
-        rounded-std-sm border-solid border-red-800
+        rounded-std-sm border-solid border-failure
         `} role="alert">
             <p className={`
             h-[40px] my-3
             flex items-center gap-2 
-            text-3xl font-bold text-red-500 font-bold 
+            text-3xl font-bold text-failure-light font-bold 
             `}>
                 <FontAwesomeIcon icon={faTriangleExclamation} />
                 Something went wrong
