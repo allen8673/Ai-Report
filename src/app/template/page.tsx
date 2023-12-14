@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { deleteFlow, getFlow, getFlows } from '@/api-helpers/flow-api';
 import FlowEditor from '@/components/flow-editor';
 import { useGraphRef } from '@/components/graph/helper';
+import EmptyPane from '@/components/panes/empty';
 import TitlePane from '@/components/panes/title';
 import Table from '@/components/table';
 import { Column } from '@/components/table/table';
@@ -67,9 +68,8 @@ export default function Page() {
         />
         <Splitter className='h-full' style={{ height: '300px' }} layout="vertical">
             <SplitterPanel className="px-[7px] " size={40}>
-                <FlowEditor
-                    className="rounded-std bg-deep"
-                    flows={selection?.flows || []}
+                {selection?.flows ? <FlowEditor
+                    flows={selection.flows}
                     graphRef={graphRef}
                     hideMiniMap
                     hideCtrls
@@ -80,7 +80,7 @@ export default function Page() {
                             graphRef.current.reactFlowInstance?.fitView({ duration: 500 })
                         }
                     }}
-                />
+                /> : <EmptyPane title='Select a template to show the graph' />}
             </SplitterPanel>
             <SplitterPanel className="overflow-auto px-[7px]" size={60}>
                 <Table className='h-full w-full'
