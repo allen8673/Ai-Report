@@ -357,8 +357,20 @@ export default function Page() {
                                 tooltip="Cancel"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
-                                    graphRef.current?.resetAllElements();
-                                    setInEdit(false)
+
+                                    confirmDialog({
+                                        position: 'top',
+                                        message: `Are you sure you want to cancel without saving? You will lose every modification.`,
+                                        header: `Cancel modify`,
+                                        icon: 'pi pi-info-circle',
+                                        acceptClassName: 'p-button-danger',
+                                        accept: async () => {
+                                            graphRef.current?.resetAllElements();
+                                            setInEdit(false)
+                                        },
+                                    });
+
+
                                 }}
                             />
                             <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faSave} />}
