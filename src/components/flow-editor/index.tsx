@@ -5,7 +5,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { SelectItem } from "primereact/selectitem";
 import { Tooltip } from "primereact/tooltip";
 import { useEffect, useState } from "react";
-import { Connection, Edge, Node, NodeRemoveChange } from 'reactflow'
+import { Connection, Edge, Node, NodeRemoveChange, NodeTypes } from 'reactflow'
 import { v4 } from "uuid";
 
 import DndList from "../dnd-list";
@@ -17,7 +17,7 @@ import { GraphProps } from "../graph/graph";
 import { useGraphRef } from "../graph/helper";
 import Modal from "../modal";
 
-import { EDGE_DEF_SETTING, REPORT_ITEMS } from "./configuration";
+import { EDGE_DEF_SETTING, GET_REPORT_ITEMS } from "./configuration";
 import { FlowGrapContext, FlowNameMapper } from "./context";
 import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
@@ -28,7 +28,7 @@ import { FlowTyep, IFlowNode, IFlowNodeBase } from "@/interface/flow";
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
 
-interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
+export interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     'initialNodes' |
     'initialEdges' |
     'nodeTypes' |
@@ -42,10 +42,11 @@ interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     flowNameMapper?: FlowNameMapper
 }
 
+const nodeType: NodeTypes = { turbo: TurboNode }
 const UNREMOVABLE_TYPES: FlowTyep[] = ['Input', 'Output']
 
-export default function FlowEditor({ flows, inEdit = false, graphRef: ref, flowNameMapper, ...others }: FlowGraphProps) {
-
+export default function FlowEditor(props: FlowGraphProps) {
+    const { flows, inEdit = false, graphRef: ref, flowNameMapper, ...others } = props
     const [onDragItem, setOnDragItem] = useState<IFlowNodeBase>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
@@ -110,19 +111,14 @@ export default function FlowEditor({ flows, inEdit = false, graphRef: ref, flowN
     return <ErrorBoundary>
         <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, flowNameMapper, graphRef }}>
             <div className="flow-editor h-full w-full relative">
-                {inEdit && <div className={`absolute 
-            z-20 
-            top-[22px] 
-            px-[7px] 
-            py-[3px] 
-            left-[22px] 
-            right-[22px] 
-            rounded-std 
-            bg-deep-weak/[.5]`} >
+                {inEdit && <div className={`
+                absolute z-20  
+                top-[22px] left-[22px] right-[22px] px-[7px] py-[3px] 
+                rounded-std bg-deep-weak/[.5]`} >
                     <Tooltip target={'.report-item'} position='top' />
                     <DndList
                         className="rounded-std"
-                        items={REPORT_ITEMS}
+                        items={GET_REPORT_ITEMS(props)}
                         disableChangeOrder
                         renderContent={(data) => <ReportItem
                             {...data}
@@ -137,7 +133,7 @@ export default function FlowEditor({ flows, inEdit = false, graphRef: ref, flowN
                     initialEdges={initialEdges}
                     initialNodes={initialNodes}
                     className="rounded-std bg-deep"
-                    nodeTypes={{ turbo: TurboNode }}
+                    nodeTypes={nodeType}
                     defaultEdgeOptions={EDGE_DEF_SETTING}
                     readonly={!inEdit}
                     graphRef={graphRef}
