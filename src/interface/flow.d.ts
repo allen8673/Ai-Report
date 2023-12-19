@@ -10,7 +10,6 @@ export interface IFlow extends IFlowBase {
     type: 'workflow' | 'template',
     rootNdeId: string[];
     flows: IFlowNode[];
-
 }
 
 export type FlowTyep = 'Input' | 'Output' | 'Normal' | 'Workflow' | 'Report';

@@ -1,7 +1,7 @@
 import { cloneDeep, filter, find, includes, max, remove, some } from "lodash";
 import { v4 } from "uuid";
 
-import { IFlow, IFlowNode } from "@/interface/flow";
+import { IFlow, IFlowBase, IFlowNode } from "@/interface/flow";
 
 /**
  * calculate the depth of node in flow
@@ -164,4 +164,17 @@ export const expandRefWF = async ({ nodes, workflowSource }: ExpandRefWF) => {
         return result;
     }, []);
 
+}
+
+export const hasDependencyCycle = (wfId: string, wfsData: IFlowBase[], currentId: string = wfId): boolean => {
+    const wf = find(wfsData, ['id', currentId]);
+    if (includes(wf?.used, wfId)) return true;
+
+    let result = false;
+    for (const id of (wf?.used || [])) {
+        result = hasDependencyCycle(wfId, wfsData, id);
+        if (result) break;
+    }
+
+    return result;
 }

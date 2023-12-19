@@ -5,7 +5,7 @@ import { ApiResult } from "@/interface/api";
 import { ISaveFlow, IFlow, IFlowBase } from "@/interface/flow";
 
 export const getFlows = async (type: 'WORKFLOW' | "TEMPLATE" = 'WORKFLOW') => {
-    const flows = (await apiCaller.get<ApiResult<IFlow[]>>(`${process.env.NEXT_PUBLIC_FLOWS_API}/${type}`)).data.data;
+    const flows = (await apiCaller.get<ApiResult<IFlowBase[]>>(`${process.env.NEXT_PUBLIC_FLOWS_API}/${type}`)).data.data;
     return flows || []
 }
 

@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
 import { InputText } from "primereact/inputtext";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { v4 } from "uuid";
 
 import { addFlow, deleteFlow, getFlow, getFlows, updateFlow } from "@/api-helpers/flow-api";
@@ -14,13 +14,13 @@ import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowEditor from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
 import { FlowNameMapper } from "@/components/flow-editor/context";
-import { X_GAP, calculateDepth, expandRefWF, getNewIdTrans, ifFlowIsCompleted, resetPosition } from "@/components/flow-editor/helper";
+import { X_GAP, calculateDepth, expandRefWF, getNewIdTrans, hasDependencyCycle, ifFlowIsCompleted, resetPosition } from "@/components/flow-editor/helper";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/panes/title";
-import { IEditFlow, IFlowNode, IFlow } from "@/interface/flow";
+import { IEditFlow, IFlowNode, IFlow, IFlowBase } from "@/interface/flow";
 import { useLayoutContext } from "@/layout/turbo-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
@@ -38,10 +38,19 @@ export default function Page() {
     const { runWorkflow, viewReports } = useWfLayoutContext()
 
     const [workflow, setWorkflow] = useState<IFlow>();
+    const [workflows, setWorkflows] = useState<IFlowBase[]>();
     const [inEdit, setInEdit] = useState<boolean>();
     const [templateNodes, setTemplateNodes] = useState<IFlowNode[]>();
-    const [flowNameMapper, setFlowNameMapper] = useState<FlowNameMapper>({})
-    const [form, setForm] = useState<FormInstance<IFlow>>()
+    const flowNameMapper: FlowNameMapper = useMemo(() => {
+        if (!workflows) return {};
+
+        return workflows.reduce<FlowNameMapper>((pre, wf) => {
+            if (wf.id !== paramObj?.id) pre[wf.id] = wf.name
+            return pre;
+        }, {})
+
+    }, [workflows])
+    const [form, setForm] = useState<FormInstance<IFlow>>();
 
     useEffect(() => {
         initial()
@@ -60,10 +69,7 @@ export default function Page() {
     const fetchAllWorflowData = async () => {
         const wfs = await getFlows('WORKFLOW')
         if (!wfs) return;
-        setFlowNameMapper(wfs.reduce<{ [id: string]: string }>((pre, wf) => {
-            if (wf.id !== paramObj?.id) pre[wf.id] = wf.name
-            return pre;
-        }, {}))
+        setWorkflows(wfs);
     }
 
     const fetchWorkflow = async (id: string) => {
@@ -252,9 +258,17 @@ export default function Page() {
                                 tooltip="Save as template"
                                 tooltipOptions={{ position: 'bottom' }}
                                 onClick={async () => {
-                                    if (!ifFlowIsCompleted(workflow?.flows)) {
+                                    if (!workflow) return;
+                                    if (!ifFlowIsCompleted(workflow.flows)) {
                                         showMessage({
                                             message: 'Cannot be saved as a template since the workflow is not completed.',
+                                            type: 'error'
+                                        })
+                                        return
+                                    }
+                                    if (hasDependencyCycle(workflow.id, workflows || [])) {
+                                        showMessage({
+                                            message: 'Cannot be saved as a template since there are some dependency cycles.',
                                             type: 'error'
                                         })
                                         return
@@ -273,20 +287,18 @@ export default function Page() {
                                     runWorkflow(workflow)
                                 }}
                             />
-                            <Button
+                            <Button icon={<FontAwesomeIcon icon={faEye} />}
                                 severity='info'
                                 tooltip="View Reports"
                                 tooltipOptions={{ position: 'bottom' }}
                                 disabled={!workflow?.id}
-                                icon={
-                                    <FontAwesomeIcon icon={faEye} />
-                                }
                                 onClick={() => {
                                     if (!workflow?.id) return;
                                     viewReports(workflow?.id)
                                 }}
                             />
-                            <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}
+                            <Button icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}
+                                className="w-[100px]"
                                 label="Edit"
                                 tooltipOptions={{ position: 'left' }}
                                 onClick={(): void => {
