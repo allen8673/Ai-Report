@@ -18,28 +18,37 @@ export const calculateDepth = (nodes: IFlowNode[], fullFlows: IFlowNode[], deep 
 }
 
 export const X_GAP = 400, Y_GAP = 150;
-export const resetPosition_x = (nodes: IFlowNode[], resetIds: string[], setX = 0) => {
-    for (const id of resetIds) {
-        const node = find(nodes, ['id', id]);
-        if (!node) continue;
-        const cal_x = Math.floor(node.position.x / X_GAP) * X_GAP;
-        node.position.x = max([cal_x, setX]) || node.position.x;
-        // node.position.x = setX || node.position.x;
-        resetPosition_x(nodes, node.forwards, setX + X_GAP)
-    }
-}
-export const resetPosition_y = (nodes: IFlowNode[], resetIds: string[], setY = 0) => {
-    for (const id of resetIds) {
-        const node = find(nodes, ['id', id]);
-        if (!node) continue;
-        while (some(nodes.filter(n => n !== node),
-            n => n.position.x === node.position.x && n.position.y === setY)
-        ) {
-            setY += Y_GAP
+export const resetPosition = (nodes: IFlowNode[], resetIds: string[]) => {
+    const resetX = (_nodes: IFlowNode[], _resetIds: string[], _setX = 0) => {
+        for (const id of _resetIds) {
+            const _node = find(_nodes, ['id', id]);
+            if (!_node) continue;
+
+            // const cal_x = Math.floor(node.position.x / X_GAP) * X_GAP;
+            // node.position.x = max([cal_x, setX]) || node.position.x;
+            // node.position.x = setX || node.position.x;
+
+            _node.position.x = X_GAP * (_node.depth || 0);
+            resetX(_nodes, _node.forwards, _setX + X_GAP)
         }
-        node.position.y = setY;
-        resetPosition_y(nodes, node.forwards)
     }
+
+    const resetY = (_nodes: IFlowNode[], _resetIds: string[], _setY = 0) => {
+        for (const id of _resetIds) {
+            const _node = find(_nodes, ['id', id]);
+            if (!_node) continue;
+            while (some(_nodes.filter(n => n !== _node),
+                n => n.position.x === _node.position.x && n.position.y === _setY)
+            ) {
+                _setY += Y_GAP
+            }
+            _node.position.y = _setY;
+            resetY(_nodes, _node.forwards)
+        }
+    }
+
+    resetX(nodes, resetIds);
+    resetY(nodes, resetIds);
 }
 
 /**
@@ -113,13 +122,6 @@ export const expandRefWF = async ({ nodes, workflowSource }: ExpandRefWF) => {
             return pre;
         }, [])
 
-        // for (const flow of wf_flows) {
-        //     if (!includes(['Input', 'Output'], flow.type)) continue;
-        //     if (flow.type === 'Input') wf_start = flow;
-        //     if (flow.type === 'Output') wf_end = flow;
-        //     remove(wf_flows, flow)
-        // }
-
         /**
          * get all source nodes of reference node,
          * and put all of forwards of workflow start node to all forwards of source nodes,
@@ -158,6 +160,7 @@ export const expandRefWF = async ({ nodes, workflowSource }: ExpandRefWF) => {
             ...cur,
             id: (id_trans[cur.id] || ''),
             forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || [],
+            depth: 0
         })
         return result;
     }, []);
