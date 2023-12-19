@@ -24,10 +24,6 @@ export const resetPosition = (nodes: IFlowNode[], resetIds: string[]) => {
             const _node = find(_nodes, ['id', id]);
             if (!_node) continue;
 
-            // const cal_x = Math.floor(node.position.x / X_GAP) * X_GAP;
-            // node.position.x = max([cal_x, setX]) || node.position.x;
-            // node.position.x = setX || node.position.x;
-
             _node.position.x = X_GAP * (_node.depth || 0);
             resetX(_nodes, _node.forwards, _setX + X_GAP)
         }
@@ -47,6 +43,9 @@ export const resetPosition = (nodes: IFlowNode[], resetIds: string[]) => {
         }
     }
 
+    // calculate the depth at first since the depth value will be used in resetPosition
+    calculateDepth(nodes.filter(n => n.type === 'Input'), nodes);
+    // reset the coordinate of nodes
     resetX(nodes, resetIds);
     resetY(nodes, resetIds);
 }

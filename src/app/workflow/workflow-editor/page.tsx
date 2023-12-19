@@ -1,7 +1,7 @@
 'use client'
 import { faCancel, faEye, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { map } from "lodash";
+import { map, size } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
@@ -122,55 +122,6 @@ export default function Page() {
         }
     }
 
-    //#region old version of the logic to add new workflow 
-    // const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
-    //     const addId2Forwards = (_node: IFlow, id: string): void => {
-    //         _node.forwards = _node.forwards || [];
-    //         _node.forwards?.push(id);
-    //     }
-    //     const templateIds = paramObj.template?.split(',') || [];
-    //     const y = 0;
-    //     const rootId = `tmp_${v4()}`
-    //     const doneId = `tmp_${v4()}`
-    //     let x = 0, idx = 0;
-    //     const flows: IFlow[] = [
-    //         { id: rootId, type: 'Input', name: 'Upload', position: { x, y } }
-    //     ]
-    //     for (const temp_id of templateIds) {
-    //         const id = `tmp_${v4()}`
-    //         x += X_GAP;
-    //         flows.push({
-    //             id,
-    //             type: 'Workflow',
-    //             workflowId: temp_id,
-    //             position: { x, y }
-    //         });
-    //         addId2Forwards(flows[idx], id);
-    //         idx++;
-    //     }
-    //     if (!!idx) {
-    //         x += X_GAP;
-    //         addId2Forwards(flows[idx], doneId);
-    //     } else {
-    //         x += X_GAP * 3;
-    //     }
-    //     flows.push(
-    //         {
-    //             id: doneId,
-    //             type: 'Output',
-    //             name: 'Done',
-    //             position: { x, y }
-    //         }
-    //     );
-    //     setWorkflow({
-    //         id: '',
-    //         name: paramObj.name || '',
-    //         flows,
-    //         rootNdeId: [rootId]
-    //     })
-    // }
-    //#endregion
-
     const createTemplateNodes = async (_workflow?: IFlow) => {
         const nodes = await expandRefWF({
             nodes: _workflow?.flows || [],
@@ -178,13 +129,11 @@ export default function Page() {
         })
         // assign new ids to nodes
         const id_trans: Record<string, string> = getNewIdTrans(nodes)
-        // calculate the depth at first since the depth value will be used in resetPosition
-        calculateDepth(nodes.filter(n => n.type === 'Input'), nodes);
+
         // calculate new position for all nodes
         const input_id = nodes.find(n => n.type === 'Input')?.id || '';
         resetPosition(nodes, [input_id])
 
-        // assign new ids to nodes, and reset the node position
         const _nodes = nodes.reduce<IFlowNode[]>((result, cur) => {
             result.push({
                 ...cur,
@@ -298,6 +247,7 @@ export default function Page() {
                         </> :
                         <>
                             <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
+                                disabled={!size(workflow?.flows)}
                                 severity='secondary'
                                 tooltip="Save as template"
                                 tooltipOptions={{ position: 'bottom' }}
