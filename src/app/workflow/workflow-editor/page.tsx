@@ -306,7 +306,7 @@ export default function Page() {
             />
             <Modal
                 title='Preview & Save as Template'
-                className='w-[90%] h-[90%]'
+                className='w-[80%] h-[80%]'
                 contentClassName="flex flex-col"
                 visible={!!templateNodes}
                 onOk={() => {
@@ -328,6 +328,7 @@ export default function Page() {
                     delayRender={500}
                 />
                 <Form
+                    className="p-[20px]"
                     onLoad={(form: FormInstance<IFlow>) => setForm(form)}
                     onDestroyed={() => {
                         setForm(undefined)
