@@ -375,6 +375,7 @@ export default function Page() {
                     className="rounded-std bg-deep"
                     flows={templateNodes || []}
                     hideMiniMap
+                    delayRender={500}
                 />
                 <Form
                     onLoad={(form: FormInstance<IFlow>) => setForm(form)}
