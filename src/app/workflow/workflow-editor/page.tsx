@@ -181,7 +181,7 @@ export default function Page() {
         }
     }
 
-    return <div className="flex h-full flex-row gap-std items-stretch">
+    return <div className="page-std">
         <div className="shrink grow flex flex-col gap-std">
             <TitlePane title={workflow?.name || 'New Workfow'} postContent={
                 <>

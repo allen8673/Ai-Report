@@ -88,7 +88,7 @@ export default function Page() {
         fetchTemplates()
     }, [])
 
-    return <div className="flex h-full flex-col gap-std items-stretch text-light">
+    return <div className="page-std">
         <TitlePane title='Template List' />
         <Splitter className='h-full' style={{ height: '300px' }} layout="vertical">
             <SplitterPanel className="px-[7px] " size={40}>

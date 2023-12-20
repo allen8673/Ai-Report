@@ -80,7 +80,7 @@ export default function Page() {
         }
     ]
 
-    return <div className="flex h-full flex-col gap-std items-stretch text-light">
+    return <div className="page-std">
         <TitlePane
             title='WorkFlow List'
             postContent={

@@ -45,3 +45,7 @@ body {
   top: -0.75rem;
   font-size: 12px;
 }
+
+.page-std {
+  @apply flex h-full flex-col gap-std items-stretch text-light
+}
