@@ -13,41 +13,34 @@ import ErrorBoundary from "../error-boundary";
 import Form from "../form";
 import { FormInstance } from "../form/form";
 import Graph from "../graph";
-import { GraphProps } from "../graph/graph";
 import { useGraphRef } from "../graph/helper";
 import Modal from "../modal";
 
 import { EDGE_DEF_SETTING, GET_REPORT_ITEMS } from "./configuration";
-import { FlowGrapContext, FlowNameMapper } from "./context";
+import { FlowGrapContext } from "./context";
 import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import ReportItem from "./report-item";
+import { FlowGraphProps, FlowNameMapper } from "./type";
 
 import { FlowTyep, IFlowNode, IFlowNodeBase } from "@/interface/flow";
 
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
 
-export interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
-    'initialNodes' |
-    'initialEdges' |
-    'nodeTypes' |
-    'edgeTypes' |
-    'defaultEdgeOptions' |
-    'onConnect' |
-    'onEdgesDelete' |
-    'readonly'> {
-    flows: IFlowNode[];
-    inEdit?: boolean;
-    flowNameMapper?: FlowNameMapper;
-    delayRender?: number
-}
 
 const nodeType: NodeTypes = { turbo: TurboNode }
 const UNREMOVABLE_TYPES: FlowTyep[] = ['Input', 'Output']
 
 export default function FlowEditor(props: FlowGraphProps) {
-    const { flows, inEdit = false, graphRef: ref, flowNameMapper, delayRender, ...others } = props
+    const {
+        flows,
+        inEdit = false,
+        graphRef: ref,
+        flowNameMapper,
+        delayRender,
+        componentData,
+        ...others } = props
     const [onDragItem, setOnDragItem] = useState<IFlowNodeBase>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
@@ -61,10 +54,33 @@ export default function FlowEditor(props: FlowGraphProps) {
         setOpenModal(flow)
     }
     const setPrompt = () => {
-        const val = promptForm?.getValues();
-        if (!val) return
-        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, prompt: val.prompt, name: val.name } }))
-        setOpenModal(undefined);
+        promptForm?.submit()
+            .then(({ id, prompt, name, apimode }) => {
+                graphRef.current.setNode(id, pre => ({
+                    ...pre,
+                    data: {
+                        ...pre.data,
+                        prompt: prompt,
+                        name: name,
+                        apimode: apimode
+                    }
+                }))
+                setOpenModal(undefined);
+            }).catch(() => {
+                // 
+            });
+        // const val = promptForm?.getValues();
+        // if (!val) return
+        // graphRef.current.setNode(val.id, pre => ({
+        //     ...pre,
+        //     data: {
+        //         ...pre.data,
+        //         prompt: val.prompt,
+        //         name: val.name,
+        //         apimode: val.apimode
+        //     }
+        // }))
+        // setOpenModal(undefined);
     }
 
     const setWorkflowRef = () => {
@@ -204,6 +220,9 @@ export default function FlowEditor(props: FlowGraphProps) {
                         onDestroyed={() => setPromptForm(undefined)}>{
                             ({ Item }) =>
                                 <>
+                                    <Item name='apimode' label="API Mode" rules={{ required: 'Please select an API mode!' }}>
+                                        <Dropdown options={componentData?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                                    </Item>
                                     <Item name='name' label="Name" >
                                         <InputText />
                                     </Item>

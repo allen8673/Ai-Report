@@ -1,16 +1,17 @@
 import { MutableRefObject, useContext } from "react";
 import React from "react";
 
+import { FlowNameMapper } from "./type";
+
 import { GraphInstance } from "@/components/graph/graph";
 import { IFlowNode } from "@/interface/flow";
 
 
-export type FlowNameMapper = { [id: string]: string }
 export interface FlowGraphStore {
     graphRef?: MutableRefObject<GraphInstance<IFlowNode, any> | null>;
     inEdit?: boolean;
     clickOnSetting?: (flow: IFlowNode) => void;
-    flowNameMapper?: FlowNameMapper
+    flowNameMapper?: FlowNameMapper;
 }
 
 export const FlowGrapContext = React.createContext<FlowGraphStore>({
