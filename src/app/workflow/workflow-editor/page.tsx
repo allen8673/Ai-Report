@@ -1,26 +1,28 @@
 'use client'
 import { faCancel, faEye, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cloneDeep, filter, includes, map, remove } from "lodash";
+import { map, size } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
 import { InputText } from "primereact/inputtext";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { v4 } from "uuid";
 
 import { addFlow, deleteFlow, getFlow, getFlows, updateFlow } from "@/api-helpers/flow-api";
+import { getComponents } from "@/api-helpers/master-api";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowEditor from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
-import { FlowNameMapper } from "@/components/flow-editor/context";
-import { X_GAP, calculateDepth, getNewIdTrans, ifWorkflowIsCompleted, resetPosition_x, resetPosition_y } from "@/components/flow-editor/helper";
+import { X_GAP, calculateDepth, expandRefWF, getNewIdTrans, hasDependencyCycle, ifFlowIsCompleted, resetPosition } from "@/components/flow-editor/helper";
+import { FlowNameMapper } from "@/components/flow-editor/type";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/panes/title";
-import { IEditFlow, IFlowNode, IFlow } from "@/interface/flow";
+import { IEditFlow, IFlowNode, IFlow, IFlowBase } from "@/interface/flow";
+import { ComponentData } from "@/interface/master";
 import { useLayoutContext } from "@/layout/turbo-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
@@ -38,10 +40,20 @@ export default function Page() {
     const { runWorkflow, viewReports } = useWfLayoutContext()
 
     const [workflow, setWorkflow] = useState<IFlow>();
+    const [workflows, setWorkflows] = useState<IFlowBase[]>();
     const [inEdit, setInEdit] = useState<boolean>();
-    const [openTemplateModal, setOpenTemplateModal] = useState<boolean>();
-    const [flowNameMapper, setFlowNameMapper] = useState<FlowNameMapper>({})
-    const [form, setForm] = useState<FormInstance<IFlow>>()
+    const [componentData, setComponentData] = useState<ComponentData[]>([])
+    const [templateNodes, setTemplateNodes] = useState<IFlowNode[]>();
+    const flowNameMapper: FlowNameMapper = useMemo(() => {
+        if (!workflows) return {};
+
+        return workflows.reduce<FlowNameMapper>((pre, wf) => {
+            if (wf.id !== paramObj?.id) pre[wf.id] = wf.name
+            return pre;
+        }, {})
+
+    }, [workflows])
+    const [form, setForm] = useState<FormInstance<IFlow>>();
 
     useEffect(() => {
         initial()
@@ -49,6 +61,9 @@ export default function Page() {
 
     const initial = async () => {
         setInEdit(mode === 'add');
+        getComponents().then(comps => {
+            setComponentData(comps)
+        })
         await fetchAllWorflowData();
         if (mode === 'add') {
             prepareNewWorkflow(paramObj)
@@ -60,10 +75,7 @@ export default function Page() {
     const fetchAllWorflowData = async () => {
         const wfs = await getFlows('WORKFLOW')
         if (!wfs) return;
-        setFlowNameMapper(wfs.reduce<{ [id: string]: string }>((pre, wf) => {
-            if (wf.id !== paramObj?.id) pre[wf.id] = wf.name
-            return pre;
-        }, {}))
+        setWorkflows(wfs);
     }
 
     const fetchWorkflow = async (id: string) => {
@@ -122,64 +134,18 @@ export default function Page() {
         }
     }
 
-    //#region old version of the logic to add new workflow 
-    // const prepareNewWorkflow = async (paramObj: IEditWorkflow) => {
-    //     const addId2Forwards = (_node: IFlow, id: string): void => {
-    //         _node.forwards = _node.forwards || [];
-    //         _node.forwards?.push(id);
-    //     }
-    //     const templateIds = paramObj.template?.split(',') || [];
-    //     const y = 0;
-    //     const rootId = `tmp_${v4()}`
-    //     const doneId = `tmp_${v4()}`
-    //     let x = 0, idx = 0;
-    //     const flows: IFlow[] = [
-    //         { id: rootId, type: 'Input', name: 'Upload', position: { x, y } }
-    //     ]
-    //     for (const temp_id of templateIds) {
-    //         const id = `tmp_${v4()}`
-    //         x += X_GAP;
-    //         flows.push({
-    //             id,
-    //             type: 'Workflow',
-    //             workflowId: temp_id,
-    //             position: { x, y }
-    //         });
-    //         addId2Forwards(flows[idx], id);
-    //         idx++;
-    //     }
-    //     if (!!idx) {
-    //         x += X_GAP;
-    //         addId2Forwards(flows[idx], doneId);
-    //     } else {
-    //         x += X_GAP * 3;
-    //     }
-    //     flows.push(
-    //         {
-    //             id: doneId,
-    //             type: 'Output',
-    //             name: 'Done',
-    //             position: { x, y }
-    //         }
-    //     );
-    //     setWorkflow({
-    //         id: '',
-    //         name: paramObj.name || '',
-    //         flows,
-    //         rootNdeId: [rootId]
-    //     })
-    // }
-    //#endregion
-
-    const saveToNewTemplate = async (nodes: IFlowNode[], name: string) => {
+    const createTemplateNodes = async (_workflow?: IFlow) => {
+        const nodes = await expandRefWF({
+            nodes: _workflow?.flows || [],
+            workflowSource: async (ref_wf) => { return (await getFlow(ref_wf.workflowid)) }
+        })
         // assign new ids to nodes
         const id_trans: Record<string, string> = getNewIdTrans(nodes)
 
         // calculate new position for all nodes
-        const input_id = nodes.find(n => n.type === 'Input')?.id || ''
-        resetPosition_x(nodes, [input_id]);
-        resetPosition_y(nodes, [input_id]);
-        // assign new ids to nodes, and reset the node position
+        const input_id = nodes.find(n => n.type === 'Input')?.id || '';
+        resetPosition(nodes, [input_id])
+
         const _nodes = nodes.reduce<IFlowNode[]>((result, cur) => {
             result.push({
                 ...cur,
@@ -189,22 +155,24 @@ export default function Page() {
             return result;
         }, []);
 
-        calculateDepth(_nodes.filter(n => n.type === 'Input'), _nodes);
+        return _nodes
+    }
+
+    const saveToNewTemplate = async (templateNodes: IFlowNode[], name: string) => {
         const template: IFlow = {
             type: 'template',
             id: '', //v4(),
             rootNdeId: [],
             name,
-            flows: _nodes
+            flows: templateNodes
         }
-
         const res = await addFlow(template);
         if (res.data.status === 'ok') {
             showMessage({
                 type: 'success',
                 message: res.data.message || 'Success',
             });
-            setOpenTemplateModal(false)
+            setTemplateNodes(undefined)
         } else {
             showMessage({
                 type: 'error',
@@ -212,125 +180,6 @@ export default function Page() {
             });
         }
     }
-
-    const expandRefWF = async (nodes: IFlowNode[]) => {
-        const _nodes = cloneDeep(nodes || []);
-        /**
-         * get all reference nodes from input nodes
-         */
-        const ref_wfs = filter(_nodes, n => n.type === 'Workflow')
-
-        /**
-         * get all workflows by reference nodes,
-         * and use the workflows instead of all reference nodes. 
-         */
-        for (const ref_wf of ref_wfs) {
-            const wf = await getFlow(ref_wf.workflowid)
-            if (!wf) continue;
-
-            /**
-             * first, expand the reference nodes in the workflow
-             */
-            const wf_flows = await expandRefWF(wf.flows);
-
-            /**
-             * get the workflow start node and end node.
-             * and remove the starrt node and end node from the flows of workflow
-             */
-            let wf_start: IFlowNode | undefined, wf_end: IFlowNode | undefined
-
-            for (const flow of wf_flows) {
-                if (!includes(['Input', 'Output'], flow.type)) continue;
-                if (flow.type === 'Input') wf_start = flow;
-                if (flow.type === 'Output') wf_end = flow;
-                remove(wf_flows, flow)
-            }
-
-            /**
-             * get all source nodes of reference node,
-             * and put all of forwards of workflow start node to all forwards of source nodes,
-             * to instead of reference node.
-             */
-            const sources = filter(_nodes, n => includes(n.forwards, ref_wf.id));
-            for (const src of sources) {
-                if (!src.forwards) continue;
-                remove(src.forwards, ref_wf.id);
-                src.forwards.push(...(wf_start?.forwards || []))
-            }
-
-            /**
-             * get all source nodes of workflow end node.
-             * also, put all of forwards of reference nodes to the forwards of workflow end node,
-             * to instead of reference node.
-             */
-            const wf_end_sources = filter(wf_flows, n => includes(n.forwards, wf_end?.id || ''));
-            for (const wf_end_src of wf_end_sources) {
-                wf_end_src.forwards = ref_wf.forwards
-            }
-
-            /**
-             * at the end, push the workflow to the node instead of reference node
-             */
-            _nodes.push(...wf_flows)
-            remove(_nodes, ['id', ref_wf.id]);
-        }
-
-        /**
-         * have to trans the node id before return
-         */
-        const id_trans: Record<string, string> = getNewIdTrans(_nodes);
-        return _nodes.reduce<IFlowNode[]>((result, cur) => {
-            result.push({
-                ...cur,
-                id: (id_trans[cur.id] || ''),
-                forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || [],
-            })
-            return result;
-        }, []);
-    }
-
-
-    // const mock_run = (forwards: string[]): void => {
-    //     let next: string[] = [];
-    //     graphRef.current?.setNodes(pre => {
-    //         if (includes(forwards, pre.id)) {
-    //             next = uniq(next.concat(pre.data.forwards || []))
-    //             return { ...pre, data: { ...pre.data, running: true } }
-    //         }
-    //         return pre
-    //     });
-    //     debounce(async () => {
-    //         graphRef.current?.setNodes(pre => {
-    //             if (includes(forwards, pre.id)) {
-    //                 let status: FlowStatus = 'success';
-    //                 let report: any = undefined;
-    //                 if (pre.id == 'f-2') status = 'failure';
-    //                 else if (pre.id == 'f-5') status = 'warning';
-    //                 if (pre.data.type === 'Output') {
-    //                     report = <>{map(range(0, 30), () => (<p>
-    //                         <p className="m-0">
-    //                             Next.js is a React framework for building full-stack web applications. You use React Components to build user interfaces, and Next.js for additional features and optimizations.
-    //                         </p>
-    //                         <p className="m-0">
-    //                             Under the hood, Next.js also abstracts and automatically configures tooling needed for React, like bundling, compiling, and more. This allows you to focus on building your application instead of spending time with configuration.
-    //                         </p>
-    //                         <p className="m-0">
-    //                             Whether you re an individual developer or part of a larger team, Next.js can help you build interactive, dynamic, and fast React applications.
-    //                         </p>
-    //                     </p>))}</>
-    //                 }
-    //                 return { ...pre, data: { ...pre.data, status: status, running: false, report } }
-    //             }
-    //             return pre
-    //         });
-    //         debounce(() => {
-    //             if (!!next.length) mock_run(next);
-    //             else {
-    //                 showMessage('workflow is done')
-    //             }
-    //         }, 500)()
-    //     }, 3000)()
-    // }
 
     return <div className="flex h-full flex-row gap-std items-stretch">
         <div className="shrink grow flex flex-col gap-std">
@@ -410,18 +259,30 @@ export default function Page() {
                         </> :
                         <>
                             <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
+                                disabled={!size(workflow?.flows)}
                                 severity='secondary'
                                 tooltip="Save as template"
                                 tooltipOptions={{ position: 'bottom' }}
-                                onClick={() => {
-                                    if (!ifWorkflowIsCompleted(workflow?.flows)) {
+                                onClick={async () => {
+                                    if (!workflow) return;
+                                    if (!ifFlowIsCompleted(workflow.flows)) {
                                         showMessage({
                                             message: 'Cannot be saved as a template since the workflow is not completed.',
                                             type: 'error'
                                         })
                                         return
                                     }
-                                    setOpenTemplateModal(true)
+                                    if (hasDependencyCycle(workflow.id, workflows || [])) {
+                                        showMessage({
+                                            message: 'Cannot be saved as a template since there are some dependency cycles.',
+                                            type: 'error'
+                                        })
+                                        return
+                                    }
+                                    createTemplateNodes(workflow)
+                                        .then(tempNodes => {
+                                            setTemplateNodes(tempNodes)
+                                        })
                                 }}
                             />
                             <Button icon={<FontAwesomeIcon icon={faPlayCircle} />}
@@ -432,20 +293,18 @@ export default function Page() {
                                     runWorkflow(workflow)
                                 }}
                             />
-                            <Button
+                            <Button icon={<FontAwesomeIcon icon={faEye} />}
                                 severity='info'
                                 tooltip="View Reports"
                                 tooltipOptions={{ position: 'bottom' }}
                                 disabled={!workflow?.id}
-                                icon={
-                                    <FontAwesomeIcon icon={faEye} />
-                                }
                                 onClick={() => {
                                     if (!workflow?.id) return;
                                     viewReports(workflow?.id)
                                 }}
                             />
-                            <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}
+                            <Button icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}
+                                className="w-[100px]"
                                 label="Edit"
                                 tooltipOptions={{ position: 'left' }}
                                 onClick={(): void => {
@@ -462,31 +321,39 @@ export default function Page() {
                 hideMiniMap
                 inEdit={inEdit}
                 flowNameMapper={flowNameMapper}
+                componentData={componentData}
             />
             <Modal
-                title='Save as Template'
-                visible={openTemplateModal}
+                title='Preview & Save as Template'
+                className='w-[80%] h-[80%]'
+                contentClassName="flex flex-col"
+                visible={!!templateNodes}
                 onOk={() => {
                     form?.submit()
                         .then(async ({ name }) => {
-                            const nodes = await expandRefWF(workflow?.flows || [])
-                            await saveToNewTemplate(nodes, name)
+                            await saveToNewTemplate(templateNodes || [], name)
                         })
                         .catch(() => {
                             // 
                         });
                 }}
                 onCancel={() => {
-                    setOpenTemplateModal(false)
+                    setTemplateNodes(undefined)
                 }}>
+                <FlowEditor
+                    className="rounded-std bg-deep"
+                    flows={templateNodes || []}
+                    hideMiniMap
+                    delayRender={500}
+                />
                 <Form
+                    className="p-[20px]"
                     onLoad={(form: FormInstance<IFlow>) => setForm(form)}
                     onDestroyed={() => {
                         setForm(undefined)
                     }}
                     onSubmit={async ({ name }) => {
-                        const nodes = await expandRefWF(workflow?.flows || []);
-                        await saveToNewTemplate(nodes, name)
+                        await saveToNewTemplate(templateNodes || [], name)
                     }}
                 >
                     {

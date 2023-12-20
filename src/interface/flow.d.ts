@@ -10,7 +10,6 @@ export interface IFlow extends IFlowBase {
     type: 'workflow' | 'template',
     rootNdeId: string[];
     flows: IFlowNode[];
-
 }
 
 export type FlowTyep = 'Input' | 'Output' | 'Normal' | 'Workflow' | 'Report';
@@ -32,7 +31,8 @@ export interface IFlowNode extends IFlowNodeBase {
     running?: boolean;
     status?: FlowStatus;
     fileName?: string;
-    workflowstatus?: 'disable' | 'enable' | ''
+    workflowstatus?: 'disable' | 'enable' | '';
+    apimode?: string
 }
 
 export interface IEditFlow {

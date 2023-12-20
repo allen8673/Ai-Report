@@ -15,7 +15,7 @@ import { getFlow } from '@/api-helpers/flow-api';
 import { checkJob, downloadJob, getJobs, runReport } from '@/api-helpers/report-api';
 import CodeEditor from '@/components/code-editor';
 import FileUploader from '@/components/file-uploader';
-import { ifWorkflowIsCompleted } from '@/components/flow-editor/helper';
+import { ifFlowIsCompleted } from '@/components/flow-editor/helper';
 import Modal from '@/components/modal';
 import EmptyPane from '@/components/panes/empty';
 import { IFlow } from '@/interface/flow';
@@ -135,7 +135,7 @@ export default function WorkflowLayout({
             return
         }
 
-        if (!ifWorkflowIsCompleted(workflow?.flows)) {
+        if (!ifFlowIsCompleted(workflow?.flows)) {
             showMessage({
                 message: `Cannot run '${workflow?.name}'(${workflow?.id}) since the workflow is not completed.`,
                 type: 'error'

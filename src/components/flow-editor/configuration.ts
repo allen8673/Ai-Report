@@ -2,7 +2,8 @@ import { IconDefinition, faUpload, faDownload, faBrain, faShareNodes, faFileLine
 import { filter } from 'lodash';
 import { Edge, MarkerType } from 'reactflow';
 
-import { FlowGraphProps } from '.';
+
+import { FlowGraphProps } from './type';
 
 import { FlowTyep, IFlowNodeBase } from '@/interface/flow';
 

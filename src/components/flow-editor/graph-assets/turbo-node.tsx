@@ -110,7 +110,7 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
                             </div>
                         }
                         <div className={`flex items-center rounded-std-sm text-light`}>
-                            <FontAwesomeIcon className='h-[30px] w-[30px] mr-[8px] mt-[2px]' icon={icon} color={'white'} />
+                            <FontAwesomeIcon className='text-[30px] mr-[8px] mt-[2px]' icon={icon} color={'white'} />
                             <div className='grow shrink overflow-hidden'>
                                 <div className="text-[20px] mb-[2px] leading-1 ellipsis wf-name"
                                     data-pr-tooltip={data.name}
