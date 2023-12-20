@@ -1,4 +1,4 @@
-import { IconDefinition, faBarsProgress, faHome, faMagicWandSparkles } from "@fortawesome/free-solid-svg-icons";
+import { IconDefinition, faBarsProgress, faFlask, faHome, faMagicWandSparkles } from "@fortawesome/free-solid-svg-icons";
 export interface IRouter {
     title: string;
     folder: string;
@@ -34,6 +34,13 @@ const RouterInfo: { [key: string]: IRouter } = {
         isNavigation: true,
         parent: "HOME"
     },
+    LAYOUT_CREATOR: {
+        title: 'Layout Creator',
+        folder: 'layout-creator',
+        icon: faFlask,
+        isNavigation: true,
+        parent: "HOME"
+    }
 }
 
 export function getFullUrl(router: IRouter | undefined): string {
