@@ -1,4 +1,4 @@
-import _ from "lodash";
+import { find, findIndex, map, remove } from "lodash";
 import { NextRequest } from "next/server";
 import { v4 } from "uuid";
 
@@ -8,7 +8,7 @@ import { mock_workflows } from "@/mock-data/mock";
 
 export async function GET(request: NextRequest) {
     const id = request.nextUrl.searchParams.get('id');
-    const data = id ? _.find(mock_workflows, ['id', id]) : _.map(mock_workflows, d => ({ id: d.id, name: d.name }));
+    const data = id ? find(mock_workflows, ['id', id]) : map(mock_workflows, d => ({ id: d.id, name: d.name }));
     return Response.json(data || null)
 }
 
@@ -34,7 +34,7 @@ export async function PUT(request: NextRequest) {
         return Response.json(result)
     }
 
-    const old_idx = _.findIndex(mock_workflows, ['id', data.id])
+    const old_idx = findIndex(mock_workflows, ['id', data.id])
     if (old_idx === -1) {
         result.status = 'failure';
         result.message = 'no such data';
@@ -54,6 +54,6 @@ export async function DELETE(request: NextRequest) {
         return Response.json(result)
     }
 
-    _.remove(mock_workflows, ['id', id]);
+    remove(mock_workflows, ['id', id]);
     return Response.json(result)
 }

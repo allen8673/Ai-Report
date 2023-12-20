@@ -1,5 +1,6 @@
 
 import { IFlow } from "@/interface/flow";
+import { ComponentData } from "@/interface/master";
 
 
 export const mock_workflows: IFlow[] = [
@@ -439,5 +440,32 @@ export const mock_templates: IFlow[] = [
                 ]
             }
         ]
+    }
+]
+
+export const mock_component_data: ComponentData[] = [
+    {
+        "COMP_ID": "COMP_0002",
+        "COMP_NAME": "CSV分析",
+        "COMP_TYPE": "Normal",
+        "APIMODE": "csv_prompt"
+    },
+    {
+        "COMP_ID": "COMP_0003",
+        "COMP_NAME": "URL分析",
+        "COMP_TYPE": "Normal",
+        "APIMODE": "url_prompt"
+    },
+    {
+        "COMP_ID": "COMP_0006",
+        "COMP_NAME": "長文萃取",
+        "COMP_TYPE": "Normal",
+        "APIMODE": "summarize"
+    },
+    {
+        "COMP_ID": "COMP_0004",
+        "COMP_NAME": "report",
+        "COMP_TYPE": "Report",
+        "APIMODE": "report"
     }
 ]
