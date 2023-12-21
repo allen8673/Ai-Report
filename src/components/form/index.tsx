@@ -22,8 +22,6 @@ function GetList<T extends FormValue>({ formCore }: GetItemProps<T>) {
                 {!!label && <label htmlFor={name} className='normal-lable'>{label}</label>}
             </span>
         </div>
-
-        return children(fieldArray)
     }
 }
 
@@ -61,17 +59,14 @@ function GetItem<T extends FormValue>({ formCore, readonly }: GetItemProps<T>) {
                         name={name}
                         control={control}
                         rules={rules}
-                        disabled={readonly}
+                        disabled={readonly || disabled}
                         render={typeof children === 'function' ? children : ({ field, fieldState }) => {
-
                             return (
                                 React.cloneElement(children, {
                                     id: field.name,
                                     ...field,
                                     [valuePropName]: field.value,
                                     className: `${classNames({ 'p-invalid': fieldState.invalid, })} ${children?.props?.className || 'w-full'}`,
-                                    disabled,
-
                                 })
                             )
                         }} />

@@ -69,18 +69,6 @@ export default function FlowEditor(props: FlowGraphProps) {
             }).catch(() => {
                 // 
             });
-        // const val = promptForm?.getValues();
-        // if (!val) return
-        // graphRef.current.setNode(val.id, pre => ({
-        //     ...pre,
-        //     data: {
-        //         ...pre.data,
-        //         prompt: val.prompt,
-        //         name: val.name,
-        //         apimode: val.apimode
-        //     }
-        // }))
-        // setOpenModal(undefined);
     }
 
     const setWorkflowRef = () => {
@@ -91,10 +79,20 @@ export default function FlowEditor(props: FlowGraphProps) {
     }
 
     const setReport = () => {
-        const val = reportForm?.getValues();
-        if (!val) return
-        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, prompt: val.prompt, name: val.name, fileName: val.fileName } }))
-        setOpenModal(undefined);
+        reportForm?.submit()
+            .then(({ id, prompt, name, fileName, apimode }) => {
+                graphRef.current.setNode(id, pre => ({
+                    ...pre,
+                    data: {
+                        ...pre.data,
+                        prompt: prompt,
+                        name: name,
+                        fileName: fileName,
+                        apimode: apimode
+                    }
+                }));
+                setOpenModal(undefined);
+            })
     }
 
     const closeModal = () => { setOpenModal(undefined) }
@@ -220,7 +218,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                         onDestroyed={() => setPromptForm(undefined)}>{
                             ({ Item }) =>
                                 <>
-                                    <Item name='apimode' label="API Mode" defaultValue={'summarize'} rules={{ required: 'Please select an API mode!' }}>
+                                    <Item name='apimode' label="API Mode" rules={{ required: 'Please select an API mode!' }}>
                                         <Dropdown options={componentData?.filter(i => i.COMP_TYPE === 'Normal').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
                                     </Item>
                                     <Item name='name' label="Name" >
