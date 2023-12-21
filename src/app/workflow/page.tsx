@@ -80,9 +80,9 @@ export default function Page() {
         }
     ]
 
-    return <div className="flex h-full flex-col gap-std items-stretch text-light">
+    return <div className="page-std">
         <TitlePane
-            title='WorkFlow List'
+            title='WorkFlow'
             postContent={
                 <Button icon={<FontAwesomeIcon className='mr-[7px]' icon={faAdd} />}
                     severity="success"

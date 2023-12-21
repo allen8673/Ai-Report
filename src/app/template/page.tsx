@@ -88,8 +88,8 @@ export default function Page() {
         fetchTemplates()
     }, [])
 
-    return <div className="flex h-full flex-col gap-std items-stretch text-light">
-        <TitlePane title='Template List' />
+    return <div className="page-std">
+        <TitlePane title='Template' />
         <Splitter className='h-full' style={{ height: '300px' }} layout="vertical">
             <SplitterPanel className="px-[7px] " size={40}>
                 {selection?.flows ? <FlowEditor
