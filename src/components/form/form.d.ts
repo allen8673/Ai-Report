@@ -56,6 +56,8 @@ export interface FormItemProps<T extends FormValue> {
     rules?: Omit<RegisterOptions<T, Path<T>>, "disabled" | "valueAsNumber" | "valueAsDate" | "setValueAs">;
     valuePropName?: string;
     disableFlowLabel?: boolean;
+    disabled?: boolean;
+    defaultValue?: PathValue<T, Path<T>>
 }
 
 export interface FormListChildren<T extends FormValue> {

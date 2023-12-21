@@ -82,7 +82,7 @@ export default function Page() {
 
     return <div className="page-std">
         <TitlePane
-            title='WorkFlow List'
+            title='WorkFlow'
             postContent={
                 <Button icon={<FontAwesomeIcon className='mr-[7px]' icon={faAdd} />}
                     severity="success"
