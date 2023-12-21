@@ -15,7 +15,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@monaco-editor/react": "^4.6.0",
-    "@tldraw/tldraw": "^2.0.0-canary.f6e7793f49d2",
+    "@tldraw/tldraw": "^2.0.0-alpha.19",
     "axios": "^1.6.2",
     "lodash": "^4.17.21",
     "next": "14.0.1",
