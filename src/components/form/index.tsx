@@ -34,7 +34,25 @@ function GetItem<T extends FormValue>({ formCore, readonly }: GetItemProps<T>) {
         return <>{msg && <small className="p-error">{msg}</small>}</>
     };
 
-    return function FormItem({ children, className, name, label, rules, valuePropName = 'value', disableFlowLabel }: FormItemProps<T>) {
+    return function FormItem(props: FormItemProps<T>) {
+        const {
+            children,
+            className,
+            name,
+            label,
+            rules,
+            valuePropName = 'value',
+            disableFlowLabel,
+            disabled,
+            defaultValue
+        } = props
+
+        useEffect(() => {
+            const value = formCore.getValues()?.[name]
+            if (!value && !!defaultValue) {
+                formCore.setValue(name, defaultValue)
+            }
+        }, [])
 
         return (
             <div className={`${(!!label ? "mt-[28px]" : '')} ${className || ''}`}>
@@ -45,12 +63,15 @@ function GetItem<T extends FormValue>({ formCore, readonly }: GetItemProps<T>) {
                         rules={rules}
                         disabled={readonly}
                         render={typeof children === 'function' ? children : ({ field, fieldState }) => {
+
                             return (
                                 React.cloneElement(children, {
                                     id: field.name,
                                     ...field,
                                     [valuePropName]: field.value,
-                                    className: `${classNames({ 'p-invalid': fieldState.invalid, })} ${children?.props?.className || 'w-full'}`
+                                    className: `${classNames({ 'p-invalid': fieldState.invalid, })} ${children?.props?.className || 'w-full'}`,
+                                    disabled,
+
                                 })
                             )
                         }} />

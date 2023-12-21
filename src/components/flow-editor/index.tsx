@@ -220,8 +220,8 @@ export default function FlowEditor(props: FlowGraphProps) {
                         onDestroyed={() => setPromptForm(undefined)}>{
                             ({ Item }) =>
                                 <>
-                                    <Item name='apimode' label="API Mode" rules={{ required: 'Please select an API mode!' }}>
-                                        <Dropdown options={componentData?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                                    <Item name='apimode' label="API Mode" defaultValue={'summarize'} rules={{ required: 'Please select an API mode!' }}>
+                                        <Dropdown options={componentData?.filter(i => i.COMP_TYPE === 'Normal').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
                                     </Item>
                                     <Item name='name' label="Name" >
                                         <InputText />
@@ -269,6 +269,9 @@ export default function FlowEditor(props: FlowGraphProps) {
                         onDestroyed={() => setReportForm(undefined)}>{
                             ({ Item }) =>
                                 <>
+                                    <Item name='apimode' label="API Mode" disabled defaultValue={'report'}>
+                                        <Dropdown options={componentData?.filter(i => i.COMP_TYPE === 'Report').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                                    </Item>
                                     <Item name='fileName' label="File" >
                                         <Dropdown options={['file_1', 'file_2']} />
                                     </Item>
