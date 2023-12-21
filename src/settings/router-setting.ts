@@ -40,6 +40,12 @@ const RouterInfo: { [key: string]: IRouter } = {
         icon: faFlask,
         isNavigation: true,
         parent: "HOME"
+    },
+    PREVIEW_DRAW: {
+        title: '',
+        folder: 'preview-draw',
+        isNavigation: false,
+        parent: "HOME"
     }
 }
 
