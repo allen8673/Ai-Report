@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { faCode } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+// import { faCode } from '@fortawesome/free-solid-svg-icons'
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
 	BaseBoxShapeUtil,
 	DefaultSpinner,
@@ -11,9 +11,9 @@ import {
 	useIsEditing,
 	useValue,
 } from '@tldraw/tldraw'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
-import { useAiDrawerContext } from './context';
+// import { useAiDrawerContext } from './context';
 
 import { addDraw } from '@/api-helpers/draw-api'
 import RouterInfo, { getFullUrl } from '@/settings/router-setting'
@@ -51,7 +51,7 @@ export class PreviewShapeUtil extends BaseBoxShapeUtil<PreviewShape> {
 	override canUnmount = () => false
 
 	override component(shape: PreviewShape) {
-		const { setHtml } = useAiDrawerContext()
+		// const { setHtml } = useAiDrawerContext()
 		const isEditing = useIsEditing(shape.id)
 		const boxShadow = useValue(
 			'box shadow',
@@ -92,13 +92,9 @@ export class PreviewShapeUtil extends BaseBoxShapeUtil<PreviewShape> {
 		const preview_draw_url = getFullUrl(RouterInfo.PREVIEW);
 		const uploadUrl = [preview_draw_url, '/', shape.id.replace(/^shape:/, '')].join('')
 
-		const copyHtml = useCallback(() => {
-			setHtml(html)
-			// copy(html, {
-			// 	debug: true,
-			// 	message: 'Press #{key} to copy',
-			// });
-		}, [html])
+		// const copyHtml = useCallback(() => {
+		// 	setHtml(html)
+		// }, [html])
 
 		return (
 			<HTMLContainer className="tl-embed-container" id={shape.id} onClick={() => alert('99')}>
@@ -134,7 +130,7 @@ export class PreviewShapeUtil extends BaseBoxShapeUtil<PreviewShape> {
 								borderRadius: 'var(--radius-2)',
 							}}
 						/>
-						<div
+						{/* <div
 							className={`
 							!absolute !top-[15px] !right-[-35px]
 							!w-[40px] !h-[60px]
@@ -154,7 +150,7 @@ export class PreviewShapeUtil extends BaseBoxShapeUtil<PreviewShape> {
 								}}
 								icon={faCode}
 								onMouseEnter={copyHtml} />
-						</div>
+						</div> */}
 						<div
 							style={{
 								textAlign: 'center',
