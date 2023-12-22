@@ -1,23 +1,36 @@
 'use client'
-import { useEditor, Tldraw } from "@tldraw/tldraw";
+import { Tldraw, Editor } from "@tldraw/tldraw";
 import { Button } from "primereact/button";
-import { useCallback } from "react";
+import { Splitter, SplitterPanel } from "primereact/splitter";
+import { useCallback, useState } from "react";
+
+import Chatbox from "../chatbox";
+import ErrorBoundary from "../error-boundary";
 
 import { PreviewShapeUtil } from "./PreviewShape";
 import { makeReal } from "./makereal-core";
+import { OPEN_AI_SYSTEM_PROMPT } from "./prompt";
 
-import '@tldraw/tldraw/tldraw.css'
 import { useLayoutContext } from "@/layout/turbo-layout/context";
 
-const shapeUtils = [PreviewShapeUtil]
+import '@tldraw/tldraw/tldraw.css';
 
-function ExportButton() {
-    const editor = useEditor();
-    const { showMessage } = useLayoutContext()
+export interface AiDrawerProps {
+    className?: string;
+}
+const shapeUtils = [PreviewShapeUtil];
+export default function AiDrawer({ className }: AiDrawerProps) {
+    const { showMessage } = useLayoutContext();
+    const [editor, setEditor] = useState<Editor>()
 
-    const onExport = useCallback(async () => {
+    const onExport = useCallback(async (prompt: string) => {
+        if (!editor) {
+            showMessage('no editor')
+            return;
+        }
+
         try {
-            await makeReal(editor)
+            await makeReal(editor, prompt)
         } catch (e: any) {
             showMessage({
                 type: 'error',
@@ -27,21 +40,32 @@ function ExportButton() {
     }, [editor])
 
     return (
-        <Button
-            onClick={onExport}
-            style={{ pointerEvents: 'all' }}
-            className="cursor-pointer my-2 mx-2">
-            Make Real
-        </Button>
-    )
-}
-
-export default function LayoutDrawer() {
-    return (
-        <div className={`h-full w-full`}>
-            <div className='relative w-full h-full z-1'>
-                <Tldraw shapeUtils={shapeUtils} shareZone={<ExportButton />} className={`rounded-std`} />
-            </div>
-        </div>
+        <Splitter className={`h-full ${className || ''}`} layout="vertical">
+            <SplitterPanel className="px-[7px] " size={70}>
+                <ErrorBoundary>
+                    <Tldraw
+                        className={`rounded-std`}
+                        onMount={e => setEditor(e)}
+                        shapeUtils={shapeUtils}
+                    />
+                </ErrorBoundary>
+            </SplitterPanel>
+            <SplitterPanel className="overflow-auto px-[7px]" size={30}>
+                <Chatbox
+                    initialValue={OPEN_AI_SYSTEM_PROMPT}
+                    buttonLabel="Make Real"
+                    onSend={(content) => {
+                        onExport(content || '')
+                    }}
+                    extention={
+                        ({ setContent }) =>
+                            <Button
+                                severity='info'
+                                onClick={() => setContent(OPEN_AI_SYSTEM_PROMPT)}>Apply Default Prompt
+                            </Button>
+                    }
+                />
+            </SplitterPanel>
+        </Splitter>
     )
 }

@@ -3,7 +3,7 @@ import { Editor, createShapeId, getSvgAsImage } from "@tldraw/tldraw";
 import apiCaller from "../../api-helpers/api-caller";
 
 import { addDraw } from "@/api-helpers/draw-api";
-import { OPENAI_USER_PROMPT, OPENAI_USER_PROMPT_WITH_PREVIOUS_DESIGN, OPEN_AI_SYSTEM_PROMPT } from "@/components/ai-drawer/prompt";
+import { OPENAI_USER_PROMPT, OPENAI_USER_PROMPT_WITH_PREVIOUS_DESIGN } from "@/components/ai-drawer/prompt";
 import { GPT4VCompletionRequest, MessageContent, PreviewShape } from "@/interface/draw";
 
 const GPT_URL = process.env.NEXT_PUBLIC_GPT_URL;
@@ -13,14 +13,16 @@ interface GetHtmlFromOpenAI {
     image: string
     text: string
     theme?: string
-    previousPreviews: PreviewShape[]
+    previousPreviews: PreviewShape[];
+    prompt: string;
 }
 
-export const makeReal = async (editor: Editor) => {
+export const makeReal = async (editor: Editor, prompt: string) => {
     const newShapeId = createShapeId();
     const selectedShapes = editor.getSelectedShapes();
 
     if (selectedShapes.length === 0) throw Error('First select something to make real.');
+    if (!prompt) throw Error('Have to give a prompt!');
 
 
     const { maxX, midY } = editor.getSelectionPageBounds() || {}
@@ -65,6 +67,7 @@ export const makeReal = async (editor: Editor) => {
             text: textFromShapes,
             previousPreviews,
             theme: editor.user.getUserPreferences().isDarkMode ? 'dark' : 'light',
+            prompt
         })
 
         if (json.error) {
@@ -102,6 +105,7 @@ export const getHtmlFromOpenAI = async ({ image,
     text,
     theme = 'light',
     previousPreviews,
+    prompt
 }: GetHtmlFromOpenAI) => {
 
     if (!GPT_URL) throw Error('Have to assign an working GPT-4 URL')
@@ -109,7 +113,7 @@ export const getHtmlFromOpenAI = async ({ image,
     const messages: GPT4VCompletionRequest['messages'] = [
         {
             role: 'system',
-            content: OPEN_AI_SYSTEM_PROMPT,
+            content: prompt,
         },
         {
             role: 'user',
