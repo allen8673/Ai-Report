@@ -90,7 +90,7 @@ export default function Page() {
 
     return <div className="page-std">
         <TitlePane title='Template' />
-        <Splitter className='h-full' style={{ height: '300px' }} layout="vertical">
+        <Splitter className='shrink grow' style={{ height: '300px' }} layout="vertical">
             <SplitterPanel className="px-[7px] " size={40}>
                 {selection?.flows ? <FlowEditor
                     flows={selection.flows}
