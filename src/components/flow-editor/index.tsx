@@ -128,13 +128,10 @@ export default function FlowEditor(props: FlowGraphProps) {
     return <ErrorBoundary>
         <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, flowNameMapper, graphRef }}>
             <div className="flow-editor h-full w-full relative">
-                {inEdit && <div className={`
-                absolute z-20  
-                top-[22px] left-[22px] right-[22px] px-[7px] py-[3px] 
-                rounded-std bg-deep-weak/[.5]`} >
+                {inEdit && <div className={`absolute z-20 top-[22px] left-[22px] right-[22px] px-[7px] py-[3px]`} >
                     <Tooltip target={'.report-item'} position='top' />
                     <DndList
-                        className="rounded-std"
+                        className="rounded-std bg-deep-weak/[.5] px-[7px] py-[3px] "
                         items={GET_REPORT_ITEMS(props)}
                         disableChangeOrder
                         renderContent={(data) => <ReportItem

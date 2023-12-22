@@ -135,9 +135,19 @@ export default function DndList<T extends { [key: string]: any } | string>({
         setItems(items);
     }, [items]);
 
-    return <DndContext id={id} className={`w-full h-full ${className || ''}`} {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}>
+    let layoutClass = ''
+    switch (direction) {
+        case 'horizontal':
+            layoutClass = 'w-full';
+            break;
+        case 'vertical':
+            layoutClass = 'h-full'
+            break;
+    }
+
+    return <DndContext id={id} className={`${layoutClass} ${className || ''}`} {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}>
         {(_items): JSX.Element => (
-            <DndDroppable className="w-full h-full" items={_items} droppableId={droppableId} direction={direction}>
+            <DndDroppable className={`${layoutClass}`} items={_items} droppableId={droppableId} direction={direction}>
                 {(_items): React.JSX.Element[] =>
                     _items.map((item, index: number) => {
                         return (
