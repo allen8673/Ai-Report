@@ -86,7 +86,7 @@ export class PreviewShapeUtil extends BaseBoxShapeUtil<PreviewShape> {
 
 		const isLoading = linkUploadVersion === undefined || uploadedShapeId !== shape.id
 
-		const preview_draw_url = getFullUrl(RouterInfo['PREVIEW_DRAW']);
+		const preview_draw_url = getFullUrl(RouterInfo.PREVIEW);
 
 		const uploadUrl = [preview_draw_url, '/', shape.id.replace(/^shape:/, '')].join('')
 
