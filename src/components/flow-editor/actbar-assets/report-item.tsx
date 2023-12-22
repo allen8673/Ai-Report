@@ -6,7 +6,6 @@ import React from 'react';
 import { flowInfoMap } from '../configuration';
 
 import { IFlowNodeBase } from '@/interface/flow';
-import './report-item.css';
 
 export interface ReportItemProps extends IFlowNodeBase {
     onDelete?: () => void;
@@ -21,22 +20,18 @@ export default function ReportItem({ name, type }: ReportItemProps) {
      m-std-min 
      w-[40px] 
      h-[40px] 
-     grow 
      bg-deep-strong 
      border-turbo-deep 
      border-[1px] 
      border-solid 
      rounded-std`;
-
     return (
         <>
 
             <div
                 className={className}
                 role="presentation" data-pr-tooltip={name}>
-                <span className="icon" >
-                    <FontAwesomeIcon icon={icon} color={'white'} />
-                </span>
+                <FontAwesomeIcon icon={icon} color={'white'} />
             </div>
         </>
     )

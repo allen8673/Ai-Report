@@ -1,4 +1,5 @@
 import { find, forEach, includes, map } from "lodash";
+import { Divider } from "primereact/divider";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -16,11 +17,12 @@ import Graph from "../graph";
 import { useGraphRef } from "../graph/helper";
 import Modal from "../modal";
 
+import AddButton from "./actbar-assets/add-button";
+import ReportItem from "./actbar-assets/report-item";
 import { EDGE_DEF_SETTING, GET_REPORT_ITEMS } from "./configuration";
 import { FlowGrapContext } from "./context";
 import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
-import ReportItem from "./report-item";
 import { FlowGraphProps, FlowNameMapper } from "./type";
 
 import { FlowType, IFlowNode, IFlowNodeBase } from "@/interface/flow";
@@ -128,10 +130,14 @@ export default function FlowEditor(props: FlowGraphProps) {
     return <ErrorBoundary>
         <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, flowNameMapper, graphRef }}>
             <div className="flow-editor h-full w-full relative">
-                {inEdit && <div className={`absolute z-20 top-[22px] left-[22px] right-[22px] px-[7px] py-[3px]`} >
+                {inEdit && <div className={`
+                absolute z-20 top-[22px] left-[22px] right-[22px] px-[7px] py-[3px]
+                rounded-std bg-deep-weak/[.5] px-[7px] py-[3px]
+                flex items-center
+                `} >
                     <Tooltip target={'.report-item'} position='top' />
                     <DndList
-                        className="rounded-std bg-deep-weak/[.5] px-[7px] py-[3px] "
+                        className="w-fit"
                         items={GET_REPORT_ITEMS(props)}
                         disableChangeOrder
                         renderContent={(data) => <ReportItem
@@ -142,6 +148,20 @@ export default function FlowEditor(props: FlowGraphProps) {
                         }}
                         direction='horizontal'
                     />
+                    <Divider className="h-[40px] mx-[4px] " color="red" layout='vertical' />
+                    <DndList
+                        className="w-fit"
+                        items={[]}
+                        disableChangeOrder
+                        renderContent={(data: IFlowNodeBase) => <ReportItem
+                            {...data}
+                        />}
+                        onDragStart={(init, item): void => {
+                            setOnDragItem(() => item)
+                        }}
+                        direction='horizontal'
+                    />
+                    <AddButton onClick={() => { alert('test') }} />
                 </div>}
                 <Graph
                     initialEdges={initialEdges}
