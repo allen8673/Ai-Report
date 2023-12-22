@@ -1,14 +1,15 @@
 'use client'
-import { useEditor, useToasts } from "@tldraw/tldraw";
+import { useEditor, useToasts, Tldraw } from "@tldraw/tldraw";
 import { Button } from "primereact/button";
 import { useCallback } from "react";
 
-import Drawer from "../drawer";
-
 import { PreviewShapeUtil } from "./PreviewShape";
 import { makeReal } from "./makereal-core";
+import '@tldraw/tldraw/tldraw.css'
 
-export function ExportButton() {
+const shapeUtils = [PreviewShapeUtil]
+
+function ExportButton() {
     const editor = useEditor();
     const toast = useToasts();
 
@@ -46,10 +47,12 @@ export function ExportButton() {
     )
 }
 
-const shapeUtils = [PreviewShapeUtil]
-
 export default function LayoutDrawer() {
-
-    return <Drawer shapeUtils={shapeUtils} shareZone={<ExportButton />} />
-
+    return (
+        <div className={`h-full w-full`}>
+            <div className='relative w-full h-full z-1'>
+                <Tldraw shapeUtils={shapeUtils} shareZone={<ExportButton />} className={`rounded-std`} />
+            </div>
+        </div>
+    )
 }

@@ -219,7 +219,6 @@ export class PreviewShapeUtil extends BaseBoxShapeUtil<PreviewShape> {
 }
 
 // todo: export these from tldraw
-
 const ROTATING_BOX_SHADOWS = [
 	{
 		offsetX: 0,
