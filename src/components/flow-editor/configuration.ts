@@ -5,7 +5,7 @@ import { Edge, MarkerType } from 'reactflow';
 
 import { FlowGraphProps } from './type';
 
-import { FlowTyep, IFlowNodeBase } from '@/interface/flow';
+import { FlowType, IFlowNodeBase } from '@/interface/flow';
 
 export const EDGE_DEF_SETTING: Partial<Edge> = {
     // type: 'smoothstep',
@@ -35,7 +35,7 @@ export const GET_REPORT_ITEMS = ({ flowNameMapper }: FlowGraphProps): IFlowNodeB
         }
     ]
 
-    const disableItms: { [key in FlowTyep]?: boolean } = {
+    const disableItms: { [key in FlowType]?: boolean } = {
         'Workflow': !flowNameMapper
     }
 
@@ -44,7 +44,7 @@ export const GET_REPORT_ITEMS = ({ flowNameMapper }: FlowGraphProps): IFlowNodeB
 
 
 export const flowInfoMap: {
-    [type in FlowTyep]: {
+    [type in FlowType]: {
         nodeType: '' | 'start' | 'end';
         nodeName?: string;
         icon: IconDefinition;

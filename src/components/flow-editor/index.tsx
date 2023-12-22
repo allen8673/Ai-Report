@@ -23,14 +23,14 @@ import TurboNode from "./graph-assets/turbo-node";
 import ReportItem from "./report-item";
 import { FlowGraphProps, FlowNameMapper } from "./type";
 
-import { FlowTyep, IFlowNode, IFlowNodeBase } from "@/interface/flow";
+import { FlowType, IFlowNode, IFlowNodeBase } from "@/interface/flow";
 
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
 
 
 const nodeType: NodeTypes = { turbo: TurboNode }
-const UNREMOVABLE_TYPES: FlowTyep[] = ['Input', 'Output']
+const UNREMOVABLE_TYPES: FlowType[] = ['Input', 'Output']
 
 export default function FlowEditor(props: FlowGraphProps) {
     const {
