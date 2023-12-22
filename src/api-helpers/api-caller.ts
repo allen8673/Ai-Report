@@ -25,7 +25,7 @@ export interface CustomError<T = any> extends Error {
 
 const apiCaller = Axios.create({
     baseURL: API_BASE_URL,
-    timeout: Number(process.env.REACT_APP_API_TIMEOUT ?? 30000),
+    timeout: Number(process.env.NEXT_PUBLIC_API_TIMEOUT ?? 30000),
     headers: {
         'Cache-Control': 'no-cache',
         // 'Access-Control-Allow-Origin': '*'
