@@ -12,11 +12,11 @@ export interface IFlow extends IFlowBase {
     flows: IFlowNode[];
 }
 
-export type FlowTyep = 'Input' | 'Output' | 'Normal' | 'Workflow' | 'Report';
+export type FlowType = 'Input' | 'Output' | 'Normal' | 'Workflow' | 'Report';
 export type FlowStatus = 'none' | 'success' | 'failure' | 'warning';
 export interface IFlowNodeBase {
     id: string;
-    type: FlowTyep;
+    type: FlowType;
     name?: string;
 }
 

@@ -22,8 +22,6 @@ import ErrorBoundary from "../error-boundary";
 
 import { EventType, GraphInstance, GraphProps } from "./graph";
 
-
-
 export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(props: GraphProps<NData, EData, NNormal, ENormal>) {
 
     const {

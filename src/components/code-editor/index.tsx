@@ -131,7 +131,7 @@ export default function CodeEditor({
 
     return (
         <ErrorBoundary>
-            <div className={`flex flex-col relative h-full w-full bg-deep ${className}`} style={style}>
+            <div className={`flex flex-col relative h-full w-full bg-deep overflow-hidden ${className}`} style={style}>
                 {!hiddenBar && (
                     <div className='flex justify-between px-[20px] py-[5px]'>
                         <span className="grow text-light font-bold">{title}</span>
