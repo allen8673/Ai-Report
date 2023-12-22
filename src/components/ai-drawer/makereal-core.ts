@@ -67,7 +67,6 @@ export const makeReal = async (editor: Editor) => {
             theme: editor.user.getUserPreferences().isDarkMode ? 'dark' : 'light',
         })
 
-
         if (json.error) {
             throw Error(`${json.error.message?.slice(0, 100)}...`)
         }
@@ -183,18 +182,12 @@ export const getHtmlFromOpenAI = async ({ image,
         messages,
     }
 
-    let json = null
-
-    try {
-        json = (await apiCaller.post(GPT_URL, body, {
-            headers: {
-                'Content-Type': 'application/json',
-                'api-key': GPT_KEY
-            }
-        })).data
-    } catch (e) {
-        // 
-    }
+    const json = (await apiCaller.post(GPT_URL, body, {
+        headers: {
+            'Content-Type': 'application/json',
+            'api-key': GPT_KEY
+        }
+    })).data
 
     return json
 }

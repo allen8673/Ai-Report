@@ -1,41 +1,30 @@
 'use client'
-import { useEditor, useToasts, Tldraw } from "@tldraw/tldraw";
+import { useEditor, Tldraw } from "@tldraw/tldraw";
 import { Button } from "primereact/button";
 import { useCallback } from "react";
 
 import { PreviewShapeUtil } from "./PreviewShape";
 import { makeReal } from "./makereal-core";
+
 import '@tldraw/tldraw/tldraw.css'
+import { useLayoutContext } from "@/layout/turbo-layout/context";
 
 const shapeUtils = [PreviewShapeUtil]
 
 function ExportButton() {
     const editor = useEditor();
-    const toast = useToasts();
+    const { showMessage } = useLayoutContext()
 
     const onExport = useCallback(async () => {
         try {
             await makeReal(editor)
         } catch (e: any) {
-            toast.addToast({
-                title: 'Something went wrong',
-                description: `${e.message.slice(0, 200)}`,
-                actions: [
-                    {
-                        type: 'primary',
-                        label: 'Read the guide',
-                        onClick: () => {
-                            // open a new tab with the url...
-                            window.open(
-                                'https://tldraw.notion.site/Make-Real-FAQs-93be8b5273d14f7386e14eb142575e6e',
-                                '_blank'
-                            )
-                        },
-                    },
-                ],
-            })
+            showMessage({
+                type: 'error',
+                message: e.message,
+            });
         }
-    }, [editor, toast])
+    }, [editor])
 
     return (
         <Button
