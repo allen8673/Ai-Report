@@ -24,12 +24,8 @@ export default function AiDrawer({ className }: AiDrawerProps) {
     const [editor, setEditor] = useState<Editor>()
 
     const onExport = useCallback(async (prompt: string) => {
-        if (!editor) {
-            showMessage('no editor')
-            return;
-        }
-
         try {
+            if (!editor) throw Error('No Editor!')
             await makeReal(editor, prompt)
         } catch (e: any) {
             showMessage({
