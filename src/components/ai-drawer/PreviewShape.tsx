@@ -1,4 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { faCode } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
 	BaseBoxShapeUtil,
 	DefaultSpinner,
@@ -9,7 +11,9 @@ import {
 	useIsEditing,
 	useValue,
 } from '@tldraw/tldraw'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
+
+import { useAiDrawerContext } from './context';
 
 import { addDraw } from '@/api-helpers/draw-api'
 import RouterInfo, { getFullUrl } from '@/settings/router-setting'
@@ -47,8 +51,8 @@ export class PreviewShapeUtil extends BaseBoxShapeUtil<PreviewShape> {
 	override canUnmount = () => false
 
 	override component(shape: PreviewShape) {
+		const { setHtml } = useAiDrawerContext()
 		const isEditing = useIsEditing(shape.id)
-
 		const boxShadow = useValue(
 			'box shadow',
 			() => {
@@ -85,13 +89,19 @@ export class PreviewShapeUtil extends BaseBoxShapeUtil<PreviewShape> {
 		}, [shape.id, html, linkUploadVersion, uploadedShapeId])
 
 		const isLoading = linkUploadVersion === undefined || uploadedShapeId !== shape.id
-
 		const preview_draw_url = getFullUrl(RouterInfo.PREVIEW);
-
 		const uploadUrl = [preview_draw_url, '/', shape.id.replace(/^shape:/, '')].join('')
 
+		const copyHtml = useCallback(() => {
+			setHtml(html)
+			// copy(html, {
+			// 	debug: true,
+			// 	message: 'Press #{key} to copy',
+			// });
+		}, [html])
+
 		return (
-			<HTMLContainer className="tl-embed-container" id={shape.id}>
+			<HTMLContainer className="tl-embed-container" id={shape.id} onClick={() => alert('99')}>
 				{isLoading ? (
 					<div
 						style={{
@@ -124,27 +134,27 @@ export class PreviewShapeUtil extends BaseBoxShapeUtil<PreviewShape> {
 								borderRadius: 'var(--radius-2)',
 							}}
 						/>
-						{/* <div
+						<div
+							className={`
+							!absolute !top-[15px] !right-[-35px]
+							!w-[40px] !h-[60px]
+							!bg-red
+							!flex !flex-col !items-center !justify-center gap-2`}
 							style={{
-								all: 'unset',
-								position: 'absolute',
-								top: -3,
-								right: -45,
-								height: 40,
-								width: 40,
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								cursor: 'pointer',
 								pointerEvents: 'all',
 							}}
 						>
-							<Dropdown boxShadow={boxShadow} html={shape.props.html} uploadUrl={uploadUrl}>
-								<button className="bg-white rounded p-2" style={{ boxShadow }}>
-									<Icon icon="dots-vertical" />
-								</button>
-							</Dropdown>
-						</div> */}
+							<FontAwesomeIcon
+								className={`
+								p-[7px] rounded-std-sm
+								flex-center bg-deep-weak 
+								text-[12px] text-light`}
+								style={{
+									pointerEvents: 'all',
+								}}
+								icon={faCode}
+								onMouseEnter={copyHtml} />
+						</div>
 						<div
 							style={{
 								textAlign: 'center',

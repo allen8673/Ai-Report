@@ -5,9 +5,11 @@ import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useCallback, useState } from "react";
 
 import Chatbox from "../chatbox";
+import CodeEditor from "../code-editor";
 import ErrorBoundary from "../error-boundary";
 
 import { PreviewShapeUtil } from "./PreviewShape";
+import { AiDrawerContext } from "./context";
 import { makeReal } from "./makereal-core";
 import { OPEN_AI_SYSTEM_PROMPT } from "./prompt";
 
@@ -22,6 +24,7 @@ const shapeUtils = [PreviewShapeUtil];
 export default function AiDrawer({ className }: AiDrawerProps) {
     const { showMessage } = useLayoutContext();
     const [editor, setEditor] = useState<Editor>()
+    const [html, setHtml] = useState<string>('')
 
     const onExport = useCallback(async (prompt: string) => {
         try {
@@ -36,32 +39,51 @@ export default function AiDrawer({ className }: AiDrawerProps) {
     }, [editor])
 
     return (
-        <Splitter className={`h-full ${className || ''}`} layout="vertical">
-            <SplitterPanel className="px-[7px] " size={70}>
-                <ErrorBoundary>
-                    <Tldraw
-                        className={`rounded-std`}
-                        onMount={e => setEditor(e)}
-                        shapeUtils={shapeUtils}
+        <AiDrawerContext.Provider value={{ setHtml }}>
+            <Splitter className={`h-full overflow-auto ${className || ''}`} layout="vertical">
+                <SplitterPanel className="px-[7px] " size={70}>
+                    <Splitter className={`h-full overflow-auto ${className || ''}`} layout='horizontal'>
+                        <SplitterPanel className="px-[7px] " size={65}>
+                            <ErrorBoundary>
+                                <Tldraw
+                                    className={`rounded-std-sm`}
+                                    onMount={e => setEditor(e)}
+                                    shapeUtils={shapeUtils}
+                                />
+                            </ErrorBoundary>
+                        </SplitterPanel>
+                        <SplitterPanel className="px-[7px] " size={35}>
+                            <CodeEditor
+                                hiddenBar
+                                language={'html'}
+                                className='grow border-solid border-light-weak rounded-std-sm'
+                                value={html}
+                                options={{
+                                    readOnly: true,
+                                    automaticLayout: true,
+                                }}
+
+                            />
+                        </SplitterPanel>
+                    </Splitter>
+                </SplitterPanel>
+                <SplitterPanel className="overflow-auto px-[7px]" size={30}>
+                    <Chatbox
+                        initialValue={OPEN_AI_SYSTEM_PROMPT}
+                        buttonLabel="Make Real"
+                        onSend={(content) => {
+                            onExport(content || '')
+                        }}
+                        extention={
+                            ({ setContent }) =>
+                                <Button
+                                    severity='info'
+                                    onClick={() => setContent(OPEN_AI_SYSTEM_PROMPT)}>Apply Default Prompt
+                                </Button>
+                        }
                     />
-                </ErrorBoundary>
-            </SplitterPanel>
-            <SplitterPanel className="overflow-auto px-[7px]" size={30}>
-                <Chatbox
-                    initialValue={OPEN_AI_SYSTEM_PROMPT}
-                    buttonLabel="Make Real"
-                    onSend={(content) => {
-                        onExport(content || '')
-                    }}
-                    extention={
-                        ({ setContent }) =>
-                            <Button
-                                severity='info'
-                                onClick={() => setContent(OPEN_AI_SYSTEM_PROMPT)}>Apply Default Prompt
-                            </Button>
-                    }
-                />
-            </SplitterPanel>
-        </Splitter>
+                </SplitterPanel>
+            </Splitter>
+        </AiDrawerContext.Provider>
     )
 }
