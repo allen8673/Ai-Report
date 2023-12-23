@@ -12,9 +12,9 @@ export interface ReportItemProps {
 export default function AddButton({ onClick }: ReportItemProps) {
     return (
         <button
-            className={`act-button flex-center border-dashed cursor-pointer`}
+            className={`actbar-tooltip act-button flex-center border-dashed cursor-pointer`}
             onClick={onClick}
-            data-pr-tooltip={'Add'}>
+            data-pr-tooltip={'Add Module'}>
             <FontAwesomeIcon icon={faAdd} color={'white'} />
         </button>
     )

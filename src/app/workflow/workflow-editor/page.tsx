@@ -21,7 +21,7 @@ import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/panes/title";
-import { IEditFlow, IFlowNode, IFlow, IFlowBase } from "@/interface/flow";
+import { IEditFlow, IFlowNode, IFlow, IFlowBase, IReportModule } from "@/interface/flow";
 import { ComponentData } from "@/interface/master";
 import { useLayoutContext } from "@/layout/turbo-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
@@ -44,6 +44,8 @@ export default function Page() {
     const [inEdit, setInEdit] = useState<boolean>();
     const [componentData, setComponentData] = useState<ComponentData[]>([])
     const [templateNodes, setTemplateNodes] = useState<IFlowNode[]>();
+    const [modules, setModules] = useState<IReportModule[]>([]);
+
     const flowNameMapper: FlowNameMapper = useMemo(() => {
         if (!workflows) return {};
 
@@ -322,6 +324,10 @@ export default function Page() {
                 inEdit={inEdit}
                 flowNameMapper={flowNameMapper}
                 componentData={componentData}
+                modules={modules}
+                onAddModule={(module) => {
+                    setModules(pre => pre.concat(module))
+                }}
             />
             <Modal
                 title='Preview & Save as Template'

@@ -13,7 +13,7 @@ export default function ReportModule({ name, type }: IReportModule) {
     return (
         <>
             <div
-                className={`act-button w-[40px] flex-center`}
+                className={`actbar-tooltip act-button w-[40px] flex-center`}
                 role="presentation" data-pr-tooltip={name}>
                 <FontAwesomeIcon icon={icon} color={'white'} />
             </div>
