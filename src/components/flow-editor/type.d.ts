@@ -19,6 +19,7 @@ export interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     modules?: IReportModule[];
     onAddModule?: (module: IReportModule) => void;
     onEditModule?: (module: IReportModule) => void;
+    onDeleteModule?: (module: IReportModule) => void;
 }
 
 export type FlowNameMapper = { [id: string]: string }

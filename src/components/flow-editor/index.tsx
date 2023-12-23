@@ -1,4 +1,8 @@
-import { Dictionary, find, forEach, groupBy, includes, keys, map } from "lodash";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Dictionary, find, forEach, groupBy, includes, keys, map, some } from "lodash";
+import { Button } from "primereact/button";
+import { confirmDialog } from "primereact/confirmdialog";
 import { Divider } from "primereact/divider";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
@@ -26,6 +30,7 @@ import { FlowGrapContext, useFlowGrapContext } from "./context";
 import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import { FlowGraphProps, FlowNameMapper } from "./type";
+
 
 import { FlowType, IFlowNode, IReportModule } from "@/interface/flow";
 
@@ -194,6 +199,7 @@ function AddModule(props: ModalProps<IReportModule>) {
             title="Add a new module"
             onOk={onOK}
             onCancel={onClose}
+            okLabel="Add"
             cancelLabel={'Close'}
             visible={visible}
         >
@@ -218,8 +224,8 @@ function AddModule(props: ModalProps<IReportModule>) {
     )
 }
 
-function EditModule(props: ModalProps<IReportModule>) {
-    const { visible, onSave, onClose, defaultValues } = props;
+function EditModule(props: ModalProps<IReportModule> & { onDelete?: (val: IReportModule) => void }) {
+    const { visible, onSave, onClose, defaultValues, onDelete } = props;
     const { componentData } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<IReportModule>>()
     const onOK = (): void => {
@@ -237,7 +243,29 @@ function EditModule(props: ModalProps<IReportModule>) {
             onOk={onOK}
             onCancel={onClose}
             cancelLabel={'Close'}
+            okLabel="Save"
             visible={visible}
+            footerPrefix={
+                <Button
+                    icon={<FontAwesomeIcon className="mr-[7px]" icon={faTrash} />}
+                    severity='danger'
+                    onClick={() => {
+                        if (!defaultValues) return;
+                        confirmDialog({
+                            position: 'top',
+                            message: `Do you want to delete ${defaultValues?.name || 'this module'}?`,
+                            header: `Delete Module`,
+                            icon: 'pi pi-info-circle',
+                            acceptClassName: 'p-button-danger',
+                            accept: async () => {
+                                onDelete?.(defaultValues);
+                                onClose?.();
+                            },
+                        });
+
+                    }}>
+                    Delete
+                </Button>}
         >
             <Form
                 defaultValues={defaultValues}
@@ -273,6 +301,7 @@ export default function FlowEditor(props: FlowGraphProps) {
         modules,
         onAddModule,
         onEditModule,
+        onDeleteModule,
         ...others
     } = props
 
@@ -316,13 +345,14 @@ export default function FlowEditor(props: FlowGraphProps) {
     }, [flows]);
 
     useEffect(() => {
+        setSelectedGroup(undefined)
         graphRef.current.setNodes(n => ({ ...n, selectable: inEdit, selected: false }));
         graphRef.current.setEdges(e => ({ ...e, deletable: inEdit, selected: false, }));
     }, [inEdit]);
 
     useEffect(() => {
+        setSelectedGroup(pre => some(modules, i => i.apimode === pre) ? pre : undefined)
         setModuleGroups(groupBy(modules, 'apimode'))
-
     }, [modules])
 
     return (
@@ -352,7 +382,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                         />
                         <Divider className="h-[40px] mx-[4px] " color="red" layout='vertical' />
                         <DndList
-                            className="grow"
+                            className="grow shrink overflow-auto no-scrollbar"
                             items={keys(moduleGroups)}
                             disableChangeOrder
                             isDragDisabled
@@ -508,6 +538,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                         onSave={(val) => {
                             onEditModule?.(val)
                         }}
+                        onDelete={onDeleteModule}
                     />
                 </div>
             </FlowGrapContext.Provider>

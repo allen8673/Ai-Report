@@ -9,7 +9,7 @@ export default function CustomModule(props: IReportModule & { onClick?: (module:
 
     return (
         <div
-            className={`actbar-tooltip act-button !h-[30px] flex-center w-fit px-2 min-w-[40px] !text-[12px] !border-turbo-light`}
+            className={`actbar-tooltip act-button !h-[30px] flex-center w-fit px-2 !text-[12px] !border-turbo-light`}
             role="presentation" onClick={() => onClick?.(props)} data-pr-tooltip={name}>
             {name}
         </div>

@@ -1,7 +1,7 @@
 'use client'
 import { faCancel, faEye, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { map, size } from "lodash";
+import { filter, map, size } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
@@ -326,7 +326,15 @@ export default function Page() {
                 componentData={componentData}
                 modules={modules}
                 onAddModule={(module) => {
+                    // TODO: add module
                     setModules(pre => pre.concat(module))
+                }}
+                onEditModule={(module) => {
+                    // TODO: save module
+                }}
+                onDeleteModule={(module) => {
+                    // TODO: delete module
+                    setModules(pre => filter(pre, i => i.name !== module.name))
                 }}
             />
             <Modal

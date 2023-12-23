@@ -17,10 +17,12 @@
     right: 22px;
     min-height: 58px;
     min-width: 58px;
+    text-wrap: nowrap;
 
     & .act-button {
         @apply gap-2 m-std-min bg-deep-strong border-turbo-deep rounded-std;
         width: 40px;
+        min-width: 40px;
         height: 40px;
         border-width: 1px;
         border-style: solid;
