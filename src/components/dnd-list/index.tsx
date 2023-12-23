@@ -145,7 +145,7 @@ export default function DndList<T extends { [key: string]: any } | string>({
             break;
     }
 
-    return <DndContext id={id} className={`${layoutClass} ${className || ''}`} {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}>
+    return <DndContext id={id} className={`${className || layoutClass}`} {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}>
         {(_items): JSX.Element => (
             <DndDroppable className={`${layoutClass}`} items={_items} droppableId={droppableId} direction={direction}>
                 {(_items): React.JSX.Element[] =>

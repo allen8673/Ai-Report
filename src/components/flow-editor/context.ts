@@ -5,6 +5,7 @@ import { FlowNameMapper } from "./type";
 
 import { GraphInstance } from "@/components/graph/graph";
 import { IFlowNode } from "@/interface/flow";
+import { ComponentData } from "@/interface/master";
 
 
 export interface FlowGraphStore {
@@ -12,6 +13,7 @@ export interface FlowGraphStore {
     inEdit?: boolean;
     clickOnSetting?: (flow: IFlowNode) => void;
     flowNameMapper?: FlowNameMapper;
+    componentData?: ComponentData[];
 }
 
 export const FlowGrapContext = React.createContext<FlowGraphStore>({

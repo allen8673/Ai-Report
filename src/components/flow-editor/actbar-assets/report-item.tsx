@@ -14,22 +14,11 @@ export interface ReportItemProps extends IFlowNodeBase {
 export default function ReportItem({ name, type }: ReportItemProps) {
     const { icon } = flowInfoMap[type] || { icon: faQuestion, color: 'rgba(255, 0, 0, 0.56)' }
 
-    const className = `report-item
-     flex-center 
-     gap-2 
-     m-std-min 
-     w-[40px] 
-     h-[40px] 
-     bg-deep-strong 
-     border-turbo-deep 
-     border-[1px] 
-     border-solid 
-     rounded-std`;
     return (
         <>
 
             <div
-                className={className}
+                className={`act-button flex-center border-solid`}
                 role="presentation" data-pr-tooltip={name}>
                 <FontAwesomeIcon icon={icon} color={'white'} />
             </div>

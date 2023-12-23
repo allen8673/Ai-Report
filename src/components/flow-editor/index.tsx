@@ -20,7 +20,7 @@ import Modal from "../modal";
 import AddButton from "./actbar-assets/add-button";
 import ReportItem from "./actbar-assets/report-item";
 import { EDGE_DEF_SETTING, GET_REPORT_ITEMS } from "./configuration";
-import { FlowGrapContext } from "./context";
+import { FlowGrapContext, useFlowGrapContext } from "./context";
 import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import { FlowGraphProps, FlowNameMapper } from "./type";
@@ -29,12 +29,154 @@ import { FlowType, IFlowNode, IFlowNodeBase } from "@/interface/flow";
 
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
+import './actbar-assets/actbar-assets.css'
 
+const nodeType: NodeTypes = { turbo: TurboNode };
+const UNREMOVABLE_TYPES: FlowType[] = ['Input', 'Output'];
 
-const nodeType: NodeTypes = { turbo: TurboNode }
-const UNREMOVABLE_TYPES: FlowType[] = ['Input', 'Output']
+interface ModalProps {
+    inEdit: boolean;
+    visible: boolean;
+    onClose: () => void;
+    onSave: (val: IFlowNode) => void
+    defaultValues?: IFlowNode
+}
+
+function PromptModal(props: ModalProps) {
+    const { visible, inEdit, defaultValues, onSave, onClose } = props;
+    const { componentData } = useFlowGrapContext();
+    const [form, setForm] = useState<FormInstance<IFlowNode>>()
+    const onOK = (): void => {
+        form?.submit()
+            .then((val) => {
+                onSave(val)
+                onClose?.();
+            }).catch(() => {
+                // 
+            });
+    }
+
+    return (
+        <Modal
+            title="Set the prompt"
+            onOk={inEdit ? onOK : undefined}
+            onCancel={onClose}
+            cancelLabel={inEdit ? undefined : 'Close'}
+            visible={visible}
+        >
+            <Form
+                readonly={!inEdit}
+                defaultValues={defaultValues}
+                onLoad={_form => setForm(_form)}
+                onDestroyed={() => setForm(undefined)}>{
+                    ({ Item }) =>
+                        <>
+                            <Item name='apimode' label="API Mode" rules={{ required: 'Please select an API mode!' }}>
+                                <Dropdown options={componentData?.filter(i => i.COMP_TYPE === 'Normal').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                            </Item>
+                            <Item name='name' label="Name" >
+                                <InputText />
+                            </Item>
+                            <Item name='prompt' label="Prompt" >
+                                <InputTextarea autoResize className="w-full min-h-[100px]" />
+                            </Item>
+                        </>
+                }
+            </Form>
+        </Modal>)
+}
+
+function WorkflowModal(props: ModalProps) {
+    const { visible, inEdit, defaultValues, onSave, onClose } = props;
+    const { flowNameMapper } = useFlowGrapContext()
+    const [form, setForm] = useState<FormInstance<IFlowNode>>()
+    const onOK = (): void => {
+        form?.submit()
+            .then((val) => {
+                onSave(val);
+                onClose?.();
+            }).catch(() => {
+                // 
+            });
+    };
+
+    return (
+        <Modal
+            title="Workflow Reference"
+            onOk={inEdit ? onOK : undefined}
+            onCancel={onClose}
+            cancelLabel={inEdit ? undefined : 'Close'}
+            visible={visible}
+        >
+            <Form
+                readonly={!inEdit}
+                defaultValues={defaultValues}
+                onLoad={form => setForm(form)}
+                onDestroyed={() => setForm(undefined)}>
+                {
+                    ({ Item }) =>
+                    (<>
+                        <Item name='workflowid' label="Select a reference workflow" >
+                            <Dropdown disabled options={map<FlowNameMapper, SelectItem>(flowNameMapper, (v, k) => ({ label: v, value: k }))} />
+                        </Item>
+                    </>)
+                }
+            </Form>
+        </Modal>
+    )
+
+}
+
+function ReportModal(props: ModalProps) {
+    const { visible, inEdit, defaultValues, onSave, onClose } = props;
+    const { componentData } = useFlowGrapContext();
+    const [form, setForm] = useState<FormInstance<IFlowNode>>()
+    const onOK = (): void => {
+        form?.submit()
+            .then((val) => {
+                onSave(val);
+                onClose?.();
+            }).catch(() => {
+                // 
+            });
+    };
+
+    return (
+        <Modal
+            title="Set the report link"
+            onOk={inEdit ? onOK : undefined}
+            onCancel={onClose}
+            cancelLabel={inEdit ? undefined : 'Close'}
+            visible={visible}
+        >
+            <Form
+                readonly={!inEdit}
+                defaultValues={defaultValues}
+                onLoad={form => setForm(form)}
+                onDestroyed={() => setForm(undefined)}>{
+                    ({ Item }) =>
+                        <>
+                            <Item name='apimode' label="API Mode" disabled defaultValue={'report'}>
+                                <Dropdown options={componentData?.filter(i => i.COMP_TYPE === 'Report').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                            </Item>
+                            <Item name='fileName' label="File" >
+                                <Dropdown options={['file_1', 'file_2']} />
+                            </Item>
+                            <Item name='name' label="Name" >
+                                <InputText />
+                            </Item>
+                            <Item name='prompt' label="Prompt" >
+                                <InputTextarea autoResize className="w-full min-h-[100px]" />
+                            </Item>
+                        </>
+                }
+            </Form>
+        </Modal>
+    )
+}
 
 export default function FlowEditor(props: FlowGraphProps) {
+
     const {
         flows,
         inEdit = false,
@@ -42,59 +184,17 @@ export default function FlowEditor(props: FlowGraphProps) {
         flowNameMapper,
         delayRender,
         componentData,
-        ...others } = props
+        ...others
+    } = props
+
+    const { graphRef } = useGraphRef<IFlowNode, any>(ref);
     const [onDragItem, setOnDragItem] = useState<IFlowNodeBase>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
-    const [promptForm, setPromptForm] = useState<FormInstance<IFlowNode>>()
-    const [wfRefForm, setWfRefForm] = useState<FormInstance<IFlowNode>>()
-    const [reportForm, setReportForm] = useState<FormInstance<IFlowNode>>()
-    const { graphRef } = useGraphRef<IFlowNode, any>(ref);
     const [openModal, setOpenModal] = useState<IFlowNode>();
 
     const clickOnSetting = (flow: IFlowNode) => {
         setOpenModal(flow)
-    }
-    const setPrompt = () => {
-        promptForm?.submit()
-            .then(({ id, prompt, name, apimode }) => {
-                graphRef.current.setNode(id, pre => ({
-                    ...pre,
-                    data: {
-                        ...pre.data,
-                        prompt: prompt,
-                        name: name,
-                        apimode: apimode
-                    }
-                }))
-                setOpenModal(undefined);
-            }).catch(() => {
-                // 
-            });
-    }
-
-    const setWorkflowRef = () => {
-        const val = wfRefForm?.getValues();
-        if (!val) return
-        graphRef.current.setNode(val.id, pre => ({ ...pre, data: { ...pre.data, workflowid: val.workflowid, workflowstatus: 'enable' } }))
-        setOpenModal(undefined);
-    }
-
-    const setReport = () => {
-        reportForm?.submit()
-            .then(({ id, prompt, name, fileName, apimode }) => {
-                graphRef.current.setNode(id, pre => ({
-                    ...pre,
-                    data: {
-                        ...pre.data,
-                        prompt: prompt,
-                        name: name,
-                        fileName: fileName,
-                        apimode: apimode
-                    }
-                }));
-                setOpenModal(undefined);
-            })
     }
 
     const closeModal = () => { setOpenModal(undefined) }
@@ -128,7 +228,7 @@ export default function FlowEditor(props: FlowGraphProps) {
     }, [inEdit]);
 
     return <ErrorBoundary>
-        <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, flowNameMapper, graphRef }}>
+        <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, flowNameMapper, componentData, graphRef }}>
             <div className="flow-editor h-full w-full relative">
                 {inEdit && <div className={`
                 absolute z-20 top-[22px] left-[22px] right-[22px] px-[7px] py-[3px]
@@ -137,7 +237,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                 `} >
                     <Tooltip target={'.report-item'} position='top' />
                     <DndList
-                        className="w-fit"
+                        className="w-[162px]"
                         items={GET_REPORT_ITEMS(props)}
                         disableChangeOrder
                         renderContent={(data) => <ReportItem
@@ -221,85 +321,60 @@ export default function FlowEditor(props: FlowGraphProps) {
                 >
                     <TurboEdgeAsset />
                 </Graph>
-                <Modal
-                    title="Set the prompt"
-                    onOk={inEdit ? setPrompt : undefined}
-                    onCancel={closeModal}
-                    cancelLabel={inEdit ? undefined : 'Close'}
+                {/* Customize Prompt Modal */}
+                <PromptModal
+                    inEdit={inEdit}
                     visible={openModal?.type === 'Normal'}
-                >
-                    <Form
-                        readonly={!inEdit}
-                        defaultValues={openModal}
-                        onLoad={form => setPromptForm(form)}
-                        onDestroyed={() => setPromptForm(undefined)}>{
-                            ({ Item }) =>
-                                <>
-                                    <Item name='apimode' label="API Mode" rules={{ required: 'Please select an API mode!' }}>
-                                        <Dropdown options={componentData?.filter(i => i.COMP_TYPE === 'Normal').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
-                                    </Item>
-                                    <Item name='name' label="Name" >
-                                        <InputText />
-                                    </Item>
-                                    <Item name='prompt' label="Prompt" >
-                                        <InputTextarea autoResize className="w-full min-h-[100px]" />
-                                    </Item>
-                                </>
-                        }
-                    </Form>
-                </Modal>
-                <Modal
-                    title="Workflow Reference"
-                    onOk={inEdit ? setWorkflowRef : undefined}
-                    onCancel={closeModal}
-                    cancelLabel={inEdit ? undefined : 'Close'}
+                    onClose={closeModal}
+                    onSave={({ id, prompt, name, apimode }) => {
+                        graphRef.current.setNode(id, pre => ({
+                            ...pre,
+                            data: {
+                                ...pre.data,
+                                prompt: prompt,
+                                name: name,
+                                apimode: apimode
+                            }
+                        }))
+                    }}
+                    defaultValues={openModal}
+                />
+                {/* Workflow Ref Modal */}
+                <WorkflowModal
+                    inEdit={inEdit}
                     visible={openModal?.type === 'Workflow'}
-                >
-                    <Form
-                        readonly={!inEdit}
-                        defaultValues={openModal}
-                        onLoad={form => setWfRefForm(form)}
-                        onDestroyed={() => setWfRefForm(undefined)}>
-                        {
-                            ({ Item }) =>
-                            (<>
-                                <Item name='workflowid' label="Select a reference workflow" >
-                                    <Dropdown disabled options={map<FlowNameMapper, SelectItem>(flowNameMapper, (v, k) => ({ label: v, value: k }))} />
-                                </Item>
-                            </>)
-                        }
-                    </Form>
-                </Modal>
-                <Modal
-                    title="Set the report link"
-                    onOk={inEdit ? setReport : undefined}
-                    onCancel={closeModal}
-                    cancelLabel={inEdit ? undefined : 'Close'}
+                    onClose={closeModal}
+                    onSave={({ id, workflowid }) => {
+                        graphRef.current.setNode(id, pre => ({
+                            ...pre,
+                            data: {
+                                ...pre.data,
+                                workflowid: workflowid,
+                                workflowstatus: 'enable'
+                            }
+                        }))
+                    }}
+                    defaultValues={openModal}
+                />
+                {/* Report Link Modal */}
+                <ReportModal
+                    inEdit={inEdit}
                     visible={openModal?.type === 'Report'}
-                >
-                    <Form
-                        readonly={!inEdit}
-                        defaultValues={openModal}
-                        onLoad={form => setReportForm(form)}
-                        onDestroyed={() => setReportForm(undefined)}>{
-                            ({ Item }) =>
-                                <>
-                                    <Item name='apimode' label="API Mode" disabled defaultValue={'report'}>
-                                        <Dropdown options={componentData?.filter(i => i.COMP_TYPE === 'Report').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
-                                    </Item>
-                                    <Item name='fileName' label="File" >
-                                        <Dropdown options={['file_1', 'file_2']} />
-                                    </Item>
-                                    <Item name='name' label="Name" >
-                                        <InputText />
-                                    </Item>
-                                    <Item name='prompt' label="Prompt" >
-                                        <InputTextarea autoResize className="w-full min-h-[100px]" />
-                                    </Item>
-                                </>
-                        }
-                    </Form>
-                </Modal>
+                    onClose={closeModal}
+                    onSave={({ id, prompt, name, fileName, apimode }) => {
+                        graphRef.current.setNode(id, pre => ({
+                            ...pre,
+                            data: {
+                                ...pre.data,
+                                prompt: prompt,
+                                name: name,
+                                fileName: fileName,
+                                apimode: apimode
+                            }
+                        }));
+                    }}
+                    defaultValues={openModal}
+                />
             </div>
         </FlowGrapContext.Provider>
     </ErrorBoundary >

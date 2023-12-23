@@ -1,0 +1,10 @@
+@tailwind components;
+
+@layer components {
+    .act-button {
+        @apply gap-2 m-std-min bg-deep-strong border-turbo-deep rounded-std;
+        width: 40px;
+        height: 40px;
+        border-width: 1px;
+    }
+}
