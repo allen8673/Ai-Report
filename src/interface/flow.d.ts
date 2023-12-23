@@ -14,13 +14,11 @@ export interface IFlow extends IFlowBase {
 
 export type FlowType = 'Input' | 'Output' | 'Normal' | 'Workflow' | 'Report';
 export type FlowStatus = 'none' | 'success' | 'failure' | 'warning';
-export interface IFlowNodeBase {
+
+export interface IFlowNode extends IFlowNodeBase {
     id: string;
     type: FlowType;
     name?: string;
-}
-
-export interface IFlowNode extends IFlowNodeBase {
     position: XYPosition;
     forwards: string[];
     prompt?: string;
@@ -45,3 +43,10 @@ export interface ISaveFlow {
     workflowid?: string
 }
 
+export interface IReportModule {
+    id: string;
+    type: FlowType;
+    name?: string;
+    prompt?: string;
+    apimode?: string
+}

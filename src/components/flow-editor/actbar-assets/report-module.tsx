@@ -5,20 +5,15 @@ import React from 'react';
 
 import { flowInfoMap } from '../configuration';
 
-import { IFlowNodeBase } from '@/interface/flow';
+import { IReportModule } from '@/interface/flow';
 
-export interface ReportItemProps extends IFlowNodeBase {
-    onDelete?: () => void;
-}
-
-export default function ReportItem({ name, type }: ReportItemProps) {
-    const { icon } = flowInfoMap[type] || { icon: faQuestion, color: 'rgba(255, 0, 0, 0.56)' }
+export default function ReportModule({ name, type }: IReportModule) {
+    const { icon } = flowInfoMap[type] || { icon: faQuestion }
 
     return (
         <>
-
             <div
-                className={`act-button flex-center border-solid`}
+                className={`act-button w-[40px] flex-center`}
                 role="presentation" data-pr-tooltip={name}>
                 <FontAwesomeIcon icon={icon} color={'white'} />
             </div>

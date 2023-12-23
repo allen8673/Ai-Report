@@ -5,7 +5,7 @@ import { Edge, MarkerType } from 'reactflow';
 
 import { FlowGraphProps } from './type';
 
-import { FlowType, IFlowNodeBase } from '@/interface/flow';
+import { FlowType, IReportModule } from '@/interface/flow';
 
 export const EDGE_DEF_SETTING: Partial<Edge> = {
     // type: 'smoothstep',
@@ -15,9 +15,9 @@ export const EDGE_DEF_SETTING: Partial<Edge> = {
     interactionWidth: 20,
 }
 
-export const GET_REPORT_ITEMS = ({ flowNameMapper }: FlowGraphProps): IFlowNodeBase[] => {
+export const GET_REPORT_MODULE = ({ flowNameMapper }: FlowGraphProps): IReportModule[] => {
 
-    const items: IFlowNodeBase[] = [
+    const items: IReportModule[] = [
         {
             id: 'custom-prompt',
             name: 'Custom Prompt',

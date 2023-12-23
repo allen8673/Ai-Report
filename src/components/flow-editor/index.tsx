@@ -18,31 +18,32 @@ import { useGraphRef } from "../graph/helper";
 import Modal from "../modal";
 
 import AddButton from "./actbar-assets/add-button";
-import ReportItem from "./actbar-assets/report-item";
-import { EDGE_DEF_SETTING, GET_REPORT_ITEMS } from "./configuration";
+import CustomModule from "./actbar-assets/custom-module";
+import CustomModuleGroup from "./actbar-assets/custom-module-group";
+import ReportModule from "./actbar-assets/report-module";
+import { EDGE_DEF_SETTING, GET_REPORT_MODULE } from "./configuration";
 import { FlowGrapContext, useFlowGrapContext } from "./context";
 import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import { FlowGraphProps, FlowNameMapper } from "./type";
 
-import { FlowType, IFlowNode, IFlowNodeBase } from "@/interface/flow";
+import { FlowType, IFlowNode, IReportModule } from "@/interface/flow";
 
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
-import './actbar-assets/actbar-assets.css'
 
 const nodeType: NodeTypes = { turbo: TurboNode };
 const UNREMOVABLE_TYPES: FlowType[] = ['Input', 'Output'];
 
-interface ModalProps {
+interface ModalProps<T> {
     inEdit: boolean;
     visible: boolean;
     onClose: () => void;
-    onSave: (val: IFlowNode) => void
-    defaultValues?: IFlowNode
+    onSave: (val: T) => void
+    defaultValues?: T
 }
 
-function PromptModal(props: ModalProps) {
+function PromptModal(props: ModalProps<IFlowNode>) {
     const { visible, inEdit, defaultValues, onSave, onClose } = props;
     const { componentData } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<IFlowNode>>()
@@ -86,7 +87,7 @@ function PromptModal(props: ModalProps) {
         </Modal>)
 }
 
-function WorkflowModal(props: ModalProps) {
+function WorkflowModal(props: ModalProps<IFlowNode>) {
     const { visible, inEdit, defaultValues, onSave, onClose } = props;
     const { flowNameMapper } = useFlowGrapContext()
     const [form, setForm] = useState<FormInstance<IFlowNode>>()
@@ -127,7 +128,7 @@ function WorkflowModal(props: ModalProps) {
 
 }
 
-function ReportModal(props: ModalProps) {
+function ReportModal(props: ModalProps<IFlowNode>) {
     const { visible, inEdit, defaultValues, onSave, onClose } = props;
     const { componentData } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<IFlowNode>>()
@@ -175,6 +176,48 @@ function ReportModal(props: ModalProps) {
     )
 }
 
+function AddCustomModule(props: ModalProps<IReportModule>) {
+    const { visible, onSave, onClose } = props;
+    const { componentData } = useFlowGrapContext();
+    const [form, setForm] = useState<FormInstance<IReportModule>>()
+    const onOK = (): void => {
+        form?.submit()
+            .then((val) => {
+                onSave(val);
+                onClose?.();
+            }).catch(() => {
+                // 
+            });
+    };
+    return (
+        <Modal
+            title="Add a new custom item"
+            onOk={onOK}
+            onCancel={onClose}
+            cancelLabel={'Close'}
+            visible={visible}
+        >
+            <Form
+                onLoad={(form: FormInstance<IReportModule>) => setForm(form)}
+                onDestroyed={() => setForm(undefined)}>{
+                    ({ Item }) =>
+                        <>
+                            <Item name='apimode' label="API Mode">
+                                <Dropdown options={componentData?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                            </Item>
+                            <Item name='name' label="Name" >
+                                <InputText />
+                            </Item>
+                            <Item name='prompt' label="Prompt" >
+                                <InputTextarea autoResize className="w-full min-h-[100px]" />
+                            </Item>
+                        </>
+                }
+            </Form>
+        </Modal>
+    )
+}
+
 export default function FlowEditor(props: FlowGraphProps) {
 
     const {
@@ -188,10 +231,13 @@ export default function FlowEditor(props: FlowGraphProps) {
     } = props
 
     const { graphRef } = useGraphRef<IFlowNode, any>(ref);
-    const [onDragItem, setOnDragItem] = useState<IFlowNodeBase>();
+    const [onDragItem, setOnDragItem] = useState<IReportModule>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
     const [openModal, setOpenModal] = useState<IFlowNode>();
+    const [addModule, setAddModule] = useState<boolean>(false);
+    const [customModules, setCustomModules] = useState<IReportModule[]>([]);
+    const [selectedGroup, setSelectedGroup] = useState<string>();
 
     const clickOnSetting = (flow: IFlowNode) => {
         setOpenModal(flow)
@@ -228,19 +274,24 @@ export default function FlowEditor(props: FlowGraphProps) {
     }, [inEdit]);
 
     return <ErrorBoundary>
-        <FlowGrapContext.Provider value={{ inEdit, clickOnSetting, flowNameMapper, componentData, graphRef }}>
+        <FlowGrapContext.Provider
+            value={{
+                inEdit,
+                clickOnSetting,
+                flowNameMapper,
+                componentData,
+                graphRef,
+                selectedGroup,
+                setSelectedGroup
+            }}>
             <div className="flow-editor h-full w-full relative">
-                {inEdit && <div className={`
-                absolute z-20 top-[22px] left-[22px] right-[22px] px-[7px] py-[3px]
-                rounded-std bg-deep-weak/[.5] px-[7px] py-[3px]
-                flex items-center
-                `} >
-                    <Tooltip target={'.report-item'} position='top' />
+                <Tooltip target={'.report-item'} position='top' />
+                {inEdit && <div className={` act-bar top-[22px]`} >
                     <DndList
                         className="w-[162px]"
-                        items={GET_REPORT_ITEMS(props)}
+                        items={GET_REPORT_MODULE(props)}
                         disableChangeOrder
-                        renderContent={(data) => <ReportItem
+                        renderContent={(data) => <ReportModule
                             {...data}
                         />}
                         onDragStart={(init, item): void => {
@@ -250,10 +301,11 @@ export default function FlowEditor(props: FlowGraphProps) {
                     />
                     <Divider className="h-[40px] mx-[4px] " color="red" layout='vertical' />
                     <DndList
-                        className="w-fit"
-                        items={[]}
+                        className="grow"
+                        items={customModules}
                         disableChangeOrder
-                        renderContent={(data: IFlowNodeBase) => <ReportItem
+                        isDragDisabled
+                        renderContent={(data: IReportModule) => <CustomModuleGroup
                             {...data}
                         />}
                         onDragStart={(init, item): void => {
@@ -261,7 +313,19 @@ export default function FlowEditor(props: FlowGraphProps) {
                         }}
                         direction='horizontal'
                     />
-                    <AddButton onClick={() => { alert('test') }} />
+                    <AddButton onClick={() => setAddModule(true)} />
+                </div>}
+                {!!selectedGroup && <div className={`act-bar !w-fit top-[100px]`} >
+                    <DndList
+                        items={customModules}
+                        renderContent={(data: IReportModule) => <CustomModule
+                            {...data}
+                        />}
+                        onDragStart={(init, item): void => {
+                            setOnDragItem(() => item)
+                        }}
+                        direction='horizontal'
+                    />
                 </div>}
                 <Graph
                     initialEdges={initialEdges}
@@ -374,6 +438,14 @@ export default function FlowEditor(props: FlowGraphProps) {
                         }));
                     }}
                     defaultValues={openModal}
+                />
+                <AddCustomModule
+                    inEdit={true}
+                    visible={addModule}
+                    onClose={() => setAddModule(false)}
+                    onSave={(val) => {
+                        setCustomModules(pre => pre.concat(val))
+                    }}
                 />
             </div>
         </FlowGrapContext.Provider>

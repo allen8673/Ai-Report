@@ -1,4 +1,4 @@
-import { MutableRefObject, useContext } from "react";
+import { Dispatch, MutableRefObject, SetStateAction, useContext } from "react";
 import React from "react";
 
 import { FlowNameMapper } from "./type";
@@ -14,9 +14,12 @@ export interface FlowGraphStore {
     clickOnSetting?: (flow: IFlowNode) => void;
     flowNameMapper?: FlowNameMapper;
     componentData?: ComponentData[];
+    selectedGroup?: string
+    setSelectedGroup: Dispatch<SetStateAction<string | undefined>>
 }
 
 export const FlowGrapContext = React.createContext<FlowGraphStore>({
+    setSelectedGroup: () => { }
 });
 
 export const useFlowGrapContext = (): FlowGraphStore => useContext(FlowGrapContext);
