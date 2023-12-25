@@ -9,7 +9,7 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { SelectItem } from "primereact/selectitem";
 import { Tooltip } from "primereact/tooltip";
-import { useEffect, useState } from "react";
+import { createRef, useEffect, useRef, useState } from "react";
 import { Connection, Edge, Node, NodeRemoveChange, NodeTypes } from 'reactflow'
 import { v4 } from "uuid";
 
@@ -306,6 +306,7 @@ export default function FlowEditor(props: FlowGraphProps) {
     } = props
 
     const { graphRef } = useGraphRef<IFlowNode, any>(ref);
+    const module_group_ref = useRef<HTMLDivElement>(null);
     const [onDragItem, setOnDragItem] = useState<IReportModule>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
@@ -369,47 +370,59 @@ export default function FlowEditor(props: FlowGraphProps) {
                 }}>
                 <div className="flow-editor h-full w-full relative">
                     <Tooltip target={'.actbar-tooltip'} position='top' />
-                    {inEdit && <div className={` act-bar top-[22px]`} >
-                        <DndList
-                            className="w-[162px]"
-                            items={GET_REPORT_MODULE(props)}
-                            disableChangeOrder
-                            renderContent={(data) => <ReportModule {...data} />}
-                            onDragStart={(init, item): void => {
-                                setOnDragItem(() => item)
-                            }}
-                            direction='horizontal'
-                        />
-                        <Divider className="h-[40px] mx-[4px] " color="red" layout='vertical' />
-                        <DndList
-                            className="grow shrink overflow-auto no-scrollbar"
-                            items={keys(moduleGroups)}
-                            disableChangeOrder
-                            isDragDisabled
-                            renderContent={(apimode: string) => {
-                                const comp = find(componentData, c => c.APIMODE === apimode)
-                                return <CustomModuleGroup comp={comp} />
-                            }}
-                            direction='horizontal'
-                        />
-                        <AddButton onClick={() => setAddModule(true)} />
-                    </div>}
-                    {!!selectedGroup && <div className={`act-bar !w-fit top-[100px]`} >
-                        <DndList
-                            items={moduleGroups[selectedGroup] || []}
-                            renderContent={(data: IReportModule) => (
-                                <CustomModule
-                                    {...data}
-                                    onClick={(module) => {
-                                        setEditModule(module)
+                    {inEdit &&
+                        (<>
+                            <div className={`act-bar main top-[22px]`} >
+                                <DndList
+                                    className="w-[162px]"
+                                    items={GET_REPORT_MODULE(props)}
+                                    disableChangeOrder
+                                    renderContent={(data) => <ReportModule {...data} />}
+                                    onDragStart={(init, item): void => {
+                                        setOnDragItem(() => item)
                                     }}
-                                />)}
-                            onDragStart={(init, item): void => {
-                                setOnDragItem(() => item)
-                            }}
-                            direction='horizontal'
-                        />
-                    </div>}
+                                    direction='horizontal'
+                                />
+                                <Divider className="h-[40px] mx-[4px] " color="red" layout='vertical' />
+                                <DndList
+                                    className="grow shrink overflow-auto no-scrollbar"
+                                    items={keys(moduleGroups)}
+                                    ref={module_group_ref}
+                                    disableChangeOrder
+                                    isDragDisabled
+                                    renderContent={(apimode: string) => {
+                                        const comp = find(componentData, c => c.APIMODE === apimode)
+                                        return <CustomModuleGroup comp={comp} />
+                                    }}
+                                    direction='horizontal'
+                                />
+                                <AddButton onClick={() => setAddModule(true)} />
+                            </div>
+                            {!!selectedGroup &&
+                                <div className={`act-bar !w-fit top-[100px]`}
+                                    style={{
+                                        left:
+                                            (module_group_ref.current?.offsetLeft || 0) + (module_group_ref.current?.parentElement?.offsetLeft || 0)
+                                    }}>
+                                    <DndList
+                                        items={moduleGroups[selectedGroup] || []}
+
+                                        renderContent={(data: IReportModule) => (
+                                            <CustomModule
+                                                {...data}
+                                                onClick={(module) => {
+                                                    setEditModule(module)
+                                                }}
+                                            />)}
+                                        onDragStart={(init, item): void => {
+                                            setOnDragItem(() => item)
+                                        }}
+                                        direction='horizontal'
+                                    />
+                                </div>
+                            }
+                        </>)
+                    }
                     <Graph
                         initialEdges={initialEdges}
                         initialNodes={initialNodes}
