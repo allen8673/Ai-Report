@@ -152,14 +152,13 @@ function ReportModal(props: ModalProps<IFlowNode>) {
     const [form, setForm] = useState<FormInstance<IFlowNode>>()
     const onOK = (): void => {
         form?.submit()
-            .then(({ id, prompt, name, fileName, apimode }) => {
+            .then(({ id, prompt, name, apimode }) => {
                 graphRef?.current?.setNode(id, pre => ({
                     ...pre,
                     data: {
                         ...pre.data,
                         prompt: prompt,
                         name: name,
-                        fileName: fileName,
                         apimode: apimode
                     }
                 }));
@@ -186,9 +185,6 @@ function ReportModal(props: ModalProps<IFlowNode>) {
                         <>
                             <Item name='apimode' label="API Mode" disabled defaultValue={'report'}>
                                 <Dropdown options={componentOpts?.filter(i => i.COMP_TYPE === 'Report').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
-                            </Item>
-                            <Item name='fileName' label="File" >
-                                <Dropdown options={['file_1', 'file_2']} />
                             </Item>
                             <Item name='name' label="Name" >
                                 <InputText />
