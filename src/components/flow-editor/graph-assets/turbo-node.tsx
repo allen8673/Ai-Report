@@ -48,7 +48,7 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
     const { running, workflowstatus } = data || {}
     const { nodeType, icon, nodeName, editable } = flowInfoMap[data.type] || {}
     const { inEdit, clickOnSetting, flowNameMapper, graphRef } = useFlowGrapContext();
-    const iconHighlight = !!data.prompt || !!data.file || !!data.report
+    const iconHighlight = !!data.prompt || !!data.report
     const deletable = editable
     const clickable = inEdit;
 
