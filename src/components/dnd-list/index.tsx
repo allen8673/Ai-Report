@@ -1,7 +1,7 @@
 'use client'
 
 import _ from "lodash";
-import { ForwardedRef, Ref, forwardRef, useEffect, useState } from "react";
+import { ForwardedRef, Ref, RefObject, forwardRef, useEffect, useRef, useState } from "react";
 import { DragDropContext, DragStart, Draggable, DropResult, Droppable, DroppableProvided } from "react-beautiful-dnd";
 import { Element } from 'react-scroll'
 import { v4 } from 'uuid'
@@ -121,8 +121,9 @@ function DndList<T extends { [key: string]: any } | string>({
     direction,
     onChange,
 }: DndListProps<T>, ref: Ref<HTMLDivElement> | null) {
+    const _initRef = useRef(null);
+    const _innerRef = ref || _initRef;
     const [_items, setItems] = useState<T[]>(items || []);
-    _items.map
     const dewfaultDragEnd = (result: DropResult): void => {
         if (!disableChangeOrder) {
             // default behavior is move the item according to dropdown position
@@ -139,6 +140,25 @@ function DndList<T extends { [key: string]: any } | string>({
         setItems(items);
     }, [items]);
 
+    /**
+     * set the roller beheavior by the direction 
+     */
+    useEffect(() => {
+        const current = (_innerRef as RefObject<HTMLDivElement>)?.current
+        if (!current || direction === 'vertical') return;
+
+        const onWheel = (e: any) => {
+            if (e.deltaY == 0) return;
+            e.preventDefault();
+            current.scrollTo({
+                left: current.scrollLeft + e.deltaY,
+                behavior: "smooth"
+            });
+        };
+        current.addEventListener("wheel", onWheel);
+        return () => current.removeEventListener("wheel", onWheel);
+    }, [direction])
+
     let layoutClass = ''
     switch (direction) {
         case 'horizontal':
@@ -151,9 +171,9 @@ function DndList<T extends { [key: string]: any } | string>({
 
     return <DndContextByRef
         id={id}
-        className={`${className || layoutClass}`}
+        className={`${className || `${layoutClass} overflow-auto no-scrollbar`}`}
         {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}
-        ref={ref}
+        ref={_innerRef}
     >
         {(_items): JSX.Element => (
             <DndDroppable className={`${layoutClass}`} items={_items} droppableId={droppableId} direction={direction}>

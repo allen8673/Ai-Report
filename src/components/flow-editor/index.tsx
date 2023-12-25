@@ -385,7 +385,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                                 />
                                 <Divider className="h-[40px] mx-[4px] " color="red" layout='vertical' />
                                 <DndList
-                                    className="grow shrink overflow-auto no-scrollbar"
+                                    className="shrink overflow-auto no-scrollbar"
                                     items={keys(moduleGroups)}
                                     ref={module_group_ref}
                                     disableChangeOrder
