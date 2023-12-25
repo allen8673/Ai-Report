@@ -22,7 +22,7 @@ import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/panes/title";
-import { IEditFlow, IFlowNode, IFlow, IFlowBase, IReportCompData } from "@/interface/flow";
+import { IEditFlow, IFlowNode, IFlow, IFlowBase, ICustomCompData } from "@/interface/flow";
 import { ComponentOpt } from "@/interface/flow";
 import { useLayoutContext } from "@/layout/turbo-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
@@ -45,7 +45,7 @@ export default function Page() {
     const [inEdit, setInEdit] = useState<boolean>();
     const [componentOpts, setComponentOpts] = useState<ComponentOpt[]>([])
     const [templateNodes, setTemplateNodes] = useState<IFlowNode[]>();
-    const [customComps, setCustomComps] = useState<IReportCompData[]>([]);
+    const [customComps, setCustomComps] = useState<ICustomCompData[]>([]);
 
     const flowNameMapper: FlowNameMapper = useMemo(() => {
         if (!workflows) return {};
@@ -332,15 +332,15 @@ export default function Page() {
                 flowNameMapper={flowNameMapper}
                 componentOpts={componentOpts}
                 customComps={customComps}
-                onAddModule={async (module) => {
-                    await createComponent(module);
+                onAddComponent={async (comp) => {
+                    await createComponent(comp);
                     await fetchCustomComps();
                 }}
-                onEditModule={async (module) => {
-                    await updateComponent(module);
+                onEditComponent={async (comp) => {
+                    await updateComponent(comp);
                     await fetchCustomComps()
                 }}
-                onDeleteModule={async ({ id }) => {
+                onDeleteComponent={async ({ id }) => {
                     await disableComponent(id);
                     await fetchCustomComps()
                 }}

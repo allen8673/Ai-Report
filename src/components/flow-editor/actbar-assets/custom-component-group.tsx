@@ -5,7 +5,7 @@ import { useFlowGrapContext } from '../context';
 
 import { ComponentOpt } from '@/interface/flow';
 
-export default function CustomModuleGroup({ comp }: { comp?: ComponentOpt }) {
+export default function CustomComponentGroup({ comp }: { comp?: ComponentOpt }) {
 
     const { COMP_NAME, APIMODE } = comp || {}
     const { selectedGroup, setSelectedGroup } = useFlowGrapContext()

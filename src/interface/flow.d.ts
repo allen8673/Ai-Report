@@ -25,6 +25,12 @@ export interface ComponentOpt {
 export interface IReportCompData {
     id: string;
     name: string;
+    comp_type: FlowType;
+}
+
+export interface ICustomCompData {
+    id: string;
+    name: string;
     comp_name: string;
     comp_type: FlowType;
     apimode: string;

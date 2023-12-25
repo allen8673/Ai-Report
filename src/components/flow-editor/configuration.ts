@@ -8,14 +8,13 @@ import { FlowGraphProps } from './type';
 import { FlowType, IReportCompData } from '@/interface/flow';
 
 export const EDGE_DEF_SETTING: Partial<Edge> = {
-    // type: 'smoothstep',
     animated: true,
     style: { strokeWidth: 2 },
     markerEnd: { type: MarkerType.ArrowClosed, color: '#2a8af6' },
     interactionWidth: 20,
 }
 
-export const GET_REPORT_MODULE = ({ flowNameMapper }: FlowGraphProps): IReportCompData[] => {
+export const GET_REPORT_COMPONENTS = ({ flowNameMapper }: FlowGraphProps): IReportCompData[] => {
 
     const items: IReportCompData[] = [
         {

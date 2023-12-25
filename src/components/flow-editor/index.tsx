@@ -22,17 +22,17 @@ import { useGraphRef } from "../graph/helper";
 import Modal from "../modal";
 
 import AddButton from "./actbar-assets/add-button";
-import CustomModule from "./actbar-assets/custom-module";
-import CustomModuleGroup from "./actbar-assets/custom-module-group";
-import ReportModule from "./actbar-assets/report-module";
-import { EDGE_DEF_SETTING, GET_REPORT_MODULE } from "./configuration";
+import CustomComponent from "./actbar-assets/custom-component";
+import CustomComponentGroup from "./actbar-assets/custom-component-group";
+import ReportComponent from "./actbar-assets/report-component";
+import { EDGE_DEF_SETTING, GET_REPORT_COMPONENTS } from "./configuration";
 import { FlowGrapContext, useFlowGrapContext } from "./context";
 import { TurboEdgeAsset } from "./graph-assets/turbo-edge";
 import TurboNode from "./graph-assets/turbo-node";
 import { FlowGraphProps, FlowNameMapper } from "./type";
 
 
-import { FlowType, IFlowNode, IReportCompData } from "@/interface/flow";
+import { FlowType, ICustomCompData, IFlowNode, IReportCompData } from "@/interface/flow";
 
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
@@ -203,10 +203,10 @@ function ReportModal(props: ModalProps<IFlowNode>) {
     )
 }
 
-function AddModule(props: ModalProps<IReportCompData>) {
+function AddComponent(props: ModalProps<ICustomCompData>) {
     const { visible, onClose } = props;
-    const { componentOpts, onAddModule } = useFlowGrapContext();
-    const [form, setForm] = useState<FormInstance<IReportCompData>>()
+    const { componentOpts, onAddComponent: onAddModule } = useFlowGrapContext();
+    const [form, setForm] = useState<FormInstance<ICustomCompData>>()
     const onOK = (): void => {
         form?.submit()
             .then(async (val) => {
@@ -235,7 +235,7 @@ function AddModule(props: ModalProps<IReportCompData>) {
             visible={visible}
         >
             <Form
-                onLoad={(form: FormInstance<IReportCompData>) => setForm(form)}
+                onLoad={(form: FormInstance<ICustomCompData>) => setForm(form)}
                 onDestroyed={() => setForm(undefined)}>{
                     ({ Item }) =>
                         <>
@@ -255,10 +255,10 @@ function AddModule(props: ModalProps<IReportCompData>) {
     )
 }
 
-function EditModule(props: ModalProps<IReportCompData>) {
+function EditComponent(props: ModalProps<ICustomCompData>) {
     const { visible, onClose, defaultValues, } = props;
-    const { componentOpts, onDeleteModule, onEditModule } = useFlowGrapContext();
-    const [form, setForm] = useState<FormInstance<IReportCompData>>()
+    const { componentOpts, onDeleteComponent: onDeleteModule, onEditComponent: onEditModule } = useFlowGrapContext();
+    const [form, setForm] = useState<FormInstance<ICustomCompData>>()
     const onOK = (): void => {
         form?.submit()
             .then(async (val) => {
@@ -304,7 +304,7 @@ function EditModule(props: ModalProps<IReportCompData>) {
         >
             <Form
                 defaultValues={defaultValues}
-                onLoad={(form: FormInstance<IReportCompData>) => setForm(form)}
+                onLoad={(form: FormInstance<ICustomCompData>) => setForm(form)}
                 onDestroyed={() => setForm(undefined)}>{
                     ({ Item }) =>
                         <>
@@ -342,9 +342,9 @@ export default function FlowEditor(props: FlowGraphProps) {
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
     const [openModal, setOpenModal] = useState<IFlowNode>();
     const [addModule, setAddModule] = useState<boolean>(false);
-    const [onDragItem, setOnDragItem] = useState<IReportCompData>();
-    const [editModule, setEditModule] = useState<IReportCompData>();
-    const [moduleGroups, setModuleGroups] = useState<Dictionary<IReportCompData[]>>({});
+    const [onDragItem, setOnDragItem] = useState<IReportCompData | ICustomCompData>();
+    const [editComp, setEditComp] = useState<ICustomCompData>();
+    const [compGroups, setCompGroups] = useState<Dictionary<ICustomCompData[]>>({});
     const [selectedGroup, setSelectedGroup] = useState<string>();
 
     const clickOnSetting = (flow: IFlowNode) => {
@@ -384,7 +384,7 @@ export default function FlowEditor(props: FlowGraphProps) {
 
     useEffect(() => {
         setSelectedGroup(pre => some(customComps, i => i.apimode === pre) ? pre : undefined)
-        setModuleGroups(groupBy(customComps, i => i.apimode))
+        setCompGroups(groupBy(customComps, i => i.apimode))
     }, [customComps])
 
     return (
@@ -404,9 +404,9 @@ export default function FlowEditor(props: FlowGraphProps) {
                             <div className={`act-bar main top-[22px]`} >
                                 <DndList
                                     className="w-[162px]"
-                                    items={GET_REPORT_MODULE(props)}
+                                    items={GET_REPORT_COMPONENTS(props)}
                                     disableChangeOrder
-                                    renderContent={(data) => <ReportModule {...data} />}
+                                    renderContent={(data) => <ReportComponent {...data} />}
                                     onDragStart={(init, item): void => {
                                         setOnDragItem(() => item)
                                     }}
@@ -415,13 +415,13 @@ export default function FlowEditor(props: FlowGraphProps) {
                                 <Divider className="h-[40px] mx-[4px] " color="red" layout='vertical' />
                                 <DndList
                                     className="shrink overflow-auto no-scrollbar"
-                                    items={keys(moduleGroups)}
+                                    items={keys(compGroups)}
                                     ref={module_group_ref}
                                     disableChangeOrder
                                     isDragDisabled
                                     renderContent={(apimode: string) => {
                                         const comp = find(componentOpts, c => c.APIMODE === apimode)
-                                        return <CustomModuleGroup comp={comp} />
+                                        return <CustomComponentGroup comp={comp} />
                                     }}
                                     direction='horizontal'
                                 />
@@ -434,12 +434,12 @@ export default function FlowEditor(props: FlowGraphProps) {
                                             (module_group_ref.current?.offsetLeft || 0) + (module_group_ref.current?.parentElement?.offsetLeft || 0)
                                     }}>
                                     <DndList
-                                        items={moduleGroups[selectedGroup] || []}
-                                        renderContent={(data: IReportCompData) => (
-                                            <CustomModule
+                                        items={compGroups[selectedGroup] || []}
+                                        renderContent={(data: ICustomCompData) => (
+                                            <CustomComponent
                                                 {...data}
                                                 onClick={(module) => {
-                                                    setEditModule(module)
+                                                    setEditComp(module)
                                                 }}
                                             />)}
                                         onDragStart={(init, item): void => {
@@ -529,14 +529,14 @@ export default function FlowEditor(props: FlowGraphProps) {
                         onClose={closeModal}
                         defaultValues={openModal}
                     />
-                    <AddModule
+                    <AddComponent
                         visible={addModule}
                         onClose={() => setAddModule(false)}
                     />
-                    <EditModule
-                        visible={!!editModule}
-                        defaultValues={editModule}
-                        onClose={() => setEditModule(undefined)}
+                    <EditComponent
+                        visible={!!editComp}
+                        defaultValues={editComp}
+                        onClose={() => setEditComp(undefined)}
                     />
                 </div>
             </FlowGrapContext.Provider>
