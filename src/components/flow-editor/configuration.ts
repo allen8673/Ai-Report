@@ -21,17 +21,17 @@ export const GET_REPORT_MODULE = ({ flowNameMapper }: FlowGraphProps): IReportMo
         {
             id: 'custom-prompt',
             name: 'Custom Prompt',
-            type: 'Normal'
+            comp_type: 'Normal'
         },
         {
             id: 'workflow',
             name: 'Workflow',
-            type: 'Workflow'
+            comp_type: 'Workflow'
         },
         {
             id: 'report',
             name: 'Report',
-            type: 'Report'
+            comp_type: 'Report'
         }
     ]
 
@@ -39,7 +39,7 @@ export const GET_REPORT_MODULE = ({ flowNameMapper }: FlowGraphProps): IReportMo
         'Workflow': !flowNameMapper
     }
 
-    return filter(items, i => !disableItms[i.type])
+    return filter(items, i => !disableItms[i.comp_type])
 }
 
 

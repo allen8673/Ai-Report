@@ -17,10 +17,14 @@ export type FlowStatus = 'none' | 'success' | 'failure' | 'warning';
 
 export interface IReportModule {
     id: string;
-    type: FlowType;
-    name?: string;
-    prompt?: string;
-    apimode?: string
+    name: string;
+    comp_name: string;
+    apimode: string;
+    prompt: string;
+    // only be used in FE
+    comp_type: FlowType;
+
+
 }
 
 export interface IFlowNode extends IFlowNodeBase {

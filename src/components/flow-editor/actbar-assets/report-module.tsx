@@ -7,7 +7,7 @@ import { flowInfoMap } from '../configuration';
 
 import { IReportModule } from '@/interface/flow';
 
-export default function ReportModule({ name, type }: IReportModule) {
+export default function ReportModule({ name, comp_type: type }: IReportModule) {
     const { icon } = flowInfoMap[type] || { icon: faQuestion }
 
     return (

@@ -41,21 +41,27 @@ const nodeType: NodeTypes = { turbo: TurboNode };
 const UNREMOVABLE_TYPES: FlowType[] = ['Input', 'Output'];
 
 interface ModalProps<T> {
-    inEdit: boolean;
     visible: boolean;
     onClose: () => void;
-    onSave: (val: T) => void
     defaultValues?: T
 }
 
 function PromptModal(props: ModalProps<IFlowNode>) {
-    const { visible, inEdit, defaultValues, onSave, onClose } = props;
-    const { componentData } = useFlowGrapContext();
+    const { visible, defaultValues, onClose } = props;
+    const { graphRef, inEdit, componentData } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<IFlowNode>>()
     const onOK = (): void => {
         form?.submit()
-            .then((val) => {
-                onSave(val)
+            .then(({ id, prompt, name, apimode }) => {
+                graphRef?.current?.setNode(id, pre => ({
+                    ...pre,
+                    data: {
+                        ...pre.data,
+                        prompt: prompt,
+                        name: name,
+                        apimode: apimode
+                    }
+                }))
                 onClose?.();
             }).catch(() => {
                 // 
@@ -93,13 +99,20 @@ function PromptModal(props: ModalProps<IFlowNode>) {
 }
 
 function WorkflowModal(props: ModalProps<IFlowNode>) {
-    const { visible, inEdit, defaultValues, onSave, onClose } = props;
-    const { flowNameMapper } = useFlowGrapContext()
+    const { visible, defaultValues, onClose } = props;
+    const { flowNameMapper, inEdit, graphRef } = useFlowGrapContext()
     const [form, setForm] = useState<FormInstance<IFlowNode>>()
     const onOK = (): void => {
         form?.submit()
-            .then((val) => {
-                onSave(val);
+            .then(({ id, workflowid }) => {
+                graphRef?.current?.setNode(id, pre => ({
+                    ...pre,
+                    data: {
+                        ...pre.data,
+                        workflowid: workflowid,
+                        workflowstatus: 'enable'
+                    }
+                }))
                 onClose?.();
             }).catch(() => {
                 // 
@@ -134,13 +147,22 @@ function WorkflowModal(props: ModalProps<IFlowNode>) {
 }
 
 function ReportModal(props: ModalProps<IFlowNode>) {
-    const { visible, inEdit, defaultValues, onSave, onClose } = props;
-    const { componentData } = useFlowGrapContext();
+    const { visible, defaultValues, onClose } = props;
+    const { componentData, graphRef, inEdit } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<IFlowNode>>()
     const onOK = (): void => {
         form?.submit()
-            .then((val) => {
-                onSave(val);
+            .then(({ id, prompt, name, fileName, apimode }) => {
+                graphRef?.current?.setNode(id, pre => ({
+                    ...pre,
+                    data: {
+                        ...pre.data,
+                        prompt: prompt,
+                        name: name,
+                        fileName: fileName,
+                        apimode: apimode
+                    }
+                }));
                 onClose?.();
             }).catch(() => {
                 // 
@@ -182,13 +204,13 @@ function ReportModal(props: ModalProps<IFlowNode>) {
 }
 
 function AddModule(props: ModalProps<IReportModule>) {
-    const { visible, onSave, onClose } = props;
-    const { componentData } = useFlowGrapContext();
+    const { visible, onClose } = props;
+    const { componentData, onAddModule } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<IReportModule>>()
     const onOK = (): void => {
         form?.submit()
             .then((val) => {
-                onSave(val);
+                onAddModule?.({ ...val, comp_type: 'Normal' })
                 onClose?.();
             }).catch(() => {
                 // 
@@ -224,14 +246,14 @@ function AddModule(props: ModalProps<IReportModule>) {
     )
 }
 
-function EditModule(props: ModalProps<IReportModule> & { onDelete?: (val: IReportModule) => void }) {
-    const { visible, onSave, onClose, defaultValues, onDelete } = props;
-    const { componentData } = useFlowGrapContext();
+function EditModule(props: ModalProps<IReportModule>) {
+    const { visible, onClose, defaultValues, } = props;
+    const { componentData, onDeleteModule, onEditModule } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<IReportModule>>()
     const onOK = (): void => {
         form?.submit()
             .then((val) => {
-                onSave(val);
+                onEditModule?.(val)
                 onClose?.();
             }).catch(() => {
                 // 
@@ -258,7 +280,7 @@ function EditModule(props: ModalProps<IReportModule> & { onDelete?: (val: IRepor
                             icon: 'pi pi-info-circle',
                             acceptClassName: 'p-button-danger',
                             accept: async () => {
-                                onDelete?.(defaultValues);
+                                onDeleteModule?.(defaultValues);
                                 onClose?.();
                             },
                         });
@@ -295,13 +317,9 @@ export default function FlowEditor(props: FlowGraphProps) {
         flows,
         inEdit = false,
         graphRef: ref,
-        flowNameMapper,
         delayRender,
         componentData,
         modules,
-        onAddModule,
-        onEditModule,
-        onDeleteModule,
         ...others
     } = props
 
@@ -360,13 +378,11 @@ export default function FlowEditor(props: FlowGraphProps) {
         <ErrorBoundary>
             <FlowGrapContext.Provider
                 value={{
-                    inEdit,
+                    ...props,
                     clickOnSetting,
-                    flowNameMapper,
-                    componentData,
                     graphRef,
                     selectedGroup,
-                    setSelectedGroup
+                    setSelectedGroup,
                 }}>
                 <div className="flow-editor h-full w-full relative">
                     <Tooltip target={'.actbar-tooltip'} position='top' />
@@ -467,10 +483,12 @@ export default function FlowEditor(props: FlowGraphProps) {
                         onMouseUp={(e, position) => {
                             if (!onDragItem || !position) return;
                             const id = `tmp_${v4()}`;
+                            const { comp_type, ...others } = onDragItem
                             graphRef.current?.addNode({
                                 id, position,
                                 data: {
-                                    ...onDragItem,
+                                    ...others,
+                                    type: comp_type,
                                     id, position, forwards: []
                                 }, type: 'turbo'
                             });
@@ -483,75 +501,30 @@ export default function FlowEditor(props: FlowGraphProps) {
                     </Graph>
                     {/* Customize Prompt Modal */}
                     <PromptModal
-                        inEdit={inEdit}
                         visible={openModal?.type === 'Normal'}
                         onClose={closeModal}
-                        onSave={({ id, prompt, name, apimode }) => {
-                            graphRef.current.setNode(id, pre => ({
-                                ...pre,
-                                data: {
-                                    ...pre.data,
-                                    prompt: prompt,
-                                    name: name,
-                                    apimode: apimode
-                                }
-                            }))
-                        }}
                         defaultValues={openModal}
                     />
                     {/* Workflow Ref Modal */}
                     <WorkflowModal
-                        inEdit={inEdit}
                         visible={openModal?.type === 'Workflow'}
                         onClose={closeModal}
-                        onSave={({ id, workflowid }) => {
-                            graphRef.current.setNode(id, pre => ({
-                                ...pre,
-                                data: {
-                                    ...pre.data,
-                                    workflowid: workflowid,
-                                    workflowstatus: 'enable'
-                                }
-                            }))
-                        }}
                         defaultValues={openModal}
                     />
                     {/* Report Link Modal */}
                     <ReportModal
-                        inEdit={inEdit}
                         visible={openModal?.type === 'Report'}
                         onClose={closeModal}
-                        onSave={({ id, prompt, name, fileName, apimode }) => {
-                            graphRef.current.setNode(id, pre => ({
-                                ...pre,
-                                data: {
-                                    ...pre.data,
-                                    prompt: prompt,
-                                    name: name,
-                                    fileName: fileName,
-                                    apimode: apimode
-                                }
-                            }));
-                        }}
                         defaultValues={openModal}
                     />
                     <AddModule
-                        inEdit={true}
                         visible={addModule}
                         onClose={() => setAddModule(false)}
-                        onSave={(val) => {
-                            onAddModule?.({ ...val, type: 'Normal' })
-                        }}
                     />
                     <EditModule
-                        inEdit={true}
                         visible={!!editModule}
                         defaultValues={editModule}
                         onClose={() => setEditModule(undefined)}
-                        onSave={(val) => {
-                            onEditModule?.(val)
-                        }}
-                        onDelete={onDeleteModule}
                     />
                 </div>
             </FlowGrapContext.Provider>
