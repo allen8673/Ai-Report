@@ -334,9 +334,9 @@ function EditComponent(props: ModalProps<ICustomCompData>) {
                                 {
                                     required: 'Component name is required!',
                                     validate: {
-                                        value: (v) => {
+                                        value: (v, formV) => {
                                             return !includes(
-                                                customComps?.map(i => i.name), v
+                                                customComps?.filter(i => i.id !== formV.id)?.map(i => i.name), v
                                             ) || 'The component name should not repeat!'
                                         },
                                     }
@@ -350,7 +350,7 @@ function EditComponent(props: ModalProps<ICustomCompData>) {
                         </>
                 }
             </Form>
-        </Modal>
+        </Modal >
     )
 }
 
