@@ -329,7 +329,7 @@ export default function Page() {
                     // TODO: add module
                     setModules(pre => pre.concat(module))
                 }}
-                onEditModule={(module) => {
+                onEditModule={() => {
                     // TODO: save module
                 }}
                 onDeleteModule={(module) => {
