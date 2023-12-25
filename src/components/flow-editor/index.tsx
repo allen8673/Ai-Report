@@ -205,14 +205,14 @@ function ReportModal(props: ModalProps<IFlowNode>) {
 
 function AddComponent(props: ModalProps<ICustomCompData>) {
     const { visible, onClose } = props;
-    const { componentOpts, onAddComponent: onAddModule } = useFlowGrapContext();
+    const { componentOpts, onAddComponent } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<ICustomCompData>>()
     const onOK = (): void => {
         form?.submit()
             .then(async (val) => {
                 const component_opt = find(componentOpts, c => c.APIMODE == val.apimode);
                 if (!component_opt) throw Error('not the such component option')
-                await onAddModule?.({
+                await onAddComponent?.({
                     ...val,
                     id: '',
                     comp_name: component_opt.COMP_NAME,
@@ -227,7 +227,7 @@ function AddComponent(props: ModalProps<ICustomCompData>) {
     };
     return (
         <Modal
-            title="Add a new module"
+            title="Add a new component"
             onOk={onOK}
             onCancel={onClose}
             okLabel="Add"
@@ -257,12 +257,12 @@ function AddComponent(props: ModalProps<ICustomCompData>) {
 
 function EditComponent(props: ModalProps<ICustomCompData>) {
     const { visible, onClose, defaultValues, } = props;
-    const { componentOpts, onDeleteComponent: onDeleteModule, onEditComponent: onEditModule } = useFlowGrapContext();
+    const { componentOpts, onDeleteComponent, onEditComponent } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<ICustomCompData>>()
     const onOK = (): void => {
         form?.submit()
             .then(async (val) => {
-                await onEditModule?.({
+                await onEditComponent?.({
                     ...defaultValues,
                     ...val,
                     user: 'user'
@@ -274,7 +274,7 @@ function EditComponent(props: ModalProps<ICustomCompData>) {
     };
     return (
         <Modal
-            title="Edit module"
+            title="Edit component"
             onOk={onOK}
             onCancel={onClose}
             cancelLabel={'Close'}
@@ -288,12 +288,12 @@ function EditComponent(props: ModalProps<ICustomCompData>) {
                         if (!defaultValues) return;
                         confirmDialog({
                             position: 'top',
-                            message: `Do you want to delete ${defaultValues?.name || 'this module'}?`,
-                            header: `Delete Module`,
+                            message: `Do you want to delete ${defaultValues?.name || 'this component'}?`,
+                            header: `Delete Component`,
                             icon: 'pi pi-info-circle',
                             acceptClassName: 'p-button-danger',
                             accept: async () => {
-                                await onDeleteModule?.(defaultValues);
+                                await onDeleteComponent?.(defaultValues);
                                 onClose?.();
                             },
                         });
@@ -337,11 +337,11 @@ export default function FlowEditor(props: FlowGraphProps) {
     } = props
 
     const { graphRef } = useGraphRef<IFlowNode, any>(ref);
-    const module_group_ref = useRef<HTMLDivElement>(null);
+    const comp_group_ref = useRef<HTMLDivElement>(null);
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
     const [openModal, setOpenModal] = useState<IFlowNode>();
-    const [addModule, setAddModule] = useState<boolean>(false);
+    const [addComp, setAddComp] = useState<boolean>(false);
     const [onDragItem, setOnDragItem] = useState<IReportCompData | ICustomCompData>();
     const [editComp, setEditComp] = useState<ICustomCompData>();
     const [compGroups, setCompGroups] = useState<Dictionary<ICustomCompData[]>>({});
@@ -416,7 +416,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                                 <DndList
                                     className="shrink overflow-auto no-scrollbar"
                                     items={keys(compGroups)}
-                                    ref={module_group_ref}
+                                    ref={comp_group_ref}
                                     disableChangeOrder
                                     isDragDisabled
                                     renderContent={(apimode: string) => {
@@ -425,21 +425,21 @@ export default function FlowEditor(props: FlowGraphProps) {
                                     }}
                                     direction='horizontal'
                                 />
-                                <AddButton onClick={() => setAddModule(true)} />
+                                <AddButton onClick={() => setAddComp(true)} />
                             </div>
                             {!!selectedGroup &&
                                 <div className={`act-bar !w-fit top-[100px]`}
                                     style={{
                                         left:
-                                            (module_group_ref.current?.offsetLeft || 0) + (module_group_ref.current?.parentElement?.offsetLeft || 0)
+                                            (comp_group_ref.current?.offsetLeft || 0) + (comp_group_ref.current?.parentElement?.offsetLeft || 0)
                                     }}>
                                     <DndList
                                         items={compGroups[selectedGroup] || []}
                                         renderContent={(data: ICustomCompData) => (
                                             <CustomComponent
                                                 {...data}
-                                                onClick={(module) => {
-                                                    setEditComp(module)
+                                                onClick={(comp) => {
+                                                    setEditComp(comp)
                                                 }}
                                             />)}
                                         onDragStart={(init, item): void => {
@@ -530,8 +530,8 @@ export default function FlowEditor(props: FlowGraphProps) {
                         defaultValues={openModal}
                     />
                     <AddComponent
-                        visible={addModule}
-                        onClose={() => setAddModule(false)}
+                        visible={addComp}
+                        onClose={() => setAddComp(false)}
                     />
                     <EditComponent
                         visible={!!editComp}

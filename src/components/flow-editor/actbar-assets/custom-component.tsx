@@ -3,7 +3,7 @@ import React from 'react';
 
 import { ICustomCompData } from '@/interface/flow';
 
-export default function CustomComponent(props: ICustomCompData & { onClick?: (module: ICustomCompData) => void }) {
+export default function CustomComponent(props: ICustomCompData & { onClick?: (comp: ICustomCompData) => void }) {
 
     const { name, onClick } = props;
 
