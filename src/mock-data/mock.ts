@@ -1,6 +1,6 @@
 
 import { IFlow } from "@/interface/flow";
-import { ComponentData } from "@/interface/master";
+import { ComponentOpt } from "@/interface/flow";
 
 
 export const mock_workflows: IFlow[] = [
@@ -443,7 +443,7 @@ export const mock_templates: IFlow[] = [
     }
 ]
 
-export const mock_component_data: ComponentData[] = [
+export const mock_component_data: ComponentOpt[] = [
     {
         "COMP_ID": "COMP_0002",
         "COMP_NAME": "CSV分析",

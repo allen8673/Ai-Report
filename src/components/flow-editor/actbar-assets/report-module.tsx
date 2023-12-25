@@ -5,9 +5,9 @@ import React from 'react';
 
 import { flowInfoMap } from '../configuration';
 
-import { IReportModule } from '@/interface/flow';
+import { IReportCompData } from '@/interface/flow';
 
-export default function ReportModule({ name, comp_type: type }: IReportModule) {
+export default function ReportModule({ name, comp_type: type }: IReportCompData) {
     const { icon } = flowInfoMap[type] || { icon: faQuestion }
 
     return (

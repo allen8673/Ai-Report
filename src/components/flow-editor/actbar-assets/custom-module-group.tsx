@@ -3,9 +3,9 @@ import React from 'react';
 
 import { useFlowGrapContext } from '../context';
 
-import { ComponentData } from '@/interface/master';
+import { ComponentOpt } from '@/interface/flow';
 
-export default function CustomModuleGroup({ comp }: { comp?: ComponentData }) {
+export default function CustomModuleGroup({ comp }: { comp?: ComponentOpt }) {
 
     const { COMP_NAME, APIMODE } = comp || {}
     const { selectedGroup, setSelectedGroup } = useFlowGrapContext()

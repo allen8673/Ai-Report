@@ -32,7 +32,7 @@ import TurboNode from "./graph-assets/turbo-node";
 import { FlowGraphProps, FlowNameMapper } from "./type";
 
 
-import { FlowType, IFlowNode, IReportModule } from "@/interface/flow";
+import { FlowType, IFlowNode, IReportCompData } from "@/interface/flow";
 
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
@@ -48,7 +48,7 @@ interface ModalProps<T> {
 
 function PromptModal(props: ModalProps<IFlowNode>) {
     const { visible, defaultValues, onClose } = props;
-    const { graphRef, inEdit, componentData } = useFlowGrapContext();
+    const { graphRef, inEdit, componentOpts } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<IFlowNode>>()
     const onOK = (): void => {
         form?.submit()
@@ -84,7 +84,7 @@ function PromptModal(props: ModalProps<IFlowNode>) {
                     ({ Item }) =>
                         <>
                             <Item name='apimode' label="API Mode" rules={{ required: 'Please select an API mode!' }}>
-                                <Dropdown options={componentData?.filter(i => i.COMP_TYPE === 'Normal').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                                <Dropdown options={componentOpts?.filter(i => i.COMP_TYPE === 'Normal').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
                             </Item>
                             <Item name='name' label="Name" >
                                 <InputText />
@@ -148,7 +148,7 @@ function WorkflowModal(props: ModalProps<IFlowNode>) {
 
 function ReportModal(props: ModalProps<IFlowNode>) {
     const { visible, defaultValues, onClose } = props;
-    const { componentData, graphRef, inEdit } = useFlowGrapContext();
+    const { componentOpts, graphRef, inEdit } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<IFlowNode>>()
     const onOK = (): void => {
         form?.submit()
@@ -185,7 +185,7 @@ function ReportModal(props: ModalProps<IFlowNode>) {
                     ({ Item }) =>
                         <>
                             <Item name='apimode' label="API Mode" disabled defaultValue={'report'}>
-                                <Dropdown options={componentData?.filter(i => i.COMP_TYPE === 'Report').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                                <Dropdown options={componentOpts?.filter(i => i.COMP_TYPE === 'Report').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
                             </Item>
                             <Item name='fileName' label="File" >
                                 <Dropdown options={['file_1', 'file_2']} />
@@ -203,14 +203,23 @@ function ReportModal(props: ModalProps<IFlowNode>) {
     )
 }
 
-function AddModule(props: ModalProps<IReportModule>) {
+function AddModule(props: ModalProps<IReportCompData>) {
     const { visible, onClose } = props;
-    const { componentData, onAddModule } = useFlowGrapContext();
-    const [form, setForm] = useState<FormInstance<IReportModule>>()
+    const { componentOpts, onAddModule } = useFlowGrapContext();
+    const [form, setForm] = useState<FormInstance<IReportCompData>>()
     const onOK = (): void => {
         form?.submit()
-            .then((val) => {
-                onAddModule?.({ ...val, comp_type: 'Normal' })
+            .then(async (val) => {
+                const component_opt = find(componentOpts, c => c.APIMODE == val.apimode);
+                if (!component_opt) throw Error('not the such component option')
+                await onAddModule?.({
+                    ...val,
+                    id: '',
+                    comp_name: component_opt.COMP_NAME,
+                    comp_type: 'Normal',
+                    owner: 'user',
+                    user: 'user'
+                })
                 onClose?.();
             }).catch(() => {
                 // 
@@ -226,12 +235,12 @@ function AddModule(props: ModalProps<IReportModule>) {
             visible={visible}
         >
             <Form
-                onLoad={(form: FormInstance<IReportModule>) => setForm(form)}
+                onLoad={(form: FormInstance<IReportCompData>) => setForm(form)}
                 onDestroyed={() => setForm(undefined)}>{
                     ({ Item }) =>
                         <>
                             <Item name='apimode' label="API Mode">
-                                <Dropdown options={componentData?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                                <Dropdown options={componentOpts?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
                             </Item>
                             <Item name='name' label="Name" >
                                 <InputText />
@@ -246,14 +255,18 @@ function AddModule(props: ModalProps<IReportModule>) {
     )
 }
 
-function EditModule(props: ModalProps<IReportModule>) {
+function EditModule(props: ModalProps<IReportCompData>) {
     const { visible, onClose, defaultValues, } = props;
-    const { componentData, onDeleteModule, onEditModule } = useFlowGrapContext();
-    const [form, setForm] = useState<FormInstance<IReportModule>>()
+    const { componentOpts, onDeleteModule, onEditModule } = useFlowGrapContext();
+    const [form, setForm] = useState<FormInstance<IReportCompData>>()
     const onOK = (): void => {
         form?.submit()
-            .then((val) => {
-                onEditModule?.(val)
+            .then(async (val) => {
+                await onEditModule?.({
+                    ...defaultValues,
+                    ...val,
+                    user: 'user'
+                })
                 onClose?.();
             }).catch(() => {
                 // 
@@ -280,7 +293,7 @@ function EditModule(props: ModalProps<IReportModule>) {
                             icon: 'pi pi-info-circle',
                             acceptClassName: 'p-button-danger',
                             accept: async () => {
-                                onDeleteModule?.(defaultValues);
+                                await onDeleteModule?.(defaultValues);
                                 onClose?.();
                             },
                         });
@@ -291,12 +304,12 @@ function EditModule(props: ModalProps<IReportModule>) {
         >
             <Form
                 defaultValues={defaultValues}
-                onLoad={(form: FormInstance<IReportModule>) => setForm(form)}
+                onLoad={(form: FormInstance<IReportCompData>) => setForm(form)}
                 onDestroyed={() => setForm(undefined)}>{
                     ({ Item }) =>
                         <>
                             <Item name='apimode' label="API Mode">
-                                <Dropdown options={componentData?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                                <Dropdown options={componentOpts?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
                             </Item>
                             <Item name='name' label="Name" >
                                 <InputText />
@@ -318,20 +331,20 @@ export default function FlowEditor(props: FlowGraphProps) {
         inEdit = false,
         graphRef: ref,
         delayRender,
-        componentData,
-        modules,
+        componentOpts,
+        customComps,
         ...others
     } = props
 
     const { graphRef } = useGraphRef<IFlowNode, any>(ref);
     const module_group_ref = useRef<HTMLDivElement>(null);
-    const [onDragItem, setOnDragItem] = useState<IReportModule>();
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
     const [openModal, setOpenModal] = useState<IFlowNode>();
     const [addModule, setAddModule] = useState<boolean>(false);
-    const [editModule, setEditModule] = useState<IReportModule>();
-    const [moduleGroups, setModuleGroups] = useState<Dictionary<IReportModule[]>>({});
+    const [onDragItem, setOnDragItem] = useState<IReportCompData>();
+    const [editModule, setEditModule] = useState<IReportCompData>();
+    const [moduleGroups, setModuleGroups] = useState<Dictionary<IReportCompData[]>>({});
     const [selectedGroup, setSelectedGroup] = useState<string>();
 
     const clickOnSetting = (flow: IFlowNode) => {
@@ -370,9 +383,9 @@ export default function FlowEditor(props: FlowGraphProps) {
     }, [inEdit]);
 
     useEffect(() => {
-        setSelectedGroup(pre => some(modules, i => i.apimode === pre) ? pre : undefined)
-        setModuleGroups(groupBy(modules, 'apimode'))
-    }, [modules])
+        setSelectedGroup(pre => some(customComps, i => i.apimode === pre) ? pre : undefined)
+        setModuleGroups(groupBy(customComps, i => i.apimode))
+    }, [customComps])
 
     return (
         <ErrorBoundary>
@@ -407,7 +420,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                                     disableChangeOrder
                                     isDragDisabled
                                     renderContent={(apimode: string) => {
-                                        const comp = find(componentData, c => c.APIMODE === apimode)
+                                        const comp = find(componentOpts, c => c.APIMODE === apimode)
                                         return <CustomModuleGroup comp={comp} />
                                     }}
                                     direction='horizontal'
@@ -422,8 +435,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                                     }}>
                                     <DndList
                                         items={moduleGroups[selectedGroup] || []}
-
-                                        renderContent={(data: IReportModule) => (
+                                        renderContent={(data: IReportCompData) => (
                                             <CustomModule
                                                 {...data}
                                                 onClick={(module) => {
@@ -431,7 +443,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                                                 }}
                                             />)}
                                         onDragStart={(init, item): void => {
-                                            setOnDragItem(() => item)
+                                            setOnDragItem(item)
                                         }}
                                         direction='horizontal'
                                     />

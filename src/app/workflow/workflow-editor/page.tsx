@@ -1,7 +1,7 @@
 'use client'
 import { faCancel, faEye, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { filter, map, size } from "lodash";
+import { map, size } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
@@ -9,8 +9,9 @@ import { InputText } from "primereact/inputtext";
 import { useEffect, useMemo, useState } from "react";
 import { v4 } from "uuid";
 
+import { createComponent, disableComponent, updateComponent } from "@/api-helpers/component-api";
 import { addFlow, deleteFlow, getFlow, getFlows, updateFlow } from "@/api-helpers/flow-api";
-import { getComponents } from "@/api-helpers/master-api";
+import { getComponentOpts, getCustomComponents } from "@/api-helpers/master-api";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowEditor from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
@@ -21,8 +22,8 @@ import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph/helper";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/panes/title";
-import { IEditFlow, IFlowNode, IFlow, IFlowBase, IReportModule } from "@/interface/flow";
-import { ComponentData } from "@/interface/master";
+import { IEditFlow, IFlowNode, IFlow, IFlowBase, IReportCompData } from "@/interface/flow";
+import { ComponentOpt } from "@/interface/flow";
 import { useLayoutContext } from "@/layout/turbo-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import RouterInfo, { getFullUrl } from "@/settings/router-setting";
@@ -42,9 +43,9 @@ export default function Page() {
     const [workflow, setWorkflow] = useState<IFlow>();
     const [workflows, setWorkflows] = useState<IFlowBase[]>();
     const [inEdit, setInEdit] = useState<boolean>();
-    const [componentData, setComponentData] = useState<ComponentData[]>([])
+    const [componentOpts, setComponentOpts] = useState<ComponentOpt[]>([])
     const [templateNodes, setTemplateNodes] = useState<IFlowNode[]>();
-    const [modules, setModules] = useState<IReportModule[]>([]);
+    const [customComps, setCustomComps] = useState<IReportCompData[]>([]);
 
     const flowNameMapper: FlowNameMapper = useMemo(() => {
         if (!workflows) return {};
@@ -63,15 +64,21 @@ export default function Page() {
 
     const initial = async () => {
         setInEdit(mode === 'add');
-        getComponents().then(comps => {
-            setComponentData(comps)
+        getComponentOpts().then(comps => {
+            setComponentOpts(comps)
         })
+        fetchCustomComps();
         await fetchAllWorflowData();
         if (mode === 'add') {
             prepareNewWorkflow(paramObj)
         } else {
             fetchWorkflow(paramObj.id || '')
         }
+    }
+
+    const fetchCustomComps = async () => {
+        const comps = await getCustomComponents();
+        setCustomComps(comps);
     }
 
     const fetchAllWorflowData = async () => {
@@ -323,18 +330,19 @@ export default function Page() {
                 hideMiniMap
                 inEdit={inEdit}
                 flowNameMapper={flowNameMapper}
-                componentData={componentData}
-                modules={modules}
-                onAddModule={(module) => {
-                    // TODO: add module
-                    setModules(pre => pre.concat(module))
+                componentOpts={componentOpts}
+                customComps={customComps}
+                onAddModule={async (module) => {
+                    await createComponent(module);
+                    await fetchCustomComps();
                 }}
-                onEditModule={() => {
-                    // TODO: save module
+                onEditModule={async (module) => {
+                    await updateComponent(module);
+                    await fetchCustomComps()
                 }}
-                onDeleteModule={(module) => {
-                    // TODO: delete module
-                    setModules(pre => filter(pre, i => i.name !== module.name))
+                onDeleteModule={async ({ id }) => {
+                    await disableComponent(id);
+                    await fetchCustomComps()
                 }}
             />
             <Modal

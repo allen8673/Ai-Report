@@ -1,9 +1,9 @@
 
 import React from 'react';
 
-import { IReportModule } from '@/interface/flow';
+import { IReportCompData } from '@/interface/flow';
 
-export default function CustomModule(props: IReportModule & { onClick?: (module: IReportModule) => void }) {
+export default function CustomModule(props: IReportCompData & { onClick?: (module: IReportCompData) => void }) {
 
     const { name, onClick } = props;
 

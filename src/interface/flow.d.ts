@@ -15,16 +15,22 @@ export interface IFlow extends IFlowBase {
 export type FlowType = 'Input' | 'Output' | 'Normal' | 'Workflow' | 'Report';
 export type FlowStatus = 'none' | 'success' | 'failure' | 'warning';
 
-export interface IReportModule {
+export interface ComponentOpt {
+    COMP_ID: string;
+    COMP_NAME: string;
+    COMP_TYPE: FlowType;
+    APIMODE: string;
+}
+
+export interface IReportCompData {
     id: string;
     name: string;
     comp_name: string;
+    comp_type: FlowType;
     apimode: string;
     prompt: string;
-    // only be used in FE
-    comp_type: FlowType;
-
-
+    owner: string;
+    user: string;
 }
 
 export interface IFlowNode extends IFlowNodeBase {
