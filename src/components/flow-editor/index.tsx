@@ -9,7 +9,7 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { SelectItem } from "primereact/selectitem";
 import { Tooltip } from "primereact/tooltip";
-import { createRef, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Connection, Edge, Node, NodeRemoveChange, NodeTypes } from 'reactflow'
 import { v4 } from "uuid";
 
