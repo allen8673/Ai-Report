@@ -205,7 +205,7 @@ function ReportModal(props: ModalProps<IFlowNode>) {
 
 function AddComponent(props: ModalProps<ICustomCompData>) {
     const { visible, onClose } = props;
-    const { componentOpts, onAddComponent } = useFlowGrapContext();
+    const { componentOpts, onAddComponent, customComps } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<ICustomCompData>>()
     const onOK = (): void => {
         form?.submit()
@@ -239,10 +239,25 @@ function AddComponent(props: ModalProps<ICustomCompData>) {
                 onDestroyed={() => setForm(undefined)}>{
                     ({ Item }) =>
                         <>
-                            <Item name='apimode' label="API Mode">
+                            <Item name='apimode' label="API Mode" rules={
+                                {
+                                    required: 'API Mode is required!',
+                                }
+                            }>
                                 <Dropdown options={componentOpts?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
                             </Item>
-                            <Item name='name' label="Name" >
+                            <Item name='name' label="Name" rules={
+                                {
+                                    required: 'Component name is required!',
+                                    validate: {
+                                        value: (v) => {
+                                            return !includes(
+                                                customComps?.map(i => i.name), v
+                                            ) || 'The component name should not repeat!'
+                                        },
+                                    }
+                                }
+                            }>
                                 <InputText />
                             </Item>
                             <Item name='prompt' label="Prompt" >
@@ -257,7 +272,7 @@ function AddComponent(props: ModalProps<ICustomCompData>) {
 
 function EditComponent(props: ModalProps<ICustomCompData>) {
     const { visible, onClose, defaultValues, } = props;
-    const { componentOpts, onDeleteComponent, onEditComponent } = useFlowGrapContext();
+    const { componentOpts, onDeleteComponent, onEditComponent, customComps } = useFlowGrapContext();
     const [form, setForm] = useState<FormInstance<ICustomCompData>>()
     const onOK = (): void => {
         form?.submit()
@@ -308,10 +323,25 @@ function EditComponent(props: ModalProps<ICustomCompData>) {
                 onDestroyed={() => setForm(undefined)}>{
                     ({ Item }) =>
                         <>
-                            <Item name='apimode' label="API Mode">
+                            <Item name='apimode' label="API Mode" rules={
+                                {
+                                    required: 'API Mode is required!',
+                                }
+                            }>
                                 <Dropdown options={componentOpts?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
                             </Item>
-                            <Item name='name' label="Name" >
+                            <Item name='name' label="Name" rules={
+                                {
+                                    required: 'Component name is required!',
+                                    validate: {
+                                        value: (v) => {
+                                            return !includes(
+                                                customComps?.map(i => i.name), v
+                                            ) || 'The component name should not repeat!'
+                                        },
+                                    }
+                                }
+                            }>
                                 <InputText />
                             </Item>
                             <Item name='prompt' label="Prompt" >
