@@ -1,6 +1,9 @@
 export { auth as authMiddleware } from "auth"
 import { NextRequest, NextResponse } from "next/server"
 
+import { getFullUrl } from "./lib/router-helper"
+import RouterInfo from "./settings/router-setting"
+
 
 // Read more: https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
 export const config = {
@@ -22,6 +25,10 @@ export function middleware(req: NextRequest) {
    *    rewrittenUrl.pathname = `/makereal.tldraw.com${rewrittenUrl.pathname}`
    * }
    */
+
+  if (rewrittenUrl.pathname === '/') {
+    rewrittenUrl.pathname = getFullUrl(RouterInfo.HOME)
+  }
 
   return NextResponse.rewrite(rewrittenUrl)
 }
