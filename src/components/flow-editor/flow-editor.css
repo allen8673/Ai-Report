@@ -1,3 +1,5 @@
+@import '../../style/globals.css';
+
 .preview-doc-modal {
     & .p-fieldset {
         @apply flex;
@@ -5,5 +7,31 @@
 
     & .p-fieldset .p-toggleable-content {
         @apply shrink grow overflow-auto
+    }
+}
+
+.flow-editor .act-bar {
+    @apply absolute z-20 rounded-std bg-deep-weak/[.5] flex items-center;
+    padding: 7px 3px;
+    right: 22px;
+    min-height: 58px;
+    min-width: 58px;
+    text-wrap: nowrap;
+
+    &.main {
+        left: 22px;
+    }
+
+    & .act-button {
+        @apply gap-2 m-std-min bg-deep-strong border-turbo-deep rounded-std;
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+        border-width: 1px;
+        border-style: solid;
+
+        &.selected {
+            box-shadow: theme('backgroundImage.turbo-gradient-selected');
+        }
     }
 }

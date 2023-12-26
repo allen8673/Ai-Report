@@ -1,9 +1,0 @@
-@tailwind components;
-
-@layer components {
-    .report-item {
-        & .name {
-            @apply shrink grow;
-        }
-    }
-}

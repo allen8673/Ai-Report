@@ -29,7 +29,8 @@ export default function AiDrawer({ className }: AiDrawerProps) {
     const onExport = useCallback(async (prompt: string) => {
         try {
             if (!editor) throw Error('No Editor!')
-            await makeReal(editor, prompt)
+            const { html } = await makeReal(editor, prompt);
+            setHtml(html);
         } catch (e: any) {
             showMessage({
                 type: 'error',
@@ -43,7 +44,7 @@ export default function AiDrawer({ className }: AiDrawerProps) {
             <Splitter className={`h-full overflow-auto ${className || ''}`} layout="vertical">
                 <SplitterPanel className="px-[7px] " size={70}>
                     <Splitter className={`h-full overflow-auto ${className || ''}`} layout='horizontal'>
-                        <SplitterPanel className="px-[7px] " size={65}>
+                        <SplitterPanel className="px-[7px] " size={50}>
                             <ErrorBoundary>
                                 <Tldraw
                                     className={`rounded-std-sm`}
@@ -52,7 +53,7 @@ export default function AiDrawer({ className }: AiDrawerProps) {
                                 />
                             </ErrorBoundary>
                         </SplitterPanel>
-                        <SplitterPanel className="px-[7px] " size={35}>
+                        <SplitterPanel className="px-[7px] " size={50}>
                             <CodeEditor
                                 hiddenBar
                                 language={'html'}

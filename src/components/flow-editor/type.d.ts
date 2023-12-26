@@ -1,6 +1,5 @@
 import { GraphProps } from "@/components/graph/graph";
-import { IFlowNode } from "@/interface/flow";
-import { ComponentData } from "@/interface/master";
+import { IFlowNode, ICustomCompData, ComponentOpt } from "@/interface/flow";
 
 export interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     'initialNodes' |
@@ -14,8 +13,12 @@ export interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     flows: IFlowNode[];
     inEdit?: boolean;
     flowNameMapper?: FlowNameMapper;
-    delayRender?: number
-    componentData?: ComponentData[]
+    delayRender?: number;
+    componentOpts?: ComponentOpt[];
+    customComps?: ICustomCompData[];
+    onAddComponent?: (comp: ICustomCompData) => void;
+    onEditComponent?: (comp: ICustomCompData) => void;
+    onDeleteComponent?: (comp: ICustomCompData) => void;
 }
 
 export type FlowNameMapper = { [id: string]: string }

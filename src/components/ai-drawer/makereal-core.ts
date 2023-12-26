@@ -4,7 +4,7 @@ import apiCaller from "../../api-helpers/api-caller";
 
 import { addDraw } from "@/api-helpers/draw-api";
 import { OPENAI_USER_PROMPT, OPENAI_USER_PROMPT_WITH_PREVIOUS_DESIGN } from "@/components/ai-drawer/prompt";
-import { GPT4VCompletionRequest, MessageContent, PreviewShape } from "@/interface/draw";
+import { DrawData, GPT4VCompletionRequest, MessageContent, PreviewShape } from "@/interface/draw";
 
 const GPT_URL = process.env.NEXT_PUBLIC_GPT_URL;
 const GPT_KEY = process.env.NEXT_PUBLIC_GPT_KEY;
@@ -17,7 +17,7 @@ interface GetHtmlFromOpenAI {
     prompt: string;
 }
 
-export const makeReal = async (editor: Editor, prompt: string) => {
+export const makeReal = async (editor: Editor, prompt: string): Promise<DrawData> => {
     const newShapeId = createShapeId();
     const selectedShapes = editor.getSelectedShapes();
 
@@ -83,7 +83,7 @@ export const makeReal = async (editor: Editor, prompt: string) => {
             throw Error('Could not generate a design from those wireframes.')
         }
 
-        await addDraw(newShapeId, html)
+        await addDraw(newShapeId, html);
 
         editor.updateShape<PreviewShape>({
             id: newShapeId,
@@ -95,6 +95,7 @@ export const makeReal = async (editor: Editor, prompt: string) => {
                 uploadedShapeId: newShapeId,
             },
         })
+        return { id: newShapeId, html }
     } catch (e) {
         editor.deleteShape(newShapeId)
         throw e

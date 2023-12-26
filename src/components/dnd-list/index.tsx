@@ -1,7 +1,7 @@
 'use client'
 
 import _ from "lodash";
-import { useEffect, useState } from "react";
+import { ForwardedRef, Ref, RefObject, forwardRef, useEffect, useRef, useState } from "react";
 import { DragDropContext, DragStart, Draggable, DropResult, Droppable, DroppableProvided } from "react-beautiful-dnd";
 import { Element } from 'react-scroll'
 import { v4 } from 'uuid'
@@ -18,7 +18,7 @@ const DndContext = <T extends GenericType>({
     onDragStart,
     onDragEnd,
     children,
-}: DndContextProps<T>): JSX.Element => {
+}: DndContextProps<T>, ref: Ref<HTMLDivElement> | null): JSX.Element => {
     const dndOnDragEnd = (result: DropResult): void => {
         if (!result.source || !result.destination) return;
         const resultItems = _.cloneDeep(items);
@@ -30,13 +30,17 @@ const DndContext = <T extends GenericType>({
         onDragStart?.(initial, items[initial.source.index]);
     };
     return (
-        <div id={id || "dnd-context"} className={className} style={style} >
+        <div id={id || "dnd-context"} className={className} style={style} ref={ref}>
             <DragDropContext onDragEnd={dndOnDragEnd} onDragStart={dndOnDragStart}>
                 {children(items)}
             </DragDropContext>
         </div>
     );
 };
+
+const DndContextByRef = forwardRef(DndContext) as <T extends GenericType>(
+    props: DndContextProps<T> & { ref?: ForwardedRef<HTMLDivElement> })
+    => ReturnType<typeof DndContext>;
 
 const DndDroppable = <T extends GenericType>({
     items = [],
@@ -98,7 +102,7 @@ const RbDndItem = <T extends { [key: string]: any } | string>({
     );
 };
 
-export default function DndList<T extends { [key: string]: any } | string>({
+function DndList<T extends { [key: string]: any } | string>({
     id,
     renderContent,
     items,
@@ -115,10 +119,11 @@ export default function DndList<T extends { [key: string]: any } | string>({
     disableWholeDraghandle,
     disableChangeOrder,
     direction,
-    onChange
-}: DndListProps<T>) {
+    onChange,
+}: DndListProps<T>, ref: Ref<HTMLDivElement> | null) {
+    const _initRef = useRef(null);
+    const _innerRef = ref || _initRef;
     const [_items, setItems] = useState<T[]>(items || []);
-    _items.map
     const dewfaultDragEnd = (result: DropResult): void => {
         if (!disableChangeOrder) {
             // default behavior is move the item according to dropdown position
@@ -135,9 +140,43 @@ export default function DndList<T extends { [key: string]: any } | string>({
         setItems(items);
     }, [items]);
 
-    return <DndContext id={id} className={`w-full h-full ${className || ''}`} {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}>
+    /**
+     * set the roller beheavior by the direction 
+     */
+    useEffect(() => {
+        const current = (_innerRef as RefObject<HTMLDivElement>)?.current
+        if (!current || direction === 'vertical') return;
+
+        const onWheel = (e: any) => {
+            if (e.deltaY == 0) return;
+            e.preventDefault();
+            current.scrollTo({
+                left: current.scrollLeft + e.deltaY,
+                behavior: "smooth"
+            });
+        };
+        current.addEventListener("wheel", onWheel);
+        return () => current.removeEventListener("wheel", onWheel);
+    }, [direction])
+
+    let layoutClass = ''
+    switch (direction) {
+        case 'horizontal':
+            layoutClass = 'w-full';
+            break;
+        case 'vertical':
+            layoutClass = 'h-full'
+            break;
+    }
+
+    return <DndContextByRef
+        id={id}
+        className={`${className || `${layoutClass} overflow-auto no-scrollbar`}`}
+        {...{ style, onDragStart, onDragEnd: onDragEnd || dewfaultDragEnd, items: _items }}
+        ref={_innerRef}
+    >
         {(_items): JSX.Element => (
-            <DndDroppable className="w-full h-full" items={_items} droppableId={droppableId} direction={direction}>
+            <DndDroppable className={`${layoutClass}`} items={_items} droppableId={droppableId} direction={direction}>
                 {(_items): React.JSX.Element[] =>
                     _items.map((item, index: number) => {
                         return (
@@ -158,5 +197,9 @@ export default function DndList<T extends { [key: string]: any } | string>({
                 }
             </DndDroppable>
         )}
-    </DndContext>
+    </DndContextByRef>
 }
+
+export default forwardRef(DndList) as <T extends { [key: string]: any } | string>(
+    props: DndListProps<T> & { ref?: ForwardedRef<HTMLDivElement> })
+    => ReturnType<typeof DndList>;

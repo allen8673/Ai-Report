@@ -14,23 +14,43 @@ export interface IFlow extends IFlowBase {
 
 export type FlowType = 'Input' | 'Output' | 'Normal' | 'Workflow' | 'Report';
 export type FlowStatus = 'none' | 'success' | 'failure' | 'warning';
-export interface IFlowNodeBase {
+
+export interface ComponentOpt {
+    COMP_ID: string;
+    COMP_NAME: string;
+    COMP_TYPE: FlowType;
+    APIMODE: string;
+}
+
+export interface IReportCompData {
     id: string;
-    type: FlowType;
-    name?: string;
+    name: string;
+    comp_type: FlowType;
+}
+
+export interface ICustomCompData {
+    id: string;
+    name: string;
+    comp_name: string;
+    comp_type: FlowType;
+    apimode: string;
+    prompt: string;
+    owner: string;
+    user: string;
 }
 
 export interface IFlowNode extends IFlowNodeBase {
+    id: string;
+    type: FlowType;
+    name?: string;
     position: XYPosition;
     forwards: string[];
     prompt?: string;
     depth?: number;
     workflowid?: string;
-    file?: any;
     report?: any;
     running?: boolean;
     status?: FlowStatus;
-    fileName?: string;
     workflowstatus?: 'disable' | 'enable' | '';
     apimode?: string
 }

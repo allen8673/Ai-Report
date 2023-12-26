@@ -5,33 +5,32 @@ import { Edge, MarkerType } from 'reactflow';
 
 import { FlowGraphProps } from './type';
 
-import { FlowType, IFlowNodeBase } from '@/interface/flow';
+import { FlowType, IReportCompData } from '@/interface/flow';
 
 export const EDGE_DEF_SETTING: Partial<Edge> = {
-    // type: 'smoothstep',
     animated: true,
     style: { strokeWidth: 2 },
     markerEnd: { type: MarkerType.ArrowClosed, color: '#2a8af6' },
     interactionWidth: 20,
 }
 
-export const GET_REPORT_ITEMS = ({ flowNameMapper }: FlowGraphProps): IFlowNodeBase[] => {
+export const GET_REPORT_COMPONENTS = ({ flowNameMapper }: FlowGraphProps): IReportCompData[] => {
 
-    const items: IFlowNodeBase[] = [
+    const items: IReportCompData[] = [
         {
             id: 'custom-prompt',
             name: 'Custom Prompt',
-            type: 'Normal'
+            comp_type: 'Normal'
         },
         {
             id: 'workflow',
             name: 'Workflow',
-            type: 'Workflow'
+            comp_type: 'Workflow'
         },
         {
             id: 'report',
             name: 'Report',
-            type: 'Report'
+            comp_type: 'Report'
         }
     ]
 
@@ -39,7 +38,7 @@ export const GET_REPORT_ITEMS = ({ flowNameMapper }: FlowGraphProps): IFlowNodeB
         'Workflow': !flowNameMapper
     }
 
-    return filter(items, i => !disableItms[i.type])
+    return filter(items, i => !disableItms[i.comp_type])
 }
 
 
