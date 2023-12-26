@@ -6,3 +6,4 @@ export const downloadString = (content: string, title: string, extension?: strin
     // document.body.appendChild(element);
     element.click();
 };
+

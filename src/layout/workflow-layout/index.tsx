@@ -20,7 +20,7 @@ import Modal from '@/components/modal';
 import EmptyPane from '@/components/panes/empty';
 import { IFlow } from '@/interface/flow';
 import { IJob } from '@/interface/job';
-import { downloadString } from '@/utils';
+import { downloadString } from '@/lib/utils';
 
 interface ViewReports {
     workflowId: string;

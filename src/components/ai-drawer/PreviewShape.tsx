@@ -16,7 +16,8 @@ import { useEffect } from 'react'
 // import { useAiDrawerContext } from './context';
 
 import { addDraw } from '@/api-helpers/draw-api'
-import RouterInfo, { getFullUrl } from '@/settings/router-setting'
+import { getFullUrl } from '@/lib/router-helper'
+import RouterInfo from '@/settings/router-setting'
 
 export type PreviewShape = TLBaseShape<
 	'preview',

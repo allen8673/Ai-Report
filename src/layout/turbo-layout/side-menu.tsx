@@ -5,7 +5,8 @@ import _ from 'lodash';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import RouterInfo, { getFullUrl } from '@/settings/router-setting';
+import { getFullUrl } from '@/lib/router-helper';
+import RouterInfo from '@/settings/router-setting';
 
 export default function SideMenu() {
     const pathname = usePathname()
