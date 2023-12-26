@@ -7,6 +7,7 @@ import { Button } from 'primereact/button';
 import { confirmDialog } from "primereact/confirmdialog";
 import { InputText } from "primereact/inputtext";
 import { useEffect, useMemo, useState } from "react";
+import RouterInfo from "router";
 import { v4 } from "uuid";
 
 import { createComponent, disableComponent, updateComponent } from "@/api-helpers/component-api";
@@ -27,7 +28,6 @@ import { ComponentOpt } from "@/interface/flow";
 import { useLayoutContext } from "@/layout/turbo-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import { getFullUrl } from "@/lib/router-helper";
-import RouterInfo from "@/settings/router-setting";
 
 type EditMode = 'add' | 'normal'
 
