@@ -10,13 +10,16 @@ import { getFullUrl } from "@/lib/router"
 export const authConfig: NextAuthConfig = {
     debug: true,
     pages: {
-        signIn: '/login'
+        // signIn: '/login'
     },
     providers: [
         Credentials({
-            credentials: { password: { label: "Password", type: "password" } },
+            credentials: {
+                id: { label: "User name" },
+                password: { label: "Password", type: "password" }
+            },
             authorize(c) {
-                if (c.password !== "1") return null;
+                if (!c.password || !c.id) return null;
                 return {
                     name: "Fill Murray",
                     email: "bill@fillmurray.com",
