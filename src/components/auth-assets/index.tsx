@@ -5,14 +5,14 @@ import { useFormState, useFormStatus, } from "react-dom";
 
 import { authenticate, userSignOut } from "@/lib/actions";
 
-export async function SignOutButton() {
+export function SignOutButton() {
     const [, dispatch] = useFormState(userSignOut, undefined);
-
     return (
         <form
             action={dispatch}
         >
-            <Button icon={<FontAwesomeIcon className='text-[30px]' icon={faUser} color={'white'} />} className=" p-0" />
+            <Button unstyled icon={<FontAwesomeIcon className='text-[30px] ' icon={faUser} color={'white'} />}
+                className="bg-inherit border-none" />
         </form>
     );
 }
