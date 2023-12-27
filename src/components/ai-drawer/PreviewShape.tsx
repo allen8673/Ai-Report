@@ -13,10 +13,10 @@ import {
 	useValue,
 } from '@tldraw/tldraw'
 import { useEffect } from 'react'
-import RouterInfo from 'router'
 
 import { addDraw } from '@/api-helpers/draw-api'
 import { getFullUrl } from '@/lib/router-helper'
+import RouterInfo from '@/settings/router'
 
 
 

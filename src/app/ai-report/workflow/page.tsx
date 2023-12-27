@@ -7,7 +7,6 @@ import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { SelectItem } from "primereact/selectitem";
 import { useEffect, useState } from 'react'
-import RouterInfo from "router";
 
 import { getAll } from "@/api-helpers/flow-api";
 import { coverToQueryString } from "@/api-helpers/url-helper";
@@ -20,6 +19,7 @@ import { Column } from "@/components/table/table";
 import { IFlowBase } from "@/interface/flow";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import { getFullUrl } from "@/lib/router-helper";
+import RouterInfo from "@/settings/router";
 
 interface FormData {
     id?: string;

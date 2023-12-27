@@ -1,12 +1,12 @@
-import { authConfig } from "auth.config"
-import NextAuth from "next-auth"
-
+import { auth } from "./settings/auth";
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
-}
+  //   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/", "/login", "/ai-report/home"]
+};
 
-export default NextAuth(authConfig).auth;
+export const middleware = auth;
+
 
 // export const middleware = auth((req: NextRequest) => {
 //   const url = req.nextUrl
@@ -21,13 +21,6 @@ export default NextAuth(authConfig).auth;
 //    *    rewrittenUrl.pathname = `/makereal.tldraw.com${rewrittenUrl.pathname}`
 //    * }
 //    */
-
-//   console.log('trace middle')
-
-//   if (rewrittenUrl.pathname === '/') {
-//     rewrittenUrl.pathname = getFullUrl(RouterInfo.HOME)
-//   }
-
 //   return NextResponse.rewrite(rewrittenUrl)
 // })
 

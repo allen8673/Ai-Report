@@ -1,12 +1,13 @@
 'use client'
-import { faFire, faQuestion, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faFire, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import RouterInfo from 'router';
 
+import { SignOutButton } from '@/components/auth-comps';
 import { getFullUrl } from '@/lib/router-helper';
+import RouterInfo from '@/settings/router';
 
 export default function SideMenu() {
     const pathname = usePathname()
@@ -27,6 +28,6 @@ export default function SideMenu() {
                 )
             })}
         </div>
-        <FontAwesomeIcon className='text-[30px]' icon={faUser} color={'white'} />
+        <SignOutButton />
     </div>
 }
