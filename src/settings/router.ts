@@ -9,6 +9,8 @@ export interface IRouter {
 }
 
 export interface IRouterInfo {
+    ROOT: IRouter;
+    AI_REPORT: IRouter;
     HOME: IRouter;
     WORKFLOW: IRouter;
     WORKFLOW_EDITOR: IRouter;
@@ -18,18 +20,28 @@ export interface IRouterInfo {
 }
 
 const RouterInfo: IRouterInfo = {
+    ROOT: {
+        title: '',
+        folder: ''
+    },
+    AI_REPORT: {
+        title: '',
+        folder: 'ai-report',
+        parent: "ROOT",
+    },
     HOME: {
         title: 'Home',
         icon: faHome,
-        folder: '',
-        isNavigation: true
+        folder: 'home',
+        isNavigation: true,
+        parent: "AI_REPORT",
     },
     WORKFLOW: {
         title: 'Workflow',
         folder: 'workflow',
         icon: faBarsProgress,
         isNavigation: true,
-        parent: "HOME"
+        parent: "AI_REPORT"
     },
     WORKFLOW_EDITOR: {
         title: 'Workflow',
@@ -42,14 +54,14 @@ const RouterInfo: IRouterInfo = {
         folder: 'template',
         icon: faMagicWandSparkles,
         isNavigation: true,
-        parent: "HOME"
+        parent: "AI_REPORT"
     },
     DRAWER: {
         title: 'Layout Creator',
         folder: 'drawer',
         icon: faFlask,
         isNavigation: true,
-        parent: "HOME"
+        parent: "AI_REPORT"
     },
     PREVIEW: {
         title: '',
@@ -58,6 +70,5 @@ const RouterInfo: IRouterInfo = {
         parent: 'DRAWER'
     }
 }
-
 
 export default RouterInfo

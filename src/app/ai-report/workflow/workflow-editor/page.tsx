@@ -26,8 +26,8 @@ import { IEditFlow, IFlowNode, IFlow, IFlowBase, ICustomCompData } from "@/inter
 import { ComponentOpt } from "@/interface/flow";
 import { useLayoutContext } from "@/layout/turbo-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
-import { getFullUrl } from "@/lib/router-helper";
-import RouterInfo from "@/settings/router-setting";
+import { getFullUrl } from "@/lib/router";
+import RouterInfo from "@/settings/router";
 
 type EditMode = 'add' | 'normal'
 

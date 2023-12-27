@@ -1,4 +1,4 @@
-import RouterInfo, { IRouter } from "@/settings/router-setting";
+import RouterInfo, { IRouter } from "@/settings/router";
 
 export function getFullUrl(router: IRouter | undefined): string {
     let parentUrl = '';

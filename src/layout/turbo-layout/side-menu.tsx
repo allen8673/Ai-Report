@@ -1,12 +1,13 @@
 'use client'
-import { faFire, faQuestion, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faFire, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { getFullUrl } from '@/lib/router-helper';
-import RouterInfo from '@/settings/router-setting';
+import { SignOutButton } from '@/components/auth-assets';
+import { getFullUrl } from '@/lib/router';
+import RouterInfo from '@/settings/router';
 
 export default function SideMenu() {
     const pathname = usePathname()
@@ -19,7 +20,7 @@ export default function SideMenu() {
         <div className='flex flex-col grow shrink gap-[6px]'>
             {_.map(navigations, n => {
                 const url = getFullUrl(n);
-                const onselected = (!n.folder && pathname === '/') || (!!n.folder && _.includes(pathname, n.folder))
+                const onselected = (pathname === '/' && n === RouterInfo.HOME) || (!!n.folder && _.includes(pathname, n.folder))
                 return (
                     <Link key={n.title} className={`flex-center p-[7px] ${onselected ? "text-light border-solid rounded-std-sm rounded-light" : 'text-light-weak'}`} href={url || "/"}>
                         <FontAwesomeIcon className={`flex-center text-[20px]  hover:text-light`} icon={n.icon || faQuestion} />
@@ -27,6 +28,6 @@ export default function SideMenu() {
                 )
             })}
         </div>
-        <FontAwesomeIcon className='text-[30px]' icon={faUser} color={'white'} />
+        <SignOutButton />
     </div>
 }

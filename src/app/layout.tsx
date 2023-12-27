@@ -3,8 +3,6 @@ import { Inter } from 'next/font/google';
 import { PrimeReactProvider } from 'primereact/api';
 import React from 'react';
 
-import TurboLayout from '@/layout/turbo-layout';
-
 import 'primeflex/primeflex.css';                                   // css utility
 import 'primeicons/primeicons.css';
 import 'primereact/resources/primereact.css';
@@ -27,9 +25,7 @@ export default function Layout({
     <html lang="en">
       <body suppressHydrationWarning={true} className={inter.className}>
         <PrimeReactProvider>
-          <TurboLayout>
-            {children}
-          </TurboLayout>
+          {children}
         </PrimeReactProvider>
       </body>
     </html>
