@@ -1,6 +1,6 @@
 import { IconDefinition, faBarsProgress, faFlask, faHome, faMagicWandSparkles } from "@fortawesome/free-solid-svg-icons";
 
-interface IRouter {
+export interface IRouter {
     title: string;
     folder: string;
     icon?: IconDefinition;
@@ -8,7 +8,9 @@ interface IRouter {
     isNavigation?: boolean
 }
 
-interface IRouterInfo {
+export interface IRouterInfo {
+    ROOT: IRouter;
+    AI_REPORT: IRouter;
     HOME: IRouter;
     WORKFLOW: IRouter;
     WORKFLOW_EDITOR: IRouter;
@@ -18,18 +20,28 @@ interface IRouterInfo {
 }
 
 const RouterInfo: IRouterInfo = {
+    ROOT: {
+        title: '',
+        folder: ''
+    },
+    AI_REPORT: {
+        title: '',
+        folder: 'ai-report',
+        parent: "ROOT",
+    },
     HOME: {
         title: 'Home',
         icon: faHome,
-        folder: '',
-        isNavigation: true
+        folder: 'home',
+        isNavigation: true,
+        parent: "AI_REPORT",
     },
     WORKFLOW: {
         title: 'Workflow',
         folder: 'workflow',
         icon: faBarsProgress,
         isNavigation: true,
-        parent: "HOME"
+        parent: "AI_REPORT"
     },
     WORKFLOW_EDITOR: {
         title: 'Workflow',
@@ -42,14 +54,14 @@ const RouterInfo: IRouterInfo = {
         folder: 'template',
         icon: faMagicWandSparkles,
         isNavigation: true,
-        parent: "HOME"
+        parent: "AI_REPORT"
     },
     DRAWER: {
         title: 'Layout Creator',
         folder: 'drawer',
         icon: faFlask,
         isNavigation: true,
-        parent: "HOME"
+        parent: "AI_REPORT"
     },
     PREVIEW: {
         title: '',
@@ -57,17 +69,6 @@ const RouterInfo: IRouterInfo = {
         isNavigation: false,
         parent: 'DRAWER'
     }
-}
-
-export function getFullUrl(router: IRouter | undefined): string {
-    let parentUrl = '';
-    if (!router?.folder || !router.parent) return parentUrl;
-
-    const parent = RouterInfo[router.parent]
-    if (!!parent) {
-        parentUrl = getFullUrl(parent)
-    }
-    return `${parentUrl}/${router.folder}`;
 }
 
 export default RouterInfo

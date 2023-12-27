@@ -18,7 +18,8 @@ import Table from "@/components/table";
 import { Column } from "@/components/table/table";
 import { IFlowBase } from "@/interface/flow";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
-import RouterInfo, { getFullUrl } from "@/settings/router-setting";
+import { getFullUrl } from "@/lib/router";
+import RouterInfo from "@/settings/router";
 
 interface FormData {
     id?: string;

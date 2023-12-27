@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 // import { faCode } from '@fortawesome/free-solid-svg-icons'
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
 import {
 	BaseBoxShapeUtil,
 	DefaultSpinner,
@@ -13,10 +14,11 @@ import {
 } from '@tldraw/tldraw'
 import { useEffect } from 'react'
 
-// import { useAiDrawerContext } from './context';
-
 import { addDraw } from '@/api-helpers/draw-api'
-import RouterInfo, { getFullUrl } from '@/settings/router-setting'
+import { getFullUrl } from '@/lib/router'
+import RouterInfo from '@/settings/router'
+
+
 
 export type PreviewShape = TLBaseShape<
 	'preview',
