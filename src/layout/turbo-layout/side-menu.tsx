@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { SignOutButton } from '@/components/auth-comps';
-import { getFullUrl } from '@/lib/router-helper';
+import { getFullUrl } from '@/lib/router';
 import RouterInfo from '@/settings/router';
 
 export default function SideMenu() {

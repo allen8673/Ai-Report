@@ -15,7 +15,7 @@ import {
 import { useEffect } from 'react'
 
 import { addDraw } from '@/api-helpers/draw-api'
-import { getFullUrl } from '@/lib/router-helper'
+import { getFullUrl } from '@/lib/router'
 import RouterInfo from '@/settings/router'
 
 
