@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { SignOutButton } from '@/components/auth-comps';
+import { SignOutButton } from '@/components/auth-assets';
 import { getFullUrl } from '@/lib/router';
 import RouterInfo from '@/settings/router';
 
