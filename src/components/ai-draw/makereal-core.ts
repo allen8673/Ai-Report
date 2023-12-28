@@ -3,7 +3,7 @@ import { Editor, createShapeId, getSvgAsImage } from "@tldraw/tldraw";
 import apiCaller from "../../api-helpers/api-caller";
 
 import { addDraw } from "@/api-helpers/draw-api";
-import { OPENAI_USER_PROMPT, OPENAI_USER_PROMPT_WITH_PREVIOUS_DESIGN } from "@/components/ai-drawer/prompt";
+import { OPENAI_USER_PROMPT, OPENAI_USER_PROMPT_WITH_PREVIOUS_DESIGN } from "@/components/ai-draw/prompt";
 import { DrawData, GPT4VCompletionRequest, MessageContent, PreviewShape } from "@/interface/draw";
 
 const GPT_URL = process.env.NEXT_PUBLIC_GPT_URL;

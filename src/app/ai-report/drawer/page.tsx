@@ -1,5 +1,5 @@
 'use client'
-import AiDrawer from "@/components/ai-drawer";
+import AiDrawer from "@/components/ai-draw";
 import TitlePane from "@/components/panes/title";
 
 export default function Page() {
