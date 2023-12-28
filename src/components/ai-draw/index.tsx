@@ -9,7 +9,7 @@ import CodeEditor from "../code-editor";
 import ErrorBoundary from "../error-boundary";
 
 import { PreviewShapeUtil } from "./PreviewShape";
-import { AiDrawerContext } from "./context";
+import { AiDrawContext } from "./context";
 import { makeReal } from "./makereal-core";
 import { OPEN_AI_SYSTEM_PROMPT } from "./prompt";
 
@@ -17,11 +17,11 @@ import { useLayoutContext } from "@/layout/turbo-layout/context";
 
 import '@tldraw/tldraw/tldraw.css';
 
-export interface AiDrawerProps {
+export interface AiDrawProps {
     className?: string;
 }
 const shapeUtils = [PreviewShapeUtil];
-export default function AiDrawer({ className }: AiDrawerProps) {
+export default function AiDraw({ className }: AiDrawProps) {
     const { showMessage } = useLayoutContext();
     const [editor, setEditor] = useState<Editor>()
     const [html, setHtml] = useState<string>('')
@@ -40,7 +40,7 @@ export default function AiDrawer({ className }: AiDrawerProps) {
     }, [editor])
 
     return (
-        <AiDrawerContext.Provider value={{ setHtml }}>
+        <AiDrawContext.Provider value={{ setHtml }}>
             <Splitter className={`h-full overflow-auto ${className || ''}`} layout="vertical">
                 <SplitterPanel className="px-[7px] " size={70}>
                     <Splitter className={`h-full overflow-auto ${className || ''}`} layout='horizontal'>
@@ -85,6 +85,6 @@ export default function AiDrawer({ className }: AiDrawerProps) {
                     />
                 </SplitterPanel>
             </Splitter>
-        </AiDrawerContext.Provider>
+        </AiDrawContext.Provider>
     )
 }

@@ -1,11 +1,11 @@
 import React, { SetStateAction, Dispatch, useContext } from "react";
 
-export interface AiDrawerStore {
+export interface AiDrawStore {
     setHtml: Dispatch<SetStateAction<string>>
 }
 
-export const AiDrawerContext = React.createContext<AiDrawerStore>({
+export const AiDrawContext = React.createContext<AiDrawStore>({
     setHtml: () => { }
 });
 
-export const useAiDrawerContext = (): AiDrawerStore => useContext(AiDrawerContext);
+export const useAiDrawContext = (): AiDrawStore => useContext(AiDrawContext);
