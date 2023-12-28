@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google';
 import { PrimeReactProvider } from 'primereact/api';
 import React from 'react';
 
-import 'primeflex/primeflex.css';                                   // css utility
+import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/primereact.css';
 import '../style/turbo-theme.css';
