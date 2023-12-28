@@ -17,8 +17,7 @@ import DndList from "../dnd-list";
 import ErrorBoundary from "../error-boundary";
 import Form from "../form";
 import { FormInstance } from "../form/form";
-import Graph from "../graph";
-import { useGraphRef } from "../graph/helper";
+import Graph, { useGraphRef } from "../graph";
 import Modal from "../modal";
 
 import AddButton from "./actbar-assets/add-button";

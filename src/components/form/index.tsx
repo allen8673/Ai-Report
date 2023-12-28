@@ -1,11 +1,10 @@
 import { classNames } from "primereact/utils";
-import React, { useEffect } from "react";
-import { Controller, Path, useFieldArray, } from "react-hook-form";
+import React, { useEffect, useRef } from "react";
+import { Controller, DefaultValues, useForm as useFormCore, Path, useFieldArray, } from "react-hook-form";
 
 import ErrorBoundary from "../error-boundary";
 
-import { FormItemProps, FormListProps, FormProps, FormValue, GetItemProps } from "./form";
-import { useForm } from "./helper";
+import { FormInstance, FormItemProps, FormListProps, FormProps, FormValue, GetItemProps } from "./form";
 
 function GetList<T extends FormValue>({ formCore }: GetItemProps<T>) {
     const { control } = formCore;
@@ -82,7 +81,30 @@ function GetItem<T extends FormValue>({ formCore, readonly }: GetItemProps<T>) {
     }
 }
 
+export const useForm = <T extends Record<string, any>>(_form?: FormInstance<T>, defaultValues?: DefaultValues<T>)
+    : { form: FormInstance<T> } => {
+    const formCore = useFormCore<T, T>({ defaultValues, mode: 'onBlur', reValidateMode: 'onBlur' });
+    const submit = async (): Promise<T> => new Promise<T>((resolve, reject) => {
+        formCore.handleSubmit(
+            (data) => resolve(data),
+            (e) => {
+                reject(e)
+            }
+        )()
+    })
+    const form = useRef<FormInstance<T>>({
+        getValues: () => {
+            return formCore.getValues()
+        },
+        setValue: (name, value, options) => {
+            formCore.setValue(name, value, options)
+        },
+        formCore,
+        submit
+    }).current;
+    return { form: _form || form }
 
+}
 
 export default function Form<T extends Record<string, any>>(props: FormProps<T>) {
     const {

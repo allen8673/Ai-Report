@@ -15,11 +15,11 @@ import { getComponentOpts, getCustomComponents } from "@/api-helpers/master-api"
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowEditor from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
-import { X_GAP, calculateDepth, expandRefWF, getNewIdTrans, hasDependencyCycle, ifFlowIsCompleted, resetPosition } from "@/components/flow-editor/helper";
+import { X_GAP, calculateDepth, expandRefWF, getNewIdTrans, hasDependencyCycle, ifFlowIsCompleted, resetPosition } from "@/components/flow-editor/lib";
 import { FlowNameMapper } from "@/components/flow-editor/type";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
-import { useGraphRef } from "@/components/graph/helper";
+import { useGraphRef } from "@/components/graph";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/panes/title";
 import { IEditFlow, IFlowNode, IFlow, IFlowBase, ICustomCompData } from "@/interface/flow";

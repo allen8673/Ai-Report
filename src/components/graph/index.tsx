@@ -1,7 +1,16 @@
 'use client'
 
 import _ from "lodash";
-import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import {
+    useCallback,
+    useEffect,
+    useImperativeHandle,
+    useMemo,
+    useRef,
+    useState,
+    MutableRefObject,
+    Ref
+} from "react";
 import ReactFlow, {
     Node,
     Edge,
@@ -21,6 +30,47 @@ import { v4 } from "uuid";
 import ErrorBoundary from "../error-boundary";
 
 import { EventType, GraphInstance, GraphProps } from "./graph";
+
+export const useGraphRef = <NData, EData = any>(ref?: Ref<GraphInstance<NData, EData>>)
+    : { graphRef: MutableRefObject<GraphInstance<NData, EData>> } => {
+    const graphRef = useRef<GraphInstance<NData, EData>>({
+        addNode: (): void => {
+            //
+        },
+        setNode: (): void => {
+            //
+        },
+        setNodes: (): void => {
+            //
+        },
+        getNodes: (): Node<NData>[] => {
+            return []
+        },
+        removeNode: (): void => {
+            //
+        },
+        duplicateNode: (): void => {
+            //
+        },
+        addEdge: (): void => {
+            //
+        },
+        setEdge: (): void => {
+            //
+        },
+        setEdges: (): void => {
+            //
+        },
+        removeEdge: (): void => {
+            //
+        },
+        resetAllElements: (): void => {
+            //
+        },
+    });
+    return { graphRef: (ref as MutableRefObject<GraphInstance<NData, EData>>) || graphRef };
+};
+
 
 export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(props: GraphProps<NData, EData, NNormal, ENormal>) {
 
