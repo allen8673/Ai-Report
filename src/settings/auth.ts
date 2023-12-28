@@ -56,17 +56,20 @@ export const authConfig: NextAuthConfig = {
         authorized(params) {
             const { auth, request: { nextUrl }, } = params
             const { pathname, searchParams } = nextUrl;
+            const inAuth = !!(auth as any)?.jwt;
+            const homeUrl = getFullUrl(RouterInfo.HOME)
             if (pathname === "/login") {
+                // if (!!(auth as any)?.jwt) return true
                 const { callbackUrl } = coverSearchParamsToObj<any>(searchParams);
-                if (!!auth && !!callbackUrl) {
-                    return Response.redirect(new URL(callbackUrl, nextUrl));
+                if (inAuth) {
+                    return Response.redirect(new URL(callbackUrl || homeUrl, nextUrl));
                 }
                 return true
             }
             if (pathname === '/') {
-                return Response.redirect(new URL(getFullUrl(RouterInfo.HOME), nextUrl));
+                return Response.redirect(new URL(homeUrl, nextUrl));
             }
-            return !!(auth as any)?.jwt
+            return inAuth
         },
 
     },
