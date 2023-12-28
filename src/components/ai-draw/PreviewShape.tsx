@@ -53,7 +53,6 @@ export class PreviewShapeUtil extends BaseBoxShapeUtil<PreviewShape> {
 	override canUnmount = () => false
 
 	override component(shape: PreviewShape) {
-		// const { setHtml } = useAiDrawerContext()
 		const isEditing = useIsEditing(shape.id)
 		const boxShadow = useValue(
 			'box shadow',

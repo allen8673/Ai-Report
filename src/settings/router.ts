@@ -15,7 +15,7 @@ export interface IRouterInfo {
     WORKFLOW: IRouter;
     WORKFLOW_EDITOR: IRouter;
     TEMPLATE: IRouter;
-    DRAWER: IRouter;
+    DRAW: IRouter;
     PREVIEW: IRouter;
 }
 
@@ -56,9 +56,9 @@ const RouterInfo: IRouterInfo = {
         isNavigation: true,
         parent: "AI_REPORT"
     },
-    DRAWER: {
+    DRAW: {
         title: 'Layout Creator',
-        folder: 'drawer',
+        folder: 'draw',
         icon: faFlask,
         isNavigation: true,
         parent: "AI_REPORT"
@@ -67,7 +67,7 @@ const RouterInfo: IRouterInfo = {
         title: '',
         folder: 'preview',
         isNavigation: false,
-        parent: 'DRAWER'
+        parent: 'DRAW'
     }
 }
 
