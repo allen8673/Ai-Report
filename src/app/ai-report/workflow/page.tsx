@@ -1,6 +1,7 @@
 'use client'
 import { faAdd, faEye, faPlayCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import RouterInfo from "@settings/router";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
@@ -19,7 +20,6 @@ import { Column } from "@/components/table/table";
 import { IFlowBase } from "@/interface/flow";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import { getFullUrl } from "@/lib/router";
-import RouterInfo from "@/settings/router";
 
 interface FormData {
     id?: string;

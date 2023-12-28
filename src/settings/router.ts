@@ -30,7 +30,7 @@ const RouterInfo: IRouterInfo = {
         parent: "ROOT",
     },
     HOME: {
-        title: 'Home',
+        title: 'Ai Report',
         icon: faHome,
         folder: 'home',
         isNavigation: true,

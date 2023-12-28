@@ -1,4 +1,4 @@
-import { auth } from "./settings/auth";
+import { auth } from "@settings/auth";
 
 export const config = {
   //   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],

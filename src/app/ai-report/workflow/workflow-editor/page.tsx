@@ -1,6 +1,7 @@
 'use client'
 import { faCancel, faEye, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import RouterInfo from "@settings/router";
 import { map, size } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from 'primereact/button';
@@ -27,7 +28,6 @@ import { ComponentOpt } from "@/interface/flow";
 import { useLayoutContext } from "@/layout/turbo-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import { getFullUrl } from "@/lib/router";
-import RouterInfo from "@/settings/router";
 
 type EditMode = 'add' | 'normal'
 

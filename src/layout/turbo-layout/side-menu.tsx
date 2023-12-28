@@ -1,13 +1,13 @@
 'use client'
 import { faFire, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import RouterInfo from '@settings/router';
 import _ from 'lodash';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { SignOutButton } from '@/components/auth-assets';
 import { getFullUrl } from '@/lib/router';
-import RouterInfo from '@/settings/router';
 
 export default function SideMenu() {
     const pathname = usePathname()

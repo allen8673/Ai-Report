@@ -1,7 +1,7 @@
 'use server'
+import { signIn, signOut } from "@settings/auth";
 import { AuthError } from "next-auth";
 
-import { signIn, signOut } from "@/settings/auth";
 export async function authenticate(
     prevState: string | undefined,
     formData: FormData,
