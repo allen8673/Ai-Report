@@ -67,7 +67,10 @@ export default function SideMenu() {
                     <Button
                         unstyled
                         icon={<FontAwesomeIcon className='text-[30px]' icon={faUser} color={'white'} />}
-                        className="bg-inherit border-none"
+                        className={`
+                        flex-center p-2 bg-inherit border-none rounded-std-sm
+                        hover:bg-deep-weak [&>span]:w-0
+                        `}
                         onClick={(e) => {
                             userMenu.current?.toggle(e)
                         }}
