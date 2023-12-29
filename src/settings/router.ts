@@ -57,7 +57,7 @@ const RouterInfo: IRouterInfo = {
         parent: "AI_REPORT"
     },
     DRAW: {
-        title: 'Layout Creator',
+        title: 'Ai Draw',
         folder: 'draw',
         icon: faFlask,
         isNavigation: true,
