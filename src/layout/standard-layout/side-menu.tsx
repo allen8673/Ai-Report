@@ -6,14 +6,34 @@ import _ from 'lodash';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from 'primereact/button';
+import { MenuItem } from 'primereact/menuitem';
+import { TieredMenu } from 'primereact/tieredmenu';
 import { Tooltip } from 'primereact/tooltip';
+import { useRef } from 'react';
 
 import { userSignOut } from '@/lib/actions';
 import { getFullUrl } from '@/lib/router';
 
 export default function SideMenu() {
     const pathname = usePathname();
+    const userMenu = useRef<TieredMenu>(null);
     const navigations = _.filter(RouterInfo, ['isNavigation', true]);
+    const userItems: MenuItem[] = [
+        {
+            label: 'Profiles',
+            icon: 'pi pi-fw pi-user',
+        },
+        {
+            separator: true
+        },
+        {
+            label: 'Logout',
+            icon: 'pi pi-fw pi-power-off',
+            command: () => {
+                userSignOut()
+            }
+        },
+    ];
 
     return (
         <>
@@ -36,15 +56,23 @@ export default function SideMenu() {
                         )
                     })}
                 </div>
-                <Button
-                    unstyled
-                    icon={<FontAwesomeIcon className='text-[30px]'
-                        icon={faUser} color={'white'}
-                        onClick={() => {
-                            userSignOut()
-                        }} />}
-                    className="bg-inherit border-none"
-                />
+                <div className="flex justify-content-center">
+                    <TieredMenu
+                        model={userItems}
+                        popup
+                        ref={userMenu}
+                        breakpoint="176px"
+                        style={{ transform: 'translate(40px ,34px)' }}
+                    />
+                    <Button
+                        unstyled
+                        icon={<FontAwesomeIcon className='text-[30px]' icon={faUser} color={'white'} />}
+                        className="bg-inherit border-none"
+                        onClick={(e) => {
+                            userMenu.current?.toggle(e)
+                        }}
+                    />
+                </div>
             </div>
         </>
     )
