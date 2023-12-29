@@ -6,9 +6,6 @@ import { useRef } from 'react';
 import { LayoutContext, ShowMessage } from './context';
 import SideMenu from './side-menu';
 
-import 'primereact/resources/themes/saga-purple/theme.css';
-// import 'primereact/resources/themes/lara-dark-purple/theme.css';
-
 export default function TurboLayout({
     children,
 }: {

@@ -6,6 +6,8 @@ import React from 'react';
 import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/primereact.css';
+import 'primereact/resources/themes/saga-purple/theme.css';
+// import 'primereact/resources/themes/lara-dark-purple/theme.css';
 import '../style/turbo-theme.css';
 import '../style/globals.css';
 
