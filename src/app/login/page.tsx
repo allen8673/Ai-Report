@@ -18,10 +18,13 @@ export default function LoginForm() {
                 text="NATIONAL INSTITUTE FOR CYBER SECURITY "
                 randomPermutaion={false} fontColor="#95679e" />
             <div className={`
-            w-[400px] h-[400px] p-8 bg-deep-weak/[.8] z-2
-            flex-center flex-col gap-[15px] 
-            rounded-std border-light-weak border-solid border-[3px]
+                    w-[400px] h-[400px] p-6 bg-deep-weak/[.8] z-2
+                    flex-center flex-col gap-[15px] 
+                    rounded-std border-light-weak border-solid border-[3px]
             `}>
+                <h1 className={`m-0 text-5xl text-turbo-deep-strong text-shadow-center shadow-turbo-deep `}>
+                    AI Report
+                </h1>
                 <Form
                     defaultValues={{ id: '', password: '' }}
                     onLoad={form => setForm(form)}
