@@ -43,7 +43,7 @@ export default function LoginForm() {
                                         required: 'Password is required!',
                                     }
                                 } >
-                                    <InputText />
+                                    <InputText type='password' />
                                 </Item>
                             </>
                     }
