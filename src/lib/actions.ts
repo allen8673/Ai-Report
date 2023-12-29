@@ -2,12 +2,11 @@
 import { signIn, signOut } from "@settings/auth";
 import { AuthError } from "next-auth";
 
-export async function authenticate(
-    prevState: string | undefined,
-    formData: FormData,
+export async function authenticate<T extends Record<string, string>>(
+    data: T,
 ) {
     try {
-        await signIn('credentials', formData);
+        await signIn('credentials', data);
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
