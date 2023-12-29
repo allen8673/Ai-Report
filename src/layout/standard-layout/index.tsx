@@ -1,21 +1,46 @@
-import HeaderBar from './header-bar'
-import SideMenu from './side-menu';
-import './standar-layout.css'
+'use client'
+import { ConfirmDialog } from 'primereact/confirmdialog';
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
 
-export default function StandarLayout({
+import { LayoutContext, ShowMessage } from './context';
+import SideMenu from './side-menu';
+
+export default function StandardLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
+    const toast = useRef<Toast>(null);
+
+    const showMessage = (msg: string | ShowMessage): void => {
+        const className = 'toast-message'
+        typeof msg === 'string' ? toast.current?.show({
+            severity: 'success',
+            detail: msg,
+            life: 3000,
+            closable: false,
+            className,
+        }) : toast.current?.show({
+            severity: msg.type || 'success',
+            summary: msg.title,
+            detail: msg.message,
+            life: 3000,
+            closable: false,
+            className,
+        })
+    }
+
     return (
-        <div className="standar-layout flex items-stretch">
-            <SideMenu />
-            <div className='grow shrink'>
-                <HeaderBar title='Home' />
-                <main className='main-view bg-gray-50'>
+        <LayoutContext.Provider value={{ showMessage }}>
+            <div className="turbo-layout flex items-stretch bg-deep-strong h-screen p-[21px] gap-std">
+                <Toast className='border-0' ref={toast} position='top-center' />
+                <ConfirmDialog />
+                <SideMenu />
+                <main className='main-view grow shrink'>
                     {children}
                 </main>
             </div>
-        </div>
+        </LayoutContext.Provider>
     );
 }

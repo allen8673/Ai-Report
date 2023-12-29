@@ -13,7 +13,7 @@ import { AiDrawContext } from "./context";
 import { makeReal } from "./makereal-core";
 import { OPEN_AI_SYSTEM_PROMPT } from "./prompt";
 
-import { useLayoutContext } from "@/layout/turbo-layout/context";
+import { useLayoutContext } from "@/layout/standard-layout/context";
 
 import '@tldraw/tldraw/tldraw.css';
 

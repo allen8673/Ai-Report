@@ -2,7 +2,7 @@ import { auth } from '@settings/auth';
 import { SessionProvider } from 'next-auth/react';
 import React from 'react';
 
-import TurboLayout from '@/layout/turbo-layout';
+import StandardLayout from '@/layout/standard-layout';
 
 export default async function Layout({
   children,
@@ -13,9 +13,9 @@ export default async function Layout({
 
   return (
     <SessionProvider session={session}>
-      <TurboLayout >
+      <StandardLayout >
         {children}
-      </TurboLayout>
+      </StandardLayout>
     </SessionProvider>
   );
 }
