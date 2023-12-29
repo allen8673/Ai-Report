@@ -7,7 +7,7 @@ module.exports = {
             script: './node_modules/next/dist/bin/next',
             args: 'start',
             autorestart: true,
-            watch: false,
+            watch: true,
             max_memory_restart: '1G',
             env: {
                 PORT: 7788,
