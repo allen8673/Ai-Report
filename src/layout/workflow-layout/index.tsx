@@ -14,6 +14,7 @@ import { WfLayoutContext } from './context';
 import { getFlow } from '@/api-helpers/flow-api';
 import { checkJob, downloadJob, getJobs, runReport } from '@/api-helpers/report-api';
 import CodeEditor from '@/components/code-editor';
+import FileGroupUploader from '@/components/file-group-uploader';
 import FileUploader from '@/components/file-uploader';
 import { ifFlowIsCompleted } from '@/components/flow-editor/lib';
 import Modal from '@/components/modal';
@@ -174,6 +175,12 @@ export default function WorkflowLayout({
                 footerClass="flex justify-end"
                 okLabel="Cancel"
             >
+                <FileGroupUploader
+                    uploadLabel="Upload & Run"
+                    grouping={[]}
+                    onUpload={e => {
+                        // 
+                    }} />
                 <FileUploader
                     uploadLabel="Upload & Run"
                     onUpload={e => {

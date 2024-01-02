@@ -3,7 +3,7 @@ import { AccordionTabProps } from "primereact/accordion";
 export type FileGroups = Record<string, File[]>
 
 export interface GroupingFileUploaderProps {
-    grouping: string[];
+    grouping?: string[];
     name?: string;
     onUpload: (fileGroups: FileGroups) => void,
     uploadLabel?: string;

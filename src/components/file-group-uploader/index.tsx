@@ -78,7 +78,7 @@ function HeaderTemplate({ title, opts, onFilesSelect }: HeaderTemplateProps) {
 export default function FileGroupUploader({ grouping, onUpload, uploadLabel }: GroupingFileUploaderProps) {
 
     const [fileGroups, setFileGroups] = useState<FileGroups>({});
-    const _grouping = grouping?.length > 1 ? grouping : ['file']
+    const _grouping: string[] = (!!grouping && grouping.length > 1) ? grouping : ['file']
 
     const onDelete = (group: string, file: File) => {
         setFileGroups(pre => {
