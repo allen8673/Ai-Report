@@ -49,9 +49,6 @@ body {
   }
 }
 
-.toast-message {
-  @apply border-0 border-x-[6px]
-}
 
 .ellipsis {
   @apply text-ellipsis overflow-hidden whitespace-nowrap;
@@ -64,4 +61,8 @@ body {
 
 .page-std {
   @apply flex h-full flex-col gap-std items-stretch text-light
+}
+
+.std-border {
+  @apply border-solid border-light-weak rounded-std-sm
 }
