@@ -1,5 +1,5 @@
 
-import _ from 'lodash';
+import { map } from 'lodash';
 import { Column, } from 'primereact/column';
 import { DataTable, } from 'primereact/datatable';
 
@@ -18,7 +18,7 @@ export default function Table<T extends Record<string, any>>({ className, column
             dataKey="id"
             tableStyle={{ minWidth: '50rem' }}
             {...tableProps}>
-            {_.map(columns, ({ key, title, format, ...c }, idx) => {
+            {map(columns, ({ key, title, format, ...c }, idx) => {
                 const col_key = (key as string) || idx
                 return (
                     <Column

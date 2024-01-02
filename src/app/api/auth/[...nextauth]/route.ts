@@ -1,7 +1,5 @@
+import { handlers } from "@settings/auth";
 import { NextRequest } from "next/server";
-
-import { handlers } from "@/settings/auth";
-
 
 const { GET: AuthGET, POST } = handlers;
 export { POST };

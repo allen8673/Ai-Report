@@ -27,6 +27,12 @@
 
 .p-datatable {
     @apply flex flex-col justify-between gap-std-sm;
+    overflow: auto;
+
+    & .p-datatable-wrapper {
+        @apply grow shrink;
+
+    }
 
     & .p-datatable-table {
         @apply rounded-std overflow-hidden;
@@ -45,7 +51,6 @@
             }
 
         }
-
     }
 
     & .p-paginator {

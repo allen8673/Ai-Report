@@ -2,6 +2,7 @@
 // import { faCode } from '@fortawesome/free-solid-svg-icons'
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import RouterInfo from '@settings/router'
 import {
 	BaseBoxShapeUtil,
 	DefaultSpinner,
@@ -16,7 +17,6 @@ import { useEffect } from 'react'
 
 import { addDraw } from '@/api-helpers/draw-api'
 import { getFullUrl } from '@/lib/router'
-import RouterInfo from '@/settings/router'
 
 
 

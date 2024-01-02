@@ -1,6 +1,8 @@
+'use client'
 import MatrixAnimationPanel from "@/components/panes/matrix-animation";
 
 export default function Home() {
+
     return (
         <div className="flex-center w-full h-full text-light" >
             <h1 className={`
