@@ -14,3 +14,9 @@ export interface HeaderTemplateProps {
     opts: AccordionTabProps;
     onFilesSelect?: (files: File[]) => void
 }
+
+export interface ItemTemplateProps {
+    group: string;
+    file: File;
+    onDelete?: (group: string, file: File) => void
+}

@@ -8,15 +8,10 @@ import React, { useRef, useState } from "react";
 
 import EmptyPane from "../panes/empty";
 
-import { FileGroups, GroupingFileUploaderProps, HeaderTemplateProps } from "./file-group-uploader";
+import { FileGroups, GroupingFileUploaderProps, HeaderTemplateProps, ItemTemplateProps } from "./file-group-uploader";
 
 import { cn } from "@/lib/utils";
 
-export interface ItemTemplateProps {
-    group: string;
-    file: File;
-    onDelete?: (group: string, file: File) => void
-}
 function ItemTemplate({ group, file, onDelete }: ItemTemplateProps) {
     return (
         <div className={cn`
