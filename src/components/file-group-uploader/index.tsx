@@ -18,11 +18,6 @@ function ItemTemplate({ group, file, onDelete }: ItemTemplateProps) {
         h-[55px] my-1 px-3 
         gap-[7px] bg-deep-weak text-light rounded-std-sm
         flex items-center`}>
-            {/* <span className="h-[40px] w-[40px] text-center">{
-                !!file?.objectURL ?
-                    <img alt='' src={file?.objectURL} className="w-full h-full" /> :
-                    <FontAwesomeIcon className="w-full h-full" icon={faFile} />
-            }</span> */}
             <div className="flex grow items-center [&>div]:text-left">
                 <div className="flex flex-column grow">
                     <div>{file.name}</div>
@@ -33,7 +28,6 @@ function ItemTemplate({ group, file, onDelete }: ItemTemplateProps) {
                     severity='danger'
                     icon={<FontAwesomeIcon icon={faTrash} />}
                     onClick={() => onDelete?.(group, file)}
-                // onClick={(e) => { opts.onRemove(e) }}
                 />
             </div>
         </div>
