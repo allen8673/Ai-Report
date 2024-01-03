@@ -1,5 +1,5 @@
 'use client'
-import { faAdd, faCloudUpload, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faCloudUpload, faEraser, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { concat, map } from "lodash";
 import { Accordion, AccordionTab } from "primereact/accordion";
@@ -38,7 +38,7 @@ function ItemTemplate({ group, file }: ItemTemplateProps) {
 
 function HeaderTemplate({ group, opts }: HeaderTemplateProps) {
     const ref = useRef<HTMLInputElement>(null);
-    const { onFilesSelect, fileGroups } = useFGUploaderContext();
+    const { onFilesSelect, fileGroups, deleteGroup } = useFGUploaderContext();
 
     return (
         <div className={cn('flex grow justify-between items-center', opts.className)} role='presentation'
@@ -48,21 +48,33 @@ function HeaderTemplate({ group, opts }: HeaderTemplateProps) {
                 onChange={e => {
                     onFilesSelect(group, map(e.target.files, f => f))
                 }}
-
             />
             <span className="flex-center gap-2">
-                {!!fileGroups[group]?.length && <i className="pi pi-check text-success rounded-full border-solid p-1" />}
+                {!!fileGroups[group]?.length
+                    ? <i className="pi pi-check-circle text-success" />
+                    : <i className="pi pi-exclamation-circle text-warning" />
+                }
                 <span className="text-xl text-light">{group}</span>
             </span>
-            <span>
+            <span className="flex-center gap-2">
+                <Button
+                    className="custom-choose-btn p-button-rounded p-button-outlined border-2"
+                    style={{ color: 'rgba(185, 28, 28, 1)' }}
+                    size='small'
+                    icon={<FontAwesomeIcon className="w-[18px] h-[18px]  p-[3px]" icon={faEraser} />}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        deleteGroup(group)
+                    }}
+                />
                 <Button
                     className="custom-choose-btn p-button-rounded p-button-outlined border-2"
                     style={{ color: '#BA4AFF' }}
                     size='small'
                     icon={<FontAwesomeIcon className="w-[18px] h-[18px]  p-[3px]" icon={faAdd} />}
                     onClick={(e) => {
-                        ref.current?.click();
                         e.stopPropagation();
+                        ref.current?.click();
                     }}
                 />
             </span>
@@ -114,8 +126,15 @@ export default function FileGroupUploader(props: GroupingFileUploaderProps) {
         })
     }
 
+    const deleteGroup = (group: string) => {
+        setFileGroups(pre => {
+            delete pre[group]
+            return { ...pre }
+        })
+    }
+
     return (
-        <FGUploaderContext.Provider value={{ deleteFile, onFilesSelect, fileGroups }}>
+        <FGUploaderContext.Provider value={{ deleteFile, deleteGroup, onFilesSelect, fileGroups }}>
             <div>
                 <Accordion >
                     {map(_grouping, (group, idx) => {
