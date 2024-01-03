@@ -1,7 +1,8 @@
 'use client'
+import { faCloudUpload } from '@fortawesome/free-solid-svg-icons';
 import { faDownload } from '@fortawesome/free-solid-svg-icons/faDownload';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { map, toString } from 'lodash';
+import { includes, map, toString } from 'lodash';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { SelectItem } from 'primereact/selectitem';
@@ -14,7 +15,8 @@ import { WfLayoutContext } from './context';
 import { getFlow } from '@/api-helpers/flow-api';
 import { checkJob, downloadJob, getJobs, runReport } from '@/api-helpers/report-api';
 import CodeEditor from '@/components/code-editor';
-import FileUploader from '@/components/file-uploader';
+import FileGroupUploader, { useFileGroupUploader } from '@/components/file-group-uploader';
+// import FileUploader from '@/components/file-uploader';
 import { ifFlowIsCompleted } from '@/components/flow-editor/lib';
 import Modal from '@/components/modal';
 import EmptyPane from '@/components/panes/empty';
@@ -119,9 +121,10 @@ export default function WorkflowLayout({
     children: React.ReactNode
 }) {
     const { showMessage } = useLayoutContext();
+    const { uploaderRef } = useFileGroupUploader()
     const [runningWF, setRunningWF] = useState<IFlow>();
     const [reportJobs, setReportJobs] = useState<ViewReports>();
-
+    const [disabledUpload, setDisabledUpload] = useState<boolean>();
     const runWorkflow = async (wf?: IFlow | string) => {
         if (!wf) return;
         const workflow: IFlow | undefined = typeof wf === 'string' ? await getFlow(wf) : wf
@@ -173,33 +176,52 @@ export default function WorkflowLayout({
                 onOk={() => setRunningWF(undefined)}
                 footerClass="flex justify-end"
                 okLabel="Cancel"
+                footerPrefix={
+                    <Button
+                        className='custom-upload-btn p-button-rounded p-button-outlined border-2'
+                        label={'Upload & Run'}
+                        icon={<FontAwesomeIcon className="w-[18px] h-[18px] p-[3px]" icon={faCloudUpload} />}
+                        style={{ color: '#2a8af6' }}
+                        onClick={() => {
+                            uploaderRef.current.upload()
+                        }}
+                        disabled={disabledUpload}
+                    />
+                }
             >
-                <FileUploader
+                <FileGroupUploader
+                    uploaderRef={uploaderRef}
+                    hideUploadButton
                     uploadLabel="Upload & Run"
-                    onUpload={e => {
-                        if (runningWF && e.files && e.files.length > 0) {
-                            const formData = new FormData();
-                            for (const i in e.files) {
-                                formData.append('files', e.files[i])
-                            }
-
-                            formData.append('userId', '23224');
-                            formData.append('workflowId', runningWF.id);
-                            formData.append('version', '1');
-
-                            runReport(formData).then((res) => {
-                                showMessage({
-                                    message: res.message || 'success',
-                                    type: 'success'
-                                })
-                                setRunningWF(undefined);
-                            }).catch((error) => {
-                                showMessage({
-                                    message: toString(error),
-                                    type: 'error'
-                                })
-                            });
+                    grouping={runningWF?.flows.filter(f => includes(['Input', 'Report'], f.type)).sort(a => a.type === 'Input' ? 1 : 0).map(f => f.name || '')}
+                    onUpload={fileGroups => {
+                        const files = fileGroups['Upload'];
+                        if (!runningWF || !files?.length) return;
+                        const formData = new FormData();
+                        for (const i in files) {
+                            formData.append('files', files[i])
                         }
+                        formData.append('userId', '23224');
+                        formData.append('workflowId', runningWF.id);
+                        formData.append('version', '1');
+
+                        runReport(formData).then((res) => {
+                            showMessage({
+                                message: res.message || 'success',
+                                type: 'success'
+                            })
+                            setRunningWF(undefined);
+                        }).catch((error) => {
+                            showMessage({
+                                message: toString(error),
+                                type: 'error'
+                            })
+                        });
+
+                    }}
+                    onChange={fileGroups => {
+                        const files = fileGroups['Upload'];
+                        setDisabledUpload(!files?.length)
                     }}
                 />
             </Modal>

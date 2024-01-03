@@ -1,7 +1,16 @@
 'use client'
+import { useEffect } from "react";
+
 import MatrixAnimationPanel from "@/components/panes/matrix-animation";
+import { useLayoutContext } from "@/layout/standard-layout/context";
 
 export default function Home() {
+
+    const { setBgMainview } = useLayoutContext()
+    useEffect(() => {
+        setBgMainview(true);
+        return () => setBgMainview(false)
+    }, []);
 
     return (
         <div className="flex-center w-full h-full text-light" >

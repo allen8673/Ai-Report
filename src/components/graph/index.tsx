@@ -123,7 +123,7 @@ export default function Graph<NData, EData, NNormal = NData, ENormal = EData>(pr
     }, [readonly]);
 
     /**
-     * Announce exposed functionalities by treeRef
+     * Announce exposed functionalities by ref
      */
     useImperativeHandle<GraphInstance<NData, EData>, GraphInstance<NData, EData>>(graphRef, () => ({
         addNode: (node: Node<NData>): void => {

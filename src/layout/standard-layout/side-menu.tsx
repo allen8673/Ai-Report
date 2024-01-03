@@ -38,7 +38,7 @@ export default function SideMenu() {
     return (
         <>
             <Tooltip target={'.link-btn'} position='right' />
-            <div className={`bg-deep rounded-std w-[60px] min-w-[60px] py-std flex flex-col items-center gap-std`}>
+            <div className={`bg-deep rounded-std w-[60px] min-w-[60px] py-std flex flex-col items-center gap-std z-1`}>
                 <FontAwesomeIcon className='text-[30px]' icon={faFire} color={'white'} />
                 <div className='flex flex-col grow shrink gap-[6px]'>
                     {_.map(navigations, n => {

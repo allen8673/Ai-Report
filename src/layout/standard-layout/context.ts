@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { Dispatch, SetStateAction, useContext } from "react";
 import React from "react";
 
 export interface ShowMessage {
@@ -8,11 +8,14 @@ export interface ShowMessage {
 }
 
 export interface LayoutStore {
-    showMessage: (msg: string | ShowMessage) => void
+    showMessage: (msg: string | ShowMessage) => void;
+    setBgMainview: Dispatch<SetStateAction<boolean | undefined>>;
+
 }
 
 export const LayoutContext = React.createContext<LayoutStore>({
-    showMessage: () => { }
+    showMessage: () => { },
+    setBgMainview: () => { }
 });
 
 export const useLayoutContext = (): LayoutStore => useContext(LayoutContext);

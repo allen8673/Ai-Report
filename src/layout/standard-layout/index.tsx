@@ -1,7 +1,7 @@
 'use client'
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import { LayoutContext, ShowMessage } from './context';
 import SideMenu from './side-menu';
@@ -9,10 +9,10 @@ import SideMenu from './side-menu';
 export default function StandardLayout({
     children,
 }: {
-    children: React.ReactNode
+    children: React.ReactNode;
 }) {
     const toast = useRef<Toast>(null);
-
+    const [bgMainview, setBgMainview] = useState<boolean>();
     const showMessage = (msg: string | ShowMessage): void => {
         const className = 'toast-message'
         typeof msg === 'string' ? toast.current?.show({
@@ -31,13 +31,15 @@ export default function StandardLayout({
         })
     }
 
+    const className = bgMainview ? 'absolute inset-0 z-0' : ' grow shrink'
+
     return (
-        <LayoutContext.Provider value={{ showMessage }}>
+        <LayoutContext.Provider value={{ showMessage, setBgMainview }}>
             <div className="turbo-layout flex items-stretch bg-deep-strong h-screen p-[21px] gap-std">
                 <Toast className='border-0' ref={toast} position='top-center' />
                 <ConfirmDialog />
                 <SideMenu />
-                <main className='main-view grow shrink'>
+                <main className={className}>
                     {children}
                 </main>
             </div>
