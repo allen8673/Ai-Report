@@ -6,7 +6,7 @@ import ErrorBoundary from "../error-boundary";
 
 import { FormInstance, FormItemProps, FormListProps, FormProps, FormValue, GetItemProps } from "./form";
 
-function GetList<T extends FormValue>({ formCore }: GetItemProps<T>) {
+function getList<T extends FormValue>({ formCore }: GetItemProps<T>) {
     const { control } = formCore;
 
     return function FormList<T extends FormValue>({ name, children, label, className }: FormListProps<T>) {
@@ -24,7 +24,7 @@ function GetList<T extends FormValue>({ formCore }: GetItemProps<T>) {
     }
 }
 
-function GetItem<T extends FormValue>({ formCore, readonly }: GetItemProps<T>) {
+function getItem<T extends FormValue>({ formCore, readonly }: GetItemProps<T>) {
     const { control, formState: { errors } } = formCore;
     const getFormErrorMessage = (name: Path<T>): React.ReactNode => {
         const msg: string = errors[name]?.message as string || ''
@@ -121,8 +121,8 @@ export default function Form<T extends Record<string, any>>(props: FormProps<T>)
     const { form: formInstance } = useForm<T>(form, defaultValues);
     const { formCore, submit } = formInstance
 
-    const FormItem = GetItem({ formCore: formInstance.formCore, readonly });
-    const FormList = GetList({ formCore: formInstance.formCore })
+    const FormItem = getItem({ formCore: formInstance.formCore, readonly });
+    const FormList = getList({ formCore: formInstance.formCore })
     useEffect(() => {
         onLoad?.(formInstance);
         return onDestroyed
