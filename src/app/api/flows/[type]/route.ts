@@ -1,6 +1,6 @@
 import { ApiResult } from "@/interface/api";
 import { IFlow } from "@/interface/flow";
-import { mock_workflows, mock_templates } from "@/mock-data/mock";
+import { mock_workflows, mock_templates } from "@/app/api/mock-data";
 export function generateStaticParams() {
     return [{ type: 'WORKFLOW' }, { type: 'TEMPLATE' }]
 }

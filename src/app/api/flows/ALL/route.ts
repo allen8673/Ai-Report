@@ -1,7 +1,7 @@
 
 import { ApiResult } from "@/interface/api";
 import { IFlowBase } from "@/interface/flow";
-import { mock_workflows, mock_templates } from "@/mock-data/mock";
+import { mock_workflows, mock_templates } from "@/app/api/mock-data";
 
 export async function GET() {
     const data: ApiResult<{

@@ -1,6 +1,6 @@
 import _ from "lodash"
 
-import { mock_templates, mock_workflows } from "@/mock-data/mock"
+import { mock_templates, mock_workflows } from "@/app/api/mock-data"
 
 export function generateStaticParams() {
     return _.map([...mock_templates, ...mock_workflows], i => ({ id: i.id }))

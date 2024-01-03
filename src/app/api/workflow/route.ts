@@ -4,7 +4,7 @@ import { v4 } from "uuid";
 
 import { ApiResult } from "@/interface/api";
 import { IFlow } from "@/interface/flow";
-import { mock_workflows } from "@/mock-data/mock";
+import { mock_workflows } from "@/app/api/mock-data";
 
 export async function GET(request: NextRequest) {
     const id = request.nextUrl.searchParams.get('id');

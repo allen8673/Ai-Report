@@ -1,6 +1,6 @@
 import { ApiResult } from "@/interface/api"
 import { ComponentOpt } from "@/interface/flow"
-import { mock_component_data } from "@/mock-data/mock"
+import { mock_component_data } from "@/app/api/mock-data"
 
 
 export async function GET() {
