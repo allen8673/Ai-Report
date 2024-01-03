@@ -4,8 +4,8 @@ export interface IRouter {
     title: string;
     folder: string;
     icon?: IconDefinition;
-    parent?: keyof IRouterInfo
-    isNavigation?: boolean
+    parent?: keyof IRouterInfo;
+    isNavigation?: boolean;
 }
 
 export interface IRouterInfo {
