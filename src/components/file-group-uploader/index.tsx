@@ -41,7 +41,7 @@ function HeaderTemplate({ group, opts }: HeaderTemplateProps) {
     const { onFilesSelect, fileGroups, deleteGroup } = useFGUploaderContext();
 
     return (
-        <div className={cn('flex grow justify-between items-center', opts.className)} role='presentation'
+        <div className={cn('flex grow shrink justify-between items-center overflow-hidden', opts.className)} role='presentation'
         >
             <input type="file" hidden multiple accept="*" ref={ref}
                 onClick={e => e.stopPropagation()}
@@ -147,7 +147,7 @@ export default function FileGroupUploader(props: GroupingFileUploaderProps) {
                                     <HeaderTemplate group={group} opts={opts} />
                                 )}
                             >
-                                <div className="bg-deep">
+                                <div className="bg-deep overflow-hidden">
                                     {!!files?.length ?
                                         map(files, f => (
                                             <ItemTemplate group={group} file={f} />
