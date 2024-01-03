@@ -5,18 +5,23 @@ export type FileGroups = Record<string, File[]>
 export interface GroupingFileUploaderProps {
     grouping?: string[];
     name?: string;
-    onUpload: (fileGroups: FileGroups) => void,
+    onUpload: (fileGroups: FileGroups) => void;
     uploadLabel?: string;
+    uploaderRef?: React.Ref<FileGroupUploaderInstance>;
+    hideUploadButton?: boolean;
+    onChange?: (fileGroups: FileGroups) => void
 }
 
 export interface HeaderTemplateProps {
-    title: string;
+    group: string;
     opts: AccordionTabProps;
-    onFilesSelect?: (files: File[]) => void
 }
 
 export interface ItemTemplateProps {
     group: string;
     file: File;
-    onDelete?: (group: string, file: File) => void
+}
+
+export interface FileGroupUploaderInstance {
+    upload: () => void;
 }
