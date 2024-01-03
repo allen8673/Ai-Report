@@ -78,40 +78,42 @@ export default function FileGroupUploader({ grouping, onUpload, uploadLabel }: G
         })
     }
 
-    return <div>
-        <Accordion >
-            {map(_grouping, group => {
-                const files = fileGroups[group]
-                return (
-                    <AccordionTab
-                        className="[&>a]:py-2"
-                        headerTemplate={opts => (
-                            <HeaderTemplate title={group} opts={opts} onFilesSelect={f => {
-                                setFileGroups(pre => ({ ...pre, [group]: concat(pre[group] || [], f) }))
-                            }} />
-                        )}
-                    >
-                        <div className="bg-deep">
-                            {!!files?.length ?
-                                map(files, f => (
-                                    <ItemTemplate group={group} file={f} onDelete={onDelete} />
-                                )) :
-                                <EmptyPane title={`Please selected files for ${group}`} />
-                            }
-                        </div>
-                    </AccordionTab >
-                )
-            })}
-        </Accordion>
-        <div className={cn`flex-center justify-end  h-[55px] mt-0 px-0`}>
-            <Button
-                className='custom-upload-btn p-button-rounded p-button-outlined border-2'
-                label={uploadLabel || 'Upload Files'}
-                icon={<FontAwesomeIcon className="w-[18px] h-[18px] p-[3px]" icon={faCloudUpload} />}
-                style={{ color: '#2a8af6' }}
-                onClick={() => onUpload(fileGroups)}
-                disabled={keys(fileGroups).length !== _grouping.length}
-            />
+    return (
+        <div>
+            <Accordion >
+                {map(_grouping, group => {
+                    const files = fileGroups[group]
+                    return (
+                        <AccordionTab
+                            className="[&>a]:py-2"
+                            headerTemplate={opts => (
+                                <HeaderTemplate title={group} opts={opts} onFilesSelect={f => {
+                                    setFileGroups(pre => ({ ...pre, [group]: concat(pre[group] || [], f) }))
+                                }} />
+                            )}
+                        >
+                            <div className="bg-deep">
+                                {!!files?.length ?
+                                    map(files, f => (
+                                        <ItemTemplate group={group} file={f} onDelete={onDelete} />
+                                    )) :
+                                    <EmptyPane title={`Please selected files for ${group}`} />
+                                }
+                            </div>
+                        </AccordionTab >
+                    )
+                })}
+            </Accordion>
+            <div className={cn`flex-center justify-end  h-[55px] mt-0 px-0`}>
+                <Button
+                    className='custom-upload-btn p-button-rounded p-button-outlined border-2'
+                    label={uploadLabel || 'Upload Files'}
+                    icon={<FontAwesomeIcon className="w-[18px] h-[18px] p-[3px]" icon={faCloudUpload} />}
+                    style={{ color: '#2a8af6' }}
+                    onClick={() => onUpload(fileGroups)}
+                    disabled={keys(fileGroups).length !== _grouping.length}
+                />
+            </div>
         </div>
-    </div>
+    )
 }
