@@ -18,7 +18,7 @@ export default function LoginForm() {
                 text="NATIONAL INSTITUTE FOR CYBER SECURITY "
                 randomPermutaion={false} fontColor="#95679e" />
             <div className={`
-                    w-[400px] h-[400px] p-6 bg-deep-weak/[.8] z-2
+                    w-[400px] h-[400px] p-6 bg-deep/[.8] z-2
                     flex-center flex-col gap-[15px] 
                     rounded-std border-light-weak border-solid border-[3px]
             `}>

@@ -14,13 +14,15 @@ export default function Home() {
 
     return (
         <div className="flex-center w-full h-full text-light" >
-            <h1 className={`
-        position: absolute
-        text-7xl
-        text-turbo-deep-strong
-        text-shadow-center
-        shadow-turbo-deep
-        `}>Welcome to AI Report</h1>
+            <div className={`
+            position: absolute
+            p-7 bg-deep/[.8] z-2
+            flex-center flex-col gap-[15px]
+            rounded-std border-light-weak border-solid border-[3px]`}>
+                <h1 className={`text-7xl text-turbo-deep-strong text-shadow-center shadow-turbo-deep`}>
+                    Welcome to AI Report
+                </h1>
+            </div>
             <MatrixAnimationPanel
                 text="NATIONAL INSTITUTE FOR CYBER SECURITY "
                 randomPermutaion={false} fontColor="#95679e" />
