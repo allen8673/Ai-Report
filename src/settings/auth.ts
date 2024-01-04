@@ -1,4 +1,5 @@
 
+import Keycloak from "@auth/core/providers/keycloak"
 import NextAuth, { NextAuthConfig } from "next-auth"
 import Credentials from 'next-auth/providers/credentials';
 
@@ -20,10 +21,8 @@ export const authConfig: NextAuthConfig = {
             // },
             authorize(c) {
                 if (!c.password || !c.id) return null;
-
                 // TODO: Call the customize auth API
                 const jwt: string = 'customize-jwt';
-
                 return {
                     name: "Fill Murray",
                     email: "bill@fillmurray.com",
@@ -33,6 +32,11 @@ export const authConfig: NextAuthConfig = {
                 } as any;
             },
         }),
+        Keycloak({
+            clientId: 'ai_report_fe',
+            clientSecret: '6eDPdttnbw2YzDy2TofYyAqjwVdUGrvk',
+            issuer: 'https://sso.cdalab.tw/realms/NICS',
+        })
     ],
     callbacks: {
         /**
@@ -56,7 +60,7 @@ export const authConfig: NextAuthConfig = {
         authorized(params) {
             const { auth, request: { nextUrl }, } = params
             const { pathname, searchParams } = nextUrl;
-            const inAuth = !!(auth as any)?.jwt;
+            const inAuth = !!auth; //!!(auth as any)?.jwt;
             const homeUrl = getFullUrl(RouterInfo.HOME)
             if (pathname === "/login") {
                 // if (!!(auth as any)?.jwt) return true

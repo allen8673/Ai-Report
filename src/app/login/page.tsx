@@ -18,7 +18,7 @@ export default function LoginForm() {
                 text="NATIONAL INSTITUTE FOR CYBER SECURITY "
                 randomPermutaion={false} fontColor="#95679e" />
             <div className={`
-                    w-[400px] h-[400px] p-6 bg-deep/[.8] z-2
+                    w-[400px] h-[450px] p-6 bg-deep/[.8] z-2
                     flex-center flex-col gap-[15px] 
                     rounded-std border-light-weak border-solid border-[3px]
             `}>
@@ -48,18 +48,34 @@ export default function LoginForm() {
                             </>
                     }
                 </Form>
-                <Button className="" onClick={async () => {
-                    try {
-                        const data = await form?.submit();
-                        if (!data) throw Error('no data')
-                        authenticate(data)
-                    } catch {
+                <span className="flex gap-1 flex-col">
+                    <Button
+                        className="flex-center"
+                        onClick={async () => {
+                            try {
+                                const data = await form?.submit();
+                                if (!data) throw Error('no data')
+                                authenticate(data)
+                            } catch {
 
-                    }
-                }}
-                >
-                    Log in
-                </Button>
+                            }
+                        }}
+                    >
+                        Login
+                    </Button>
+                    <Button
+                        severity='success'
+                        onClick={async () => {
+                            try {
+                                authenticate({}, 'keycloak')
+                            } catch {
+
+                            }
+                        }}
+                    >
+                        Login with CCOE
+                    </Button>
+                </span>
             </div>
         </div>
     )
