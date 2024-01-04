@@ -6,7 +6,7 @@ import { useState } from "react";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import MatrixAnimationPanel from "@/components/panes/matrix-animation";
-import { authenticate } from "@/lib/actions";
+import { authenticate } from "@/lib/auth";
 
 export default function LoginForm() {
     const [form, setForm] = useState<FormInstance<{ id: string, password: string }>>()

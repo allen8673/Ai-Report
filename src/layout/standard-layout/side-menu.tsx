@@ -11,7 +11,7 @@ import { TieredMenu } from 'primereact/tieredmenu';
 import { Tooltip } from 'primereact/tooltip';
 import { useRef } from 'react';
 
-import { userSignOut } from '@/lib/actions';
+import { userSignOut } from '@/lib/auth';
 import { getFullUrl } from '@/lib/router';
 
 export default function SideMenu() {
