@@ -33,9 +33,9 @@ export const authConfig: NextAuthConfig = {
             },
         }),
         Keycloak({
-            clientId: 'ai_report_fe',
-            clientSecret: '6eDPdttnbw2YzDy2TofYyAqjwVdUGrvk',
-            issuer: 'https://sso.cdalab.tw/realms/NICS',
+            clientId: process.env.KEYCLOAK_CLIENT_ID,
+            clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
+            issuer: process.env.KEYCLOAK_ISSUER,
         })
     ],
     callbacks: {

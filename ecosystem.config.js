@@ -11,7 +11,8 @@ module.exports = {
             max_memory_restart: '1G',
             env: {
                 PORT: 7788,
-                NEXTAUTH_URL: "https://report-dev.nics.moda"
+                NEXTAUTH_URL: "https://report-dev.nics.moda",
+                KEYCLOAK_ISSUER: 'https://sso.cdalab.tw/realms/NICS'
             }
         }
     ]
