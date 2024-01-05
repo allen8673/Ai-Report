@@ -1,5 +1,6 @@
 'use client'
 import { Button } from "primereact/button";
+import { Divider } from "primereact/divider";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 
@@ -18,7 +19,7 @@ export default function LoginForm() {
                 text="NATIONAL INSTITUTE FOR CYBER SECURITY "
                 randomPermutaion={false} fontColor="#95679e" />
             <div className={`
-                    w-[400px] h-[450px] p-6 bg-deep/[.8] z-2
+                    w-[400px] h-[450px] p-5 bg-deep/[.8] z-2
                     flex-center flex-col gap-[15px] 
                     rounded-std border-light-weak border-solid border-[3px]
             `}>
@@ -48,7 +49,7 @@ export default function LoginForm() {
                             </>
                     }
                 </Form>
-                <span className="flex gap-1 flex-col">
+                <div className="flex-center gap-1 flex-col w-full">
                     <Button
                         className="flex-center"
                         onClick={async () => {
@@ -63,6 +64,7 @@ export default function LoginForm() {
                     >
                         Login
                     </Button>
+                    <Divider />
                     <Button
                         severity='success'
                         onClick={async () => {
@@ -75,7 +77,7 @@ export default function LoginForm() {
                     >
                         Login with CCOE
                     </Button>
-                </span>
+                </div>
             </div>
         </div>
     )
