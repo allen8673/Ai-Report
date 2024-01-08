@@ -14,7 +14,7 @@ export default function Home() {
     }, []);
 
     return (
-        <div className="flex-center w-full h-full text-light overflow-hidden" >
+        <div className="flex-center w-full h-full text-light" >
             <div className={`
             absolute top-[20px] right-[20px]
             p-7 bg-deep/[.8] z-2
@@ -24,7 +24,7 @@ export default function Home() {
                     Welcome to AI Report
                 </h1>
             </div>
-            <MpaView />
+            <MpaView ctrlPosition='bottom-right' />
             {/* <MatrixAnimationPanel
                 text="NATIONAL INSTITUTE FOR CYBER SECURITY "
                 randomPermutaion={false} 
