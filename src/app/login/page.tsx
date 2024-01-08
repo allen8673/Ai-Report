@@ -29,7 +29,8 @@ export default function LoginForm() {
                 <Form
                     defaultValues={{ id: '', password: '' }}
                     onLoad={form => setForm(form)}
-                    onDestroyed={() => setForm(undefined)}>{
+                    onDestroyed={() => setForm(undefined)}>
+                    {
                         ({ Item }) =>
                             <>
                                 <Item name='id' label="ID" rules={
