@@ -38,7 +38,7 @@ export default function StandardLayout({
             <div className="turbo-layout flex items-stretch bg-deep-strong h-screen p-[21px] gap-std">
                 <Toast className='border-0' ref={toast} position='top-center' />
                 <ConfirmDialog />
-                <SideMenu />
+                <SideMenu bgMainview={bgMainview} />
                 <main className={className}>
                     {children}
                 </main>
