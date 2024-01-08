@@ -1,30 +1,13 @@
 'use client'
-import { useEffect, useState } from "react";
-import Map from 'react-map-gl/maplibre';
+import { useEffect } from "react";
 
+import MpaView from "@/components/map-view";
 import { useLayoutContext } from "@/layout/standard-layout/context";
-
-const mapUrl = `https://api.maptiler.com/maps/5c9946fa-9bed-4f8a-bd7b-3bc10ec13d5d/style.json?key=${process.env.NEXT_PUBLIC_MAP_KEY}`
 
 export default function Home() {
 
-    const [location, setLocation] = useState<{ longitude: number; latitude: number; }>(
-        {
-            longitude: 121.273,
-            latitude: 23.529,
-        }
-    )
+    const { setBgMainview } = useLayoutContext();
 
-    useEffect(() => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((p) => {
-                const { longitude, latitude } = p.coords
-                setLocation({ longitude, latitude })
-            });
-        }
-    }, [])
-
-    const { setBgMainview } = useLayoutContext()
     useEffect(() => {
         setBgMainview(true);
         return () => setBgMainview(false)
@@ -41,19 +24,7 @@ export default function Home() {
                     Welcome to AI Report
                 </h1>
             </div>
-            <Map
-                initialViewState={{
-                    zoom: 15,
-                    pitch: 60,
-                    bearing: -10
-                }}
-                {...location}
-                onDrag={({ viewState }) => {
-                    const { latitude, longitude } = viewState
-                    setLocation({ latitude, longitude })
-                }}
-                mapStyle={mapUrl}
-            />
+            <MpaView />
             {/* <MatrixAnimationPanel
                 text="NATIONAL INSTITUTE FOR CYBER SECURITY "
                 randomPermutaion={false} 
