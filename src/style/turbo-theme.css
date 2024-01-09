@@ -166,3 +166,7 @@
     }
 
 }
+
+.p-button {
+    box-shadow: none;
+}

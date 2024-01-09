@@ -11,10 +11,10 @@ import { TieredMenu } from 'primereact/tieredmenu';
 import { Tooltip } from 'primereact/tooltip';
 import { useRef } from 'react';
 
-import { userSignOut } from '@/lib/actions';
+import { userSignOut } from '@/lib/auth';
 import { getFullUrl } from '@/lib/router';
 
-export default function SideMenu() {
+export default function SideMenu({ bgMainview }: { bgMainview?: boolean }) {
     const pathname = usePathname();
     const userMenu = useRef<TieredMenu>(null);
     const navigations = _.filter(RouterInfo, ['isNavigation', true]);
@@ -38,7 +38,11 @@ export default function SideMenu() {
     return (
         <>
             <Tooltip target={'.link-btn'} position='right' />
-            <div className={`bg-deep rounded-std w-[60px] min-w-[60px] py-std flex flex-col items-center gap-std z-1`}>
+            <div className={`
+                bg-deep rounded-std w-[60px] min-w-[60px] py-std
+                flex flex-col items-center gap-std z-1
+                ${bgMainview ? "shadow-[0px_0px_15px_-3px] shadow-light-weak" : ""}
+                `}>
                 <FontAwesomeIcon className='text-[30px]' icon={faFire} color={'white'} />
                 <div className='flex flex-col grow shrink gap-[6px]'>
                     {_.map(navigations, n => {

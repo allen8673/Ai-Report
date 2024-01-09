@@ -3,10 +3,10 @@ import { signIn, signOut } from "@settings/auth";
 import { AuthError } from "next-auth";
 
 export async function authenticate<T extends Record<string, string>>(
-    data: T,
+    data: T, provider: string = 'credentials'
 ) {
     try {
-        await signIn('credentials', data);
+        await signIn(provider, data);
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {

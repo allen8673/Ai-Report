@@ -2,9 +2,9 @@ import { find, findIndex, map, remove } from "lodash";
 import { NextRequest } from "next/server";
 import { v4 } from "uuid";
 
+import { mock_workflows } from "@/app/api/mock-data";
 import { ApiResult } from "@/interface/api";
 import { IFlow } from "@/interface/flow";
-import { mock_workflows } from "@/mock-data/mock";
 
 export async function GET(request: NextRequest) {
     const id = request.nextUrl.searchParams.get('id');

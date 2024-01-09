@@ -74,6 +74,10 @@ const config: Config = {
           DEFAULT: 'rgba(161, 98, 7, 1)',
           deep: 'rgba(113, 63, 18)',
         },
+        nics: {
+          light: '#c3cb04',
+          deep: '#069493',
+        }
       },
       spacing: {
         std: '20px',

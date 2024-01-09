@@ -9,7 +9,8 @@ export interface GroupingFileUploaderProps {
     uploadLabel?: string;
     uploaderRef?: React.Ref<FileGroupUploaderInstance>;
     hideUploadButton?: boolean;
-    onChange?: (fileGroups: FileGroups) => void
+    onChange?: (fileGroups: FileGroups) => void;
+    accept?: string
 }
 
 export interface HeaderTemplateProps {

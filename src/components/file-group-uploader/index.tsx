@@ -37,18 +37,13 @@ function ItemTemplate({ group, file }: ItemTemplateProps) {
 }
 
 function HeaderTemplate({ group, opts }: HeaderTemplateProps) {
-    const ref = useRef<HTMLInputElement>(null);
-    const { onFilesSelect, fileGroups, deleteGroup } = useFGUploaderContext();
+    const { fileGroups, deleteGroup, openFileSelector } = useFGUploaderContext();
 
     return (
-        <div className={cn('flex grow shrink justify-between items-center overflow-hidden', opts.className)} role='presentation'
+        <div
+            className={cn('flex grow shrink justify-between items-center overflow-hidden', opts.className)}
+            role='presentation'
         >
-            <input type="file" hidden multiple accept="*" ref={ref}
-                onClick={e => e.stopPropagation()}
-                onChange={e => {
-                    onFilesSelect(group, map(e.target.files, f => f))
-                }}
-            />
             <span className="flex-center gap-2">
                 {!!fileGroups[group]?.length
                     ? <i className="pi pi-check-circle text-success" />
@@ -58,7 +53,8 @@ function HeaderTemplate({ group, opts }: HeaderTemplateProps) {
             </span>
             <span className="flex-center gap-2">
                 <Button
-                    className="custom-choose-btn p-button-rounded p-button-outlined border-2"
+                    className="custom-choose-btn p-button-rounded border-2"
+                    outlined
                     style={{ color: 'rgba(185, 28, 28, 1)' }}
                     size='small'
                     icon={<FontAwesomeIcon className="w-[18px] h-[18px]  p-[3px]" icon={faEraser} />}
@@ -68,13 +64,14 @@ function HeaderTemplate({ group, opts }: HeaderTemplateProps) {
                     }}
                 />
                 <Button
-                    className="custom-choose-btn p-button-rounded p-button-outlined border-2"
+                    className="custom-choose-btn p-button-rounded border-2"
+                    outlined
                     style={{ color: '#BA4AFF' }}
                     size='small'
                     icon={<FontAwesomeIcon className="w-[18px] h-[18px]  p-[3px]" icon={faAdd} />}
                     onClick={(e) => {
                         e.stopPropagation();
-                        ref.current?.click();
+                        openFileSelector(group)
                     }}
                 />
             </span>
@@ -97,10 +94,13 @@ export default function FileGroupUploader(props: GroupingFileUploaderProps) {
         uploadLabel,
         uploaderRef,
         hideUploadButton,
-        onChange
+        onChange,
+        accept = '*'
     } = props;
+    const inputFileRef = useRef<HTMLInputElement>(null);
     const _grouping: string[] = (!!grouping && grouping.length > 0) ? grouping : ['file'];
     const [fileGroups, setFileGroups] = useState<FileGroups>({});
+    const [targetGrp, setTargetGrp] = useState<string>();
 
     /**
      * Announce exposed functionalities by ref
@@ -113,8 +113,15 @@ export default function FileGroupUploader(props: GroupingFileUploaderProps) {
         onChange?.(fileGroups)
     }, [fileGroups])
 
+    const openFileSelector = (group: string) => {
+        if (!inputFileRef.current) return;
+        inputFileRef.current.click();
+        setTargetGrp(group);
+    }
+
     const onFilesSelect = (group: string, files: File[]) => {
-        setFileGroups(pre => ({ ...pre, [group]: concat(pre[group] || [], files) }))
+        setFileGroups(pre => ({ ...pre, [group]: concat(pre[group] || [], files) }));
+        setTargetGrp(undefined);
     }
 
     const deleteFile = (group: string, file: File) => {
@@ -134,11 +141,23 @@ export default function FileGroupUploader(props: GroupingFileUploaderProps) {
     }
 
     return (
-        <FGUploaderContext.Provider value={{ deleteFile, deleteGroup, onFilesSelect, fileGroups }}>
+        <FGUploaderContext.Provider value={{ deleteFile, deleteGroup, openFileSelector, fileGroups }}>
             <div>
+                <input
+                    ref={inputFileRef}
+                    type="file"
+                    hidden multiple
+                    accept={accept}
+                    value={''}
+                    onClick={e => e.stopPropagation()}
+                    onChange={e => {
+                        if (!targetGrp) return;
+                        onFilesSelect(targetGrp, map(e.target.files, f => f));
+                    }}
+                />
                 <Accordion >
                     {map(_grouping, (group, idx) => {
-                        const files = fileGroups[group]
+                        const files = fileGroups[group];
                         return (
                             <AccordionTab
                                 key={`file-group-${idx}`}
@@ -148,11 +167,17 @@ export default function FileGroupUploader(props: GroupingFileUploaderProps) {
                                 )}
                             >
                                 <div className="bg-deep overflow-hidden">
+
                                     {!!files?.length ?
                                         map(files, f => (
                                             <ItemTemplate group={group} file={f} />
                                         )) :
-                                        <EmptyPane title={`Please selected files for ${group}`} />
+                                        <EmptyPane
+                                            title={`Click here to select files for ${group}`}
+                                            onClick={() => {
+                                                openFileSelector(group)
+                                            }}
+                                        />
                                     }
                                 </div>
                             </AccordionTab >
