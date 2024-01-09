@@ -1,77 +1,75 @@
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useMemo, useState } from 'react';
+import { map } from 'lodash';
+import { useMemo, useState } from 'react';
 import Map, { FullscreenControl, Marker, NavigationControl, ViewState } from 'react-map-gl/maplibre';
 
-import { MpaViewProps, Position } from './map-view';
+import { MpaViewProps } from './map-view';
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 const mapUrl = `https://api.maptiler.com/maps/${process.env.NEXT_PUBLIC_MAP_ID}/style.json?key=${process.env.NEXT_PUBLIC_MAP_KEY}`
-const INIT_POSITION: Position = {
-    longitude: 121.273,
-    latitude: 23.529,
-}
 const INIT_VIEWSTATE: Partial<ViewState> = {
-    longitude: 121.273,
-    latitude: 23.529,
-    zoom: 8,
+    longitude: 121.15334218362636,
+    latitude: 23.117270960253094,
+    zoom: 8.832856,
     pitch: 50,
+    bearing: -20
 }
 
-export default function MpaView({ hiddenCtrls, ctrlPosition }: MpaViewProps) {
-    const [viewStateCtrl, setViewStateCtrl] = useState<Partial<ViewState>>(INIT_VIEWSTATE);
-    const [location, setLocation] = useState<Position>(INIT_POSITION);
-    const locationPin = useMemo(() => {
-        return <Marker
-            key={`marker-${'location'}`}
-            longitude={location.longitude}
-            latitude={location.latitude}
-            anchor="bottom"
-            onClick={e => {
-                e.originalEvent.stopPropagation();
-                setViewStateCtrl(pre => ({ ...pre, ...location, zoom: 15 }))
-            }}
-        >
-            <>
-                <FontAwesomeIcon
-                    icon={faLocationDot}
-                    className={`
-                text-7xl text-nics-deep opacity-80
-            `} />
-            </>
+export default function MpaView(props: MpaViewProps) {
+    const { hiddenCtrls, ctrlPosition, positions, renderPin } = props;
+    const [viewState, setViewState] = useState<Partial<ViewState>>(INIT_VIEWSTATE);
+    const locationPins = useMemo(() => {
 
-            {/* <div>123123</div> */}
-            {/* <span className={`
-                pi pi-map-marker text-7xl 
-                text-nics-deep text-shadow-center shadow-nics-light
-                opacity-70
-            `} /> */}
-        </Marker>
-    }, [location])
-
-    useEffect(() => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((p) => {
-                const { longitude, latitude } = p.coords
-                setLocation({ longitude, latitude });
-                setViewStateCtrl(pre => ({ ...pre, longitude, latitude }))
-            });
-        }
-    }, []);
+        return map(positions, position => {
+            const { position: location, key = '' } = position;
+            const { onClick, onMouseEnter, onMouseLeave, render } = renderPin || {};
+            return (
+                <Marker
+                    key={`marker-${key}`}
+                    longitude={location.longitude}
+                    latitude={location.latitude}
+                    anchor="bottom"
+                    onClick={e => {
+                        e.originalEvent.stopPropagation();
+                        onClick?.({ position, setViewState })
+                        // setViewStateCtrl(pre => ({ ...pre, ...location, zoom: 15 }))
+                    }}
+                >
+                    <span
+                        onMouseEnter={() => {
+                            onMouseEnter?.({ position, setViewState });
+                        }}
+                        onMouseLeave={() => {
+                            onMouseLeave?.({ position, setViewState })
+                        }}
+                    >
+                        {typeof render === 'function' ?
+                            render(position) :
+                            (render || <FontAwesomeIcon
+                                icon={faLocationDot}
+                                className={`text-7xl text-nics-deep opacity-80 cursor-pointer`}
+                            />)
+                        }
+                    </span>
+                </Marker>
+            );
+        })
+    }, [positions]);
 
 
     return (
         <Map
-            {...viewStateCtrl}
+            {...viewState}
             onDrag={({ viewState }) => {
-                setViewStateCtrl(viewState)
+                setViewState(viewState)
             }}
             onZoom={({ viewState }) => {
-                setViewStateCtrl(viewState)
+                setViewState(viewState)
             }}
             onRotate={({ viewState }) => {
-                setViewStateCtrl(viewState)
+                setViewState(viewState)
             }}
             mapStyle={mapUrl}
         >
@@ -82,7 +80,7 @@ export default function MpaView({ hiddenCtrls, ctrlPosition }: MpaViewProps) {
                     <NavigationControl position={ctrlPosition} />
                 </>
             )}
-            {locationPin}
+            {locationPins}
         </Map >
     )
 }
