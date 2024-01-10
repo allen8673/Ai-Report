@@ -46,7 +46,7 @@ function LocationPane(pinData: PositionInfo<MockData>) {
 export default function Home() {
 
     const { setBgMainview } = useLayoutContext();
-    const [locationInfo, setLocationInfo] = useState<PositionInfo<MockData>>({ name: 'You are here', position: INIT_POSITION });
+    const [locationInfo, setLocationInfo] = useState<PositionInfo<MockData>>({ name: 'You are here', key: 'YRH', position: INIT_POSITION });
     const [pinData, setPinData] = useState<PositionInfo>();
 
     useEffect(() => {

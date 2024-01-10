@@ -23,7 +23,7 @@ export interface RenderPin<T> {
 }
 
 export interface PositionInfo<T = any> {
-    key?: string;
+    key: string;
     name?: string;
     position: Position;
     data?: T;

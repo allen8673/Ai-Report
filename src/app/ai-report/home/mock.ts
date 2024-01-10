@@ -8,6 +8,7 @@ export interface MockData {
 export const mockdata: PositionInfo<MockData>[] = [
     {
         name: 'National Museum of Natural Science',
+        key: 'NMNS',
         position: {
             longitude: 120.6620173,
             latitude: 24.1565483,
@@ -19,6 +20,7 @@ export const mockdata: PositionInfo<MockData>[] = [
     },
     {
         name: 'National Science and Technology Museum',
+        key: 'NSTM',
         position: {
             longitude: 120.3222442,
             latitude: 22.6408282,
@@ -30,6 +32,7 @@ export const mockdata: PositionInfo<MockData>[] = [
     },
     {
         name: 'National Palace Museum',
+        key: 'NPM',
         position: {
             longitude: 121.548663,
             latitude: 25.101992,
@@ -42,6 +45,7 @@ export const mockdata: PositionInfo<MockData>[] = [
     },
     {
         name: 'National Center for Traditional Arts',
+        key: 'NCTA',
         position: {
             longitude: 121.825276,
             latitude: 24.686011,

@@ -16,7 +16,8 @@ const INIT_VIEWSTATE: Partial<ViewState> = {
     pitch: 50,
     bearing: -20
 }
-const ACCURACY = 0.1
+const ACCURACY = 0.1;
+const FPS = 180
 
 export default function MpaView<T>(props: MpaViewProps<T>) {
     const { hiddenCtrls, ctrlPosition, positions, renderPin } = props;
@@ -34,7 +35,6 @@ export default function MpaView<T>(props: MpaViewProps<T>) {
                     onClick={e => {
                         e.originalEvent.stopPropagation();
                         onClick?.({ position, setViewState, zoomTo })
-                        // setViewStateCtrl(pre => ({ ...pre, ...location, zoom: 15 }))
                     }}
                 >
                     <span
@@ -57,17 +57,45 @@ export default function MpaView<T>(props: MpaViewProps<T>) {
         })
     }, [positions]);
 
-    const zoomTo = async (position: Position, zoom: number) => {
-        let currentZoom = viewState.zoom || 0;
-        const isDecreasing = currentZoom > zoom
+    const positionAnimation = async (position: Position, frames: number) => {
+        const { longitude, latitude } = position;
+        let currentlon = viewState.longitude || 0;
+        let currentlat = viewState.latitude || 0;
+        const lonIsDecreasing = currentlon > longitude;
+        const latIsDecreasing = currentlat > latitude;
+        const lon_move_gap = Math.abs(currentlon - longitude) / frames;
+        const lat_move_gap = Math.abs(currentlat - latitude) / frames;
 
-        while (Math.abs(currentZoom - zoom) > ACCURACY) {
-            isDecreasing ? (currentZoom -= 0.1) : (currentZoom += 0.1)
-            setViewState(pre => ({ ...pre, ...position, zoom: currentZoom }));
-            await new Promise(resolve => setTimeout(resolve, 5));
+        let _ctrl = 0
+        while (_ctrl < frames) {
+            lonIsDecreasing ? (currentlon -= lon_move_gap) : (currentlon += lon_move_gap);
+            latIsDecreasing ? (currentlat -= lat_move_gap) : (currentlat += lat_move_gap);
+            setViewState(pre => ({ ...pre, longitude: currentlon, latitude: currentlat }));
+            _ctrl++;
+            await new Promise(resolve => setTimeout(resolve, (1 / FPS) * 1000));
         }
+        setViewState(pre => ({ ...pre, longitude, latitude }))
     }
 
+    const zoomAnimation = async (zoom: number, frames: number) => {
+        let currentZoom = viewState.zoom || 0;
+        const zoomIsDecreasing = currentZoom > zoom;
+        const zoom_move_gap = Math.abs(currentZoom - zoom) / frames;
+        let _ctrl = 0
+        while (_ctrl < frames) {
+            zoomIsDecreasing ? (currentZoom -= zoom_move_gap) : (currentZoom += zoom_move_gap);
+            setViewState(pre => ({ ...pre, zoom: currentZoom }));
+            _ctrl++
+            await new Promise(resolve => setTimeout(resolve, (1 / FPS) * 1000));
+        }
+        setViewState(pre => ({ ...pre, zoom }))
+    }
+
+    const zoomTo = async (position: Position, zoom: number) => {
+        const frames = Math.abs((viewState.zoom || 0) - zoom) / ACCURACY;
+        await positionAnimation(position, frames);
+        await zoomAnimation(zoom, frames);
+    }
 
     return (
         <Map
