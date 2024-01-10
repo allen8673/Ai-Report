@@ -69,7 +69,7 @@ export default function Home() {
             absolute top-[20px] right-[20px] w-[560px]
             p-7 bg-deep/[.8] z-2
             flex-center flex-col gap-[15px]
-            rounded-std border-light-weak border-solid border-[3px]`}>
+            rounded-std shadow-[0px_0px_15px_-3px] shadow-light-weak`}>
                 {(!!pinData ? <LocationPane {...pinData} /> : <DefaultContent />)}
             </div>
             <MpaView
