@@ -101,8 +101,8 @@ export default function Home() {
                             className={className}
                         />
                     },
-                    onClick: ({ position, setViewState }) => {
-                        setViewState(pre => ({ ...pre, ...position.position, zoom: 20 }));
+                    onClick: ({ position, zoomTo }) => {
+                        zoomTo(position.position, 15)
                     },
                     onMouseEnter: ({ position }) => {
                         setPinData(position)

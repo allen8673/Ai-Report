@@ -13,6 +13,7 @@ type SetViewState = Dispatch<SetStateAction<Partial<ViewState>>>;
 export type PinAct<T = void> = (props: {
     position: PositionInfo;
     setViewState: SetViewState;
+    zoomTo: (position: Position, zoom: number) => void
 }) => T
 export interface RenderPin<T> {
     render?: ReactNode | ((position: PositionInfo<T>) => ReactNode);

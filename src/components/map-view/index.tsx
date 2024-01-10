@@ -4,7 +4,7 @@ import { map } from 'lodash';
 import { useMemo, useState } from 'react';
 import Map, { FullscreenControl, Marker, NavigationControl, ViewState } from 'react-map-gl/maplibre';
 
-import { MpaViewProps } from './map-view';
+import { MpaViewProps, Position } from './map-view';
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -16,12 +16,12 @@ const INIT_VIEWSTATE: Partial<ViewState> = {
     pitch: 50,
     bearing: -20
 }
+const ACCURACY = 0.1
 
-export default function MpaView(props: MpaViewProps) {
+export default function MpaView<T>(props: MpaViewProps<T>) {
     const { hiddenCtrls, ctrlPosition, positions, renderPin } = props;
     const [viewState, setViewState] = useState<Partial<ViewState>>(INIT_VIEWSTATE);
     const locationPins = useMemo(() => {
-
         return map(positions, position => {
             const { position: location, key = '' } = position;
             const { onClick, onMouseEnter, onMouseLeave, render } = renderPin || {};
@@ -33,16 +33,16 @@ export default function MpaView(props: MpaViewProps) {
                     anchor="bottom"
                     onClick={e => {
                         e.originalEvent.stopPropagation();
-                        onClick?.({ position, setViewState })
+                        onClick?.({ position, setViewState, zoomTo })
                         // setViewStateCtrl(pre => ({ ...pre, ...location, zoom: 15 }))
                     }}
                 >
                     <span
                         onMouseEnter={() => {
-                            onMouseEnter?.({ position, setViewState });
+                            onMouseEnter?.({ position, setViewState, zoomTo });
                         }}
                         onMouseLeave={() => {
-                            onMouseLeave?.({ position, setViewState })
+                            onMouseLeave?.({ position, setViewState, zoomTo })
                         }}
                     >
                         {(typeof render === 'function' ? render(position) : render) ||
@@ -56,6 +56,17 @@ export default function MpaView(props: MpaViewProps) {
             );
         })
     }, [positions]);
+
+    const zoomTo = async (position: Position, zoom: number) => {
+        let currentZoom = viewState.zoom || 0;
+        const isDecreasing = currentZoom > zoom
+
+        while (Math.abs(currentZoom - zoom) > ACCURACY) {
+            isDecreasing ? (currentZoom -= 0.1) : (currentZoom += 0.1)
+            setViewState(pre => ({ ...pre, ...position, zoom: currentZoom }));
+            await new Promise(resolve => setTimeout(resolve, 5));
+        }
+    }
 
 
     return (
