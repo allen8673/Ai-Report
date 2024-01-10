@@ -12,7 +12,7 @@ const mapUrl = `https://api.maptiler.com/maps/${process.env.NEXT_PUBLIC_MAP_ID}/
 const INIT_VIEWSTATE: Partial<ViewState> = {
     longitude: 121.15334218362636,
     latitude: 23.117270960253094,
-    zoom: 8.832856,
+    zoom: 9,
     pitch: 50,
     bearing: -20
 }
@@ -110,6 +110,8 @@ export default function MpaView<T>(props: MpaViewProps<T>) {
                 setViewState(viewState)
             }}
             mapStyle={mapUrl}
+            minZoom={8}
+        // maxBounds={[[118, 18], [123, 26]]}
         >
             {!hiddenCtrls && (
                 <>
