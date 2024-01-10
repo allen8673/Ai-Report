@@ -16,8 +16,8 @@ const INIT_VIEWSTATE: Partial<ViewState> = {
     pitch: 50,
     bearing: -20
 }
-const ACCURACY = 0.1;
-const FPS = 180
+const FPS = 60
+const FRAMES = 10
 
 export default function MpaView<T>(props: MpaViewProps<T>) {
     const { hiddenCtrls, ctrlPosition, positions, renderPin } = props;
@@ -92,9 +92,8 @@ export default function MpaView<T>(props: MpaViewProps<T>) {
     }
 
     const zoomTo = async (position: Position, zoom: number) => {
-        const frames = Math.abs((viewState.zoom || 0) - zoom) / ACCURACY;
-        await positionAnimation(position, frames);
-        await zoomAnimation(zoom, frames);
+        await positionAnimation(position, FRAMES);
+        await zoomAnimation(zoom, FRAMES);
     }
 
     return (
