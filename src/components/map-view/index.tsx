@@ -100,14 +100,8 @@ export default function MpaView<T>(props: MpaViewProps<T>) {
     return (
         <Map
             {...viewState}
-            onDrag={({ viewState }) => {
-                setViewState(viewState)
-            }}
-            onZoom={({ viewState }) => {
-                setViewState(viewState)
-            }}
-            onRotate={({ viewState }) => {
-                setViewState(viewState)
+            onMove={({ viewState }) => {
+                setViewState(() => viewState)
             }}
             mapStyle={mapUrl}
             minZoom={8}
