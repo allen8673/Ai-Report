@@ -1,5 +1,10 @@
 'use client'
+import { IconDefinition, faCircleExclamation, faShield, faShieldVirus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { concat } from "lodash";
 import { useEffect, useState } from "react";
+
+import { MockData, mockdata } from "./mock";
 
 import MpaView from "@/components/map-view";
 import { Position, PositionInfo } from "@/components/map-view/map-view";
@@ -17,18 +22,31 @@ function DefaultContent() {
         </h1>)
 }
 
-function LocationPane(pinData: PositionInfo) {
+function LocationPane(pinData: PositionInfo<MockData>) {
+    const { data } = pinData
+    let textColor = '';
+    switch (data?.type) {
+        case 'warning':
+            textColor = 'text-warning';
+            break;
+        case 'danger':
+            textColor = 'text-failure';
+            break;
+    }
+    const className = `text-xl font-bold ${textColor}`;
     return (<div className="text-turbo-deep-strong">
-        <h1 className="">You are here</h1>
-        <h3><b>latitude:</b> {pinData.position.latitude}</h3>
-        <h3><b>longitude:</b> {pinData.position.longitude}</h3>
+        <h1 className="">{pinData.name}</h1>
+        <i className="m-0 text-turbo-deep-weak"><b> {pinData.position.latitude}, {pinData.position.longitude}</b></i>
+        {!!data && <p className={className}>
+            {data.riskDescription}
+        </p>}
     </div>)
 }
 
 export default function Home() {
 
     const { setBgMainview } = useLayoutContext();
-    const [location, setLocation] = useState<Position>(INIT_POSITION);
+    const [locationInfo, setLocationInfo] = useState<PositionInfo<MockData>>({ name: 'You are here', position: INIT_POSITION });
     const [pinData, setPinData] = useState<PositionInfo>();
 
     useEffect(() => {
@@ -40,7 +58,7 @@ export default function Home() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((p) => {
                 const { longitude, latitude } = p.coords
-                setLocation({ longitude, latitude });
+                setLocationInfo(pre => ({ ...pre, position: { longitude, latitude } }));
             });
         }
     }, []);
@@ -55,8 +73,34 @@ export default function Home() {
                 {(!!pinData ? <LocationPane {...pinData} /> : <DefaultContent />)}
             </div>
             <MpaView
-                positions={[{ key: 'location', position: location }]}
+                positions={concat(mockdata, locationInfo)}
                 renderPin={{
+                    render: (position) => {
+                        if (!position.data?.type) return undefined
+                        let icon: IconDefinition;
+                        let textColor;
+                        switch (position.data.type) {
+                            default:
+                            case 'normal':
+                                icon = faShield;
+                                textColor = 'text-success';
+                                break;
+                            case 'warning':
+                                icon = faCircleExclamation;
+                                textColor = 'text-warning';
+                                break;
+                            case 'danger':
+                                icon = faShieldVirus;
+                                textColor = 'text-failure';
+                                break;
+                        }
+                        const className = `text-5xl ${textColor} opacity-90 cursor-pointer`
+
+                        return <FontAwesomeIcon
+                            icon={icon}
+                            className={className}
+                        />
+                    },
                     onClick: ({ position, setViewState }) => {
                         setViewState(pre => ({ ...pre, ...position.position, zoom: 20 }));
                     },
@@ -65,7 +109,7 @@ export default function Home() {
                     },
                     onMouseLeave: () => {
                         setPinData(undefined)
-                    }
+                    },
                 }}
                 ctrlPosition='bottom-right'
             />

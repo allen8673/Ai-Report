@@ -45,12 +45,11 @@ export default function MpaView(props: MpaViewProps) {
                             onMouseLeave?.({ position, setViewState })
                         }}
                     >
-                        {typeof render === 'function' ?
-                            render(position) :
-                            (render || <FontAwesomeIcon
+                        {(typeof render === 'function' ? render(position) : render) ||
+                            <FontAwesomeIcon
                                 icon={faLocationDot}
                                 className={`text-7xl text-nics-deep opacity-80 cursor-pointer`}
-                            />)
+                            />
                         }
                     </span>
                 </Marker>
