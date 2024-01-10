@@ -66,7 +66,7 @@ export default function Home() {
     return (
         <div className="flex-center w-full h-full text-light" >
             <div className={`
-            absolute top-[20px] right-[20px]
+            absolute top-[20px] right-[20px] w-[560px]
             p-7 bg-deep/[.8] z-2
             flex-center flex-col gap-[15px]
             rounded-std border-light-weak border-solid border-[3px]`}>
