@@ -7,13 +7,8 @@ import { useEffect, useState } from "react";
 import { MockData, mockdata } from "./mock";
 
 import MpaView from "@/components/map-view";
-import { Position, PositionInfo } from "@/components/map-view/map-view";
-import { useLayoutContext } from "@/layout/standard-layout/context";
-
-const INIT_POSITION: Position = {
-    longitude: 121.273,
-    latitude: 23.529,
-}
+import { PositionInfo } from "@/components/map-view/map-view";
+import { useBackgroundMainview } from "@/layout/standard-layout/lib";
 
 function DefaultContent() {
     return (
@@ -45,20 +40,16 @@ function LocationPane(pinData: PositionInfo<MockData>) {
 
 export default function Home() {
 
-    const { setBgMainview } = useLayoutContext();
-    const [locationInfo, setLocationInfo] = useState<PositionInfo<MockData>>({ name: 'You are here', key: 'YRH', position: INIT_POSITION });
+    const [locationInfo, setLocationInfo] = useState<PositionInfo<MockData>>();
     const [pinData, setPinData] = useState<PositionInfo>();
 
-    useEffect(() => {
-        setBgMainview(true);
-        return () => setBgMainview(false)
-    }, []);
+    useBackgroundMainview();
 
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((p) => {
                 const { longitude, latitude } = p.coords
-                setLocationInfo(pre => ({ ...pre, position: { longitude, latitude } }));
+                setLocationInfo(() => ({ name: 'You are here', key: 'YRH', position: { longitude, latitude } }));
             });
         }
     }, []);
@@ -73,7 +64,7 @@ export default function Home() {
                 {(!!pinData ? <LocationPane {...pinData} /> : <DefaultContent />)}
             </div>
             <MpaView
-                positions={concat(mockdata, locationInfo)}
+                positions={!!locationInfo ? concat(mockdata, locationInfo) : mockdata}
                 renderPin={{
                     render: (position) => {
                         if (!position.data?.type) return undefined

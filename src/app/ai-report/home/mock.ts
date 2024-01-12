@@ -10,8 +10,8 @@ export const mockdata: PositionInfo<MockData>[] = [
         name: 'National Museum of Natural Science',
         key: 'NMNS',
         position: {
-            longitude: 120.6620173,
-            latitude: 24.1565483,
+            longitude: 120.6655278,
+            latitude: 24.1573179,
         },
         data: {
             type: 'normal',
