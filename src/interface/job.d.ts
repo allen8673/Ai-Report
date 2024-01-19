@@ -9,3 +9,11 @@ export interface IJob {
     STATUS: string;
     ERR_MSG?: string
 }
+
+export interface IJobStatus {
+    JOB_ID: string;
+    WORKFLOW_ID: string;
+    ITEM_ID: string;
+    VERSION: number;
+    STATUS: string;
+}

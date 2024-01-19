@@ -114,7 +114,7 @@ export default function Page() {
                 })
                 return wf;
             }, []);
-            setWorkflow({ type: 'workflow', id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
+            setWorkflow({ type: 'workflow', id, name: paramObj.name || '', flows, rootNdeId: [rootId], VERSION: 0 })
 
         } else {
             /**
@@ -140,7 +140,7 @@ export default function Page() {
                 },
 
             ]
-            setWorkflow({ type: 'workflow', id, name: paramObj.name || '', flows, rootNdeId: [rootId] })
+            setWorkflow({ type: 'workflow', id, name: paramObj.name || '', flows, rootNdeId: [rootId], VERSION: 0 })
         }
     }
 
@@ -174,7 +174,8 @@ export default function Page() {
             id: '', //v4(),
             rootNdeId: [],
             name,
-            flows: templateNodes
+            flows: templateNodes,
+            VERSION: 0
         }
         const res = await addFlow(template);
         if (res.data.status === 'ok') {

@@ -7,9 +7,10 @@ export interface IFlowBase {
 }
 
 export interface IFlow extends IFlowBase {
-    type: 'workflow' | 'template',
+    type: 'workflow' | 'template';
     rootNdeId: string[];
     flows: IFlowNode[];
+    VERSION: number;
 }
 
 export type FlowType = 'Input' | 'Output' | 'Normal' | 'Workflow' | 'Report';
@@ -20,6 +21,12 @@ export interface ComponentOpt {
     COMP_NAME: string;
     COMP_TYPE: FlowType;
     APIMODE: string;
+}
+
+export interface SysPromptOpt {
+    PROMPT_ID: number;
+    PROMPT_NAME: string,
+    PROMPT_CONTENT: string;
 }
 
 export interface IReportCompData {
