@@ -60,12 +60,17 @@ function getItem<T extends FormValue>({ formCore, readonly }: GetItemProps<T>) {
                         rules={rules}
                         disabled={readonly || disabled}
                         render={typeof children === 'function' ? children : ({ field, fieldState }) => {
+                            const { onChange, ...otherfield } = field;
                             return (
                                 React.cloneElement(children, {
                                     id: field.name,
-                                    ...field,
+                                    ...otherfield,
                                     [valuePropName]: field.value,
                                     className: `${classNames({ 'p-invalid': fieldState.invalid, })} ${children?.props?.className || 'w-full'}`,
+                                    onChange: (e: any) => {
+                                        children?.props?.onChange?.(e)
+                                        onChange(e);
+                                    }
                                 })
                             )
                         }} />
@@ -126,7 +131,7 @@ export default function Form<T extends Record<string, any>>(props: FormProps<T>)
     useEffect(() => {
         onLoad?.(formInstance);
         return onDestroyed
-    }, [])
+    }, []);
 
     return <ErrorBoundary>
         <form className={`zd-form text-deep ${className}`}
