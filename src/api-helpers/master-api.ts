@@ -14,6 +14,6 @@ export const getCustomComponents = async () => {
 }
 
 export const getSysprompts = async () => {
-    const sysPromptOpt = (await apiCaller.get<ApiResult<SysPromptOpt[]>>(`${process.env.NEXT_PUBLIC_MASTER}/getSysprompts`)).data.data;
-    return sysPromptOpt || []
+    const sysPromptOpts = (await apiCaller.get<ApiResult<SysPromptOpt[]>>(`${process.env.NEXT_PUBLIC_MASTER}/getSysprompts`)).data.data;
+    return sysPromptOpts || []
 }
