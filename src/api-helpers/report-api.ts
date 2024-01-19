@@ -25,8 +25,8 @@ export const checkJob = async (flowid: string) => {
     return (await apiCaller.get<ApiResult>(`${process.env.NEXT_PUBLIC_REPORT}/check/${flowid}`)).data
 }
 
-export const getJobsOngoing = async (flowid: string, version: number) => {
-    return (await apiCaller.get<ApiResult<IJob[]>>(`${process.env.NEXT_PUBLIC_REPORT}/getJobsOngoing/${flowid}/${version}`)).data.data
+export const getJobsOngoing = async (flowid: string) => {
+    return (await apiCaller.get<ApiResult<IJob[]>>(`${process.env.NEXT_PUBLIC_REPORT}/getJobsOngoing/${flowid}`)).data.data
 }
 
 export const getJobItemStatus = async (jobid: string) => {

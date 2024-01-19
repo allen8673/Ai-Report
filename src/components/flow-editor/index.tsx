@@ -105,7 +105,8 @@ function PromptModal(props: ModalProps<IFlowNode>) {
                             </Item>
                             {
                                 isCSV && <Item name='syspromptid' label="System Prompt">
-                                    <Dropdown options={sysPromptOpts?.map(i => ({ label: `${i.PROMPT_ID}-${i.PROMPT_NAME}`, value: i.PROMPT_ID }))}
+                                    <Dropdown
+                                        options={sysPromptOpts?.map(i => ({ label: `${i.PROMPT_ID}-${i.PROMPT_NAME}`, value: i.PROMPT_ID }))}
                                         onChange={e => {
                                             const opt = find(sysPromptOpts, i => i.PROMPT_ID === e.value);
                                             if (!opt) return;

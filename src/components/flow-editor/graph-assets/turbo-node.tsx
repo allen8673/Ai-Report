@@ -25,7 +25,7 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
             status_color = 'bg-failure';
             icon = faXmark
             break;
-        case 'warning':
+        case 'wait':
             status_color = 'bg-warning';
             icon = faExclamation
             break;

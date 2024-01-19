@@ -91,7 +91,7 @@ export default function Page() {
     return <div className="page-std">
         <TitlePane title='Template' />
         <Splitter className='shrink grow' style={{ height: '300px' }} layout="vertical">
-            <SplitterPanel className="px-[7px] " size={40}>
+            <SplitterPanel className="px-[7px] " size={60}>
                 {selection?.flows ? <FlowEditor
                     flows={selection.flows}
                     graphRef={graphRef}
@@ -106,7 +106,7 @@ export default function Page() {
                     }}
                 /> : <EmptyPane icon={faPaperPlane} title='Select a template to show the graph' />}
             </SplitterPanel>
-            <SplitterPanel className="overflow-auto px-[7px]" size={60}>
+            <SplitterPanel className="overflow-auto px-[7px]" size={40}>
                 <Table className='h-full w-full'
                     data={templates}
                     columns={columns}
