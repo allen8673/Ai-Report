@@ -12,7 +12,7 @@ import { v4 } from "uuid";
 
 import { createComponent, disableComponent, updateComponent } from "@/api-helpers/component-api";
 import { addFlow, deleteFlow, getFlow, getFlows, updateFlow } from "@/api-helpers/flow-api";
-import { getComponentOpts, getCustomComponents } from "@/api-helpers/master-api";
+import { getComponentOpts, getCustomComponents, getSysprompts } from "@/api-helpers/master-api";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowEditor from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
@@ -23,7 +23,7 @@ import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/panes/title";
-import { IEditFlow, IFlowNode, IFlow, IFlowBase, ICustomCompData } from "@/interface/flow";
+import { IEditFlow, IFlowNode, IFlow, IFlowBase, ICustomCompData, SysPromptOpt } from "@/interface/flow";
 import { ComponentOpt } from "@/interface/flow";
 import { useLayoutContext } from "@/layout/standard-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
@@ -47,6 +47,7 @@ export default function Page() {
     const [componentOpts, setComponentOpts] = useState<ComponentOpt[]>([])
     const [templateNodes, setTemplateNodes] = useState<IFlowNode[]>();
     const [customComps, setCustomComps] = useState<ICustomCompData[]>([]);
+    const [sysPromptOpts, setSysPromptOpts] = useState<SysPromptOpt[]>([]);
 
     const flowNameMapper: FlowNameMapper = useMemo(() => {
         if (!workflows) return {};
@@ -69,6 +70,7 @@ export default function Page() {
             setComponentOpts(comps)
         })
         fetchCustomComps();
+        fetchSysPromptOpts();
         await fetchAllWorflowData();
         if (mode === 'add') {
             prepareNewWorkflow(paramObj)
@@ -80,6 +82,11 @@ export default function Page() {
     const fetchCustomComps = async () => {
         const comps = await getCustomComponents();
         setCustomComps(comps);
+    }
+
+    const fetchSysPromptOpts = async () => {
+        const sys_prompts = await getSysprompts();
+        setSysPromptOpts(sys_prompts);
     }
 
     const fetchAllWorflowData = async () => {
@@ -333,6 +340,7 @@ export default function Page() {
                 inEdit={inEdit}
                 flowNameMapper={flowNameMapper}
                 componentOpts={componentOpts}
+                sysPromptOpts={sysPromptOpts}
                 customComps={customComps}
                 onAddComponent={async (comp) => {
                     await createComponent(comp);

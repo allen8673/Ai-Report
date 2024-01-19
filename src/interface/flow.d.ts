@@ -44,6 +44,7 @@ export interface ICustomCompData {
     prompt: string;
     owner: string;
     user: string;
+    syspromptid?: number;
 }
 
 export interface IFlowNode extends IFlowNodeBase {
@@ -59,7 +60,8 @@ export interface IFlowNode extends IFlowNodeBase {
     running?: boolean;
     status?: FlowStatus;
     workflowstatus?: 'disable' | 'enable' | '';
-    apimode?: string
+    apimode?: string;
+    syspromptid?: number;
 }
 
 export interface IEditFlow {

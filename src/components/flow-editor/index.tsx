@@ -47,18 +47,31 @@ interface ModalProps<T> {
 
 function PromptModal(props: ModalProps<IFlowNode>) {
     const { visible, defaultValues, onClose } = props;
-    const { graphRef, inEdit, componentOpts } = useFlowGrapContext();
-    const [form, setForm] = useState<FormInstance<IFlowNode>>()
+    const { graphRef, inEdit, componentOpts, sysPromptOpts } = useFlowGrapContext();
+    const [form, setForm] = useState<FormInstance<IFlowNode>>();
+    const [isCSV, setIsCSV] = useState<boolean>();
+
+    useEffect(() => {
+        setIsCSV(defaultValues?.apimode === 'csv_prompt')
+    }, [defaultValues])
+
+    useEffect(() => {
+        if (!isCSV) {
+            form?.setValue('syspromptid', undefined);
+        }
+    }, [isCSV]);
+
     const onOK = (): void => {
         form?.submit()
-            .then(({ id, prompt, name, apimode }) => {
+            .then(({ id, prompt, name, apimode, syspromptid }) => {
                 graphRef?.current?.setNode(id, pre => ({
                     ...pre,
                     data: {
                         ...pre.data,
                         prompt: prompt,
                         name: name,
-                        apimode: apimode
+                        apimode: apimode,
+                        syspromptid: syspromptid
                     }
                 }))
                 onClose?.();
@@ -83,8 +96,25 @@ function PromptModal(props: ModalProps<IFlowNode>) {
                     ({ Item }) =>
                         <>
                             <Item name='apimode' label="API Mode" rules={{ required: 'Please select an API mode!' }}>
-                                <Dropdown options={componentOpts?.filter(i => i.COMP_TYPE === 'Normal').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                                <Dropdown
+                                    options={componentOpts?.filter(i => i.COMP_TYPE === 'Normal').map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))}
+                                    onChange={(e) => {
+                                        setIsCSV(e.value === 'csv_prompt');
+                                    }}
+                                />
                             </Item>
+                            {
+                                isCSV && <Item name='syspromptid' label="System Prompt">
+                                    <Dropdown options={sysPromptOpts?.map(i => ({ label: `${i.PROMPT_ID}-${i.PROMPT_NAME}`, value: i.PROMPT_ID }))}
+                                        onChange={e => {
+                                            const opt = find(sysPromptOpts, i => i.PROMPT_ID === e.value);
+                                            if (!opt) return;
+                                            form?.setValue('name', opt.PROMPT_NAME);
+                                            form?.setValue('prompt', opt.PROMPT_CONTENT);
+                                        }}
+                                    />
+                                </Item>
+                            }
                             <Item name='name' label="Name" >
                                 <InputText />
                             </Item>
@@ -200,8 +230,9 @@ function ReportModal(props: ModalProps<IFlowNode>) {
 
 function AddComponent(props: ModalProps<ICustomCompData>) {
     const { visible, onClose } = props;
-    const { componentOpts, onAddComponent, customComps } = useFlowGrapContext();
-    const [form, setForm] = useState<FormInstance<ICustomCompData>>()
+    const { componentOpts, onAddComponent, customComps, sysPromptOpts } = useFlowGrapContext();
+    const [form, setForm] = useState<FormInstance<ICustomCompData>>();
+    const [isCSV, setIsCSV] = useState<boolean>(false)
     const onOK = (): void => {
         form?.submit()
             .then(async (val) => {
@@ -220,6 +251,13 @@ function AddComponent(props: ModalProps<ICustomCompData>) {
                 // 
             });
     };
+
+    useEffect(() => {
+        if (!isCSV) {
+            form?.setValue('syspromptid', undefined);
+        }
+    }, [isCSV])
+
     return (
         <Modal
             title="Add a new component"
@@ -239,8 +277,24 @@ function AddComponent(props: ModalProps<ICustomCompData>) {
                                     required: 'API Mode is required!',
                                 }
                             }>
-                                <Dropdown options={componentOpts?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                                <Dropdown options={componentOpts?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))}
+                                    onChange={(e) => {
+                                        setIsCSV(e.value === 'csv_prompt');
+                                    }}
+                                />
                             </Item>
+                            {
+                                isCSV && <Item name='syspromptid' label="System Prompt">
+                                    <Dropdown options={sysPromptOpts?.map(i => ({ label: `${i.PROMPT_ID}-${i.PROMPT_NAME}`, value: i.PROMPT_ID }))}
+                                        onChange={e => {
+                                            const opt = find(sysPromptOpts, i => i.PROMPT_ID === e.value);
+                                            if (!opt) return;
+                                            form?.setValue('name', opt.PROMPT_NAME);
+                                            form?.setValue('prompt', opt.PROMPT_CONTENT);
+                                        }}
+                                    />
+                                </Item>
+                            }
                             <Item name='name' label="Name" rules={
                                 {
                                     required: 'Component name is required!',
@@ -255,7 +309,7 @@ function AddComponent(props: ModalProps<ICustomCompData>) {
                             }>
                                 <InputText />
                             </Item>
-                            <Item name='prompt' label="Prompt" >
+                            <Item name='prompt' label="Prompt"  >
                                 <InputTextarea autoResize className="w-full min-h-[100px]" />
                             </Item>
                         </>
@@ -267,8 +321,20 @@ function AddComponent(props: ModalProps<ICustomCompData>) {
 
 function EditComponent(props: ModalProps<ICustomCompData>) {
     const { visible, onClose, defaultValues, } = props;
-    const { componentOpts, onDeleteComponent, onEditComponent, customComps } = useFlowGrapContext();
-    const [form, setForm] = useState<FormInstance<ICustomCompData>>()
+    const { componentOpts, onDeleteComponent, onEditComponent, customComps, sysPromptOpts } = useFlowGrapContext();
+    const [form, setForm] = useState<FormInstance<ICustomCompData>>();
+    const [isCSV, setIsCSV] = useState<boolean>();
+
+    useEffect(() => {
+        setIsCSV(defaultValues?.apimode === 'csv_prompt')
+    }, [defaultValues])
+
+    useEffect(() => {
+        if (!isCSV) {
+            form?.setValue('syspromptid', undefined);
+        }
+    }, [isCSV]);
+
     const onOK = (): void => {
         form?.submit()
             .then(async (val) => {
@@ -282,6 +348,7 @@ function EditComponent(props: ModalProps<ICustomCompData>) {
                 // 
             });
     };
+
     return (
         <Modal
             title="Edit component"
@@ -323,8 +390,25 @@ function EditComponent(props: ModalProps<ICustomCompData>) {
                                     required: 'API Mode is required!',
                                 }
                             }>
-                                <Dropdown options={componentOpts?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))} />
+                                <Dropdown
+                                    options={componentOpts?.map(i => ({ label: i.COMP_NAME, value: i.APIMODE }))}
+                                    onChange={(e) => {
+                                        setIsCSV(e.value === 'csv_prompt');
+                                    }}
+                                />
                             </Item>
+                            {
+                                isCSV && <Item name='syspromptid' label="System Prompt">
+                                    <Dropdown options={sysPromptOpts?.map(i => ({ label: `${i.PROMPT_ID}-${i.PROMPT_NAME}`, value: i.PROMPT_ID }))}
+                                        onChange={e => {
+                                            const opt = find(sysPromptOpts, i => i.PROMPT_ID === e.value);
+                                            if (!opt) return;
+                                            form?.setValue('name', opt.PROMPT_NAME);
+                                            form?.setValue('prompt', opt.PROMPT_CONTENT);
+                                        }}
+                                    />
+                                </Item>
+                            }
                             <Item name='name' label="Name" rules={
                                 {
                                     required: 'Component name is required!',

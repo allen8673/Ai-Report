@@ -1,5 +1,5 @@
 import { GraphProps } from "@/components/graph/graph";
-import { IFlowNode, ICustomCompData, ComponentOpt } from "@/interface/flow";
+import { IFlowNode, ICustomCompData, ComponentOpt, SysPromptOpt } from "@/interface/flow";
 
 export interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     'initialNodes' |
@@ -16,6 +16,7 @@ export interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     delayRender?: number;
     componentOpts?: ComponentOpt[];
     customComps?: ICustomCompData[];
+    sysPromptOpts?: SysPromptOpt[];
     onAddComponent?: (comp: ICustomCompData) => void;
     onEditComponent?: (comp: ICustomCompData) => void;
     onDeleteComponent?: (comp: ICustomCompData) => void;
