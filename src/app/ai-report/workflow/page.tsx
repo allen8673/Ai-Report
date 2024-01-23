@@ -24,7 +24,7 @@ import TitlePane from "@/components/panes/title";
 import Table from "@/components/table";
 import { Column } from "@/components/table/table";
 import { IFlow, IFlowBase, IFlowNode } from "@/interface/flow";
-import { IJob, IJobStatus } from "@/interface/job";
+import { IJob } from "@/interface/job";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import { getFullUrl } from "@/lib/router";
 
@@ -39,7 +39,6 @@ function WorkflowPreviewer({ workflow }: { workflow?: IFlow }) {
     const [jobs, setJobs] = useState<IJob[]>([]);
     const [jobId, setJobId] = useState<string>();
     const [executor, setExecutor] = useState<NodeJS.Timeout>()
-    // const [jobStatus, setJobStatus] = useState<IJobStatus[]>();
 
     useEffect(() => {
         if (!workflow) {
@@ -55,21 +54,22 @@ function WorkflowPreviewer({ workflow }: { workflow?: IFlow }) {
             })
     }, [workflow]);
 
+    const stopChechJobStatus = () => {
+        if (executor != undefined) {
+            clearInterval(executor)
+        }
+    }
 
     const executeChechJobStatus = async (_jobId?: string) => {
-
         const checkJobStatus = async (_jobId: string) => {
             const jobStatus = await getJobItemStatus(_jobId);
-            graphRef.current.setNodes(n => {
+            graphRef.current?.setNodes(n => {
                 const status = find(jobStatus, js => js.ITEM_ID === n.id)
                 if (!!status) n.data.status = status.STATUS;
                 return n
             })
         }
-
-        if (!!executor) {
-            clearInterval(executor)
-        }
+        stopChechJobStatus();
         if (!_jobId) return;
         await checkJobStatus(_jobId);
         const _executor = setInterval(async () => await checkJobStatus(_jobId), 5000);
@@ -77,8 +77,12 @@ function WorkflowPreviewer({ workflow }: { workflow?: IFlow }) {
     }
 
     useEffect(() => {
-        executeChechJobStatus(jobId)
-    }, [jobId])
+        executeChechJobStatus(jobId);
+    }, [jobId]);
+
+    useEffect(() => {
+        return stopChechJobStatus;
+    }, [executor]);
 
     return (
         workflow?.flows ?
@@ -191,7 +195,7 @@ export default function Page() {
                 />
             }
         />
-        <Splitter className='shrink grow' style={{ height: '300px' }} layout="vertical">
+        <Splitter className='shrink grow' style={{ height: '300px' }} layout='horizontal'>
             <SplitterPanel className="px-[7px] " size={60}>
                 <WorkflowPreviewer workflow={selection} />
             </SplitterPanel>
