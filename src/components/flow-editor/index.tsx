@@ -436,6 +436,8 @@ function EditComponent(props: ModalProps<ICustomCompData>) {
     )
 }
 
+function 
+
 export default function FlowEditor(props: FlowGraphProps) {
 
     const {
@@ -479,20 +481,21 @@ export default function FlowEditor(props: FlowGraphProps) {
         await fetchCustomComps()
     }
 
+    const fetchComponentOpts = async () => {
+        const opts = await getComponentOpts();
+        setComponentOpts(opts)
+    }
     const fetchCustomComps = async () => {
         const comps = await getCustomComponents();
         setCustomComps(comps);
     }
-
     const fetchSysPromptOpts = async () => {
         const sys_prompts = await getSysprompts();
         setSysPromptOpts(sys_prompts);
     }
 
     const initial = async () => {
-        getComponentOpts().then(comps => {
-            setComponentOpts(comps)
-        })
+        fetchComponentOpts();
         fetchCustomComps();
         fetchSysPromptOpts();
     };
@@ -552,10 +555,10 @@ export default function FlowEditor(props: FlowGraphProps) {
                     sysPromptOpts,
                 }}>
                 <div className="flow-editor h-full w-full relative">
-                    <Tooltip target={'.actbar-tooltip'} position='top' />
                     {inEdit &&
                         (<>
                             <div className={`act-bar main top-[22px]`} >
+                                <Tooltip target={'.actbar-tooltip'} position='top' />
                                 <DndList
                                     className="w-max-[162px]"
                                     items={GET_REPORT_COMPONENTS(props)}
