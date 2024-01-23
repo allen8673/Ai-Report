@@ -31,7 +31,9 @@ import TurboNode from "./graph-assets/turbo-node";
 import { FlowGraphProps, FlowNameMapper } from "./type";
 
 
-import { FlowType, ICustomCompData, IFlowNode, IReportCompData } from "@/interface/flow";
+import { createComponent, disableComponent, updateComponent } from "@/api-helpers/component-api";
+import { getComponentOpts, getCustomComponents, getSysprompts } from "@/api-helpers/master-api";
+import { ComponentOpt, FlowType, ICustomCompData, IFlowNode, IReportCompData, SysPromptOpt } from "@/interface/flow";
 
 import './graph-assets/turbo-elements.css';
 import './flow-editor.css';
@@ -441,8 +443,6 @@ export default function FlowEditor(props: FlowGraphProps) {
         inEdit = false,
         graphRef: ref,
         delayRender,
-        componentOpts,
-        customComps,
         ...others
     } = props
 
@@ -456,12 +456,50 @@ export default function FlowEditor(props: FlowGraphProps) {
     const [editComp, setEditComp] = useState<ICustomCompData>();
     const [compGroups, setCompGroups] = useState<Dictionary<ICustomCompData[]>>({});
     const [selectedGroup, setSelectedGroup] = useState<string>();
+    const [componentOpts, setComponentOpts] = useState<ComponentOpt[]>([]);
+    const [customComps, setCustomComps] = useState<ICustomCompData[]>([]);
+    const [sysPromptOpts, setSysPromptOpts] = useState<SysPromptOpt[]>([]);
 
     const clickOnSetting = (flow: IFlowNode) => {
         setOpenModal(flow)
     }
 
     const closeModal = () => { setOpenModal(undefined) }
+
+    const onAddComponent = async (comp: ICustomCompData) => {
+        await createComponent(comp);
+        await fetchCustomComps();
+    }
+    const onEditComponent = async (comp: ICustomCompData) => {
+        await updateComponent(comp);
+        await fetchCustomComps()
+    }
+    const onDeleteComponent = async ({ id }: ICustomCompData) => {
+        await disableComponent(id);
+        await fetchCustomComps()
+    }
+
+    const fetchCustomComps = async () => {
+        const comps = await getCustomComponents();
+        setCustomComps(comps);
+    }
+
+    const fetchSysPromptOpts = async () => {
+        const sys_prompts = await getSysprompts();
+        setSysPromptOpts(sys_prompts);
+    }
+
+    const initial = async () => {
+        getComponentOpts().then(comps => {
+            setComponentOpts(comps)
+        })
+        fetchCustomComps();
+        fetchSysPromptOpts();
+    };
+
+    useEffect(() => {
+        initial()
+    }, []);
 
     useEffect(() => {
         const edges: Edge[] = [];
@@ -506,6 +544,12 @@ export default function FlowEditor(props: FlowGraphProps) {
                     graphRef,
                     selectedGroup,
                     setSelectedGroup,
+                    onAddComponent,
+                    onEditComponent,
+                    onDeleteComponent,
+                    componentOpts,
+                    customComps,
+                    sysPromptOpts,
                 }}>
                 <div className="flow-editor h-full w-full relative">
                     <Tooltip target={'.actbar-tooltip'} position='top' />
@@ -513,7 +557,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                         (<>
                             <div className={`act-bar main top-[22px]`} >
                                 <DndList
-                                    className="w-[162px]"
+                                    className="w-max-[162px]"
                                     items={GET_REPORT_COMPONENTS(props)}
                                     disableChangeOrder
                                     renderContent={(data) => <ReportComponent {...data} />}

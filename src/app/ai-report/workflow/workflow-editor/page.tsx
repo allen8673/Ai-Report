@@ -10,9 +10,7 @@ import { InputText } from "primereact/inputtext";
 import { useEffect, useMemo, useState } from "react";
 import { v4 } from "uuid";
 
-import { createComponent, disableComponent, updateComponent } from "@/api-helpers/component-api";
 import { addFlow, deleteFlow, getFlow, getFlows, updateFlow } from "@/api-helpers/flow-api";
-import { getComponentOpts, getCustomComponents, getSysprompts } from "@/api-helpers/master-api";
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowEditor from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
@@ -23,8 +21,7 @@ import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph";
 import Modal from "@/components/modal";
 import TitlePane from "@/components/panes/title";
-import { IEditFlow, IFlowNode, IFlow, IFlowBase, ICustomCompData, SysPromptOpt } from "@/interface/flow";
-import { ComponentOpt } from "@/interface/flow";
+import { IEditFlow, IFlowNode, IFlow, IFlowBase } from "@/interface/flow";
 import { useLayoutContext } from "@/layout/standard-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import { getFullUrl } from "@/lib/router";
@@ -44,10 +41,10 @@ export default function Page() {
     const [workflow, setWorkflow] = useState<IFlow>();
     const [workflows, setWorkflows] = useState<IFlowBase[]>();
     const [inEdit, setInEdit] = useState<boolean>();
-    const [componentOpts, setComponentOpts] = useState<ComponentOpt[]>([])
+    // const [componentOpts, setComponentOpts] = useState<ComponentOpt[]>([])
     const [templateNodes, setTemplateNodes] = useState<IFlowNode[]>();
-    const [customComps, setCustomComps] = useState<ICustomCompData[]>([]);
-    const [sysPromptOpts, setSysPromptOpts] = useState<SysPromptOpt[]>([]);
+    // const [customComps, setCustomComps] = useState<ICustomCompData[]>([]);
+    // const [sysPromptOpts, setSysPromptOpts] = useState<SysPromptOpt[]>([]);
 
     const flowNameMapper: FlowNameMapper = useMemo(() => {
         if (!workflows) return {};
@@ -66,11 +63,6 @@ export default function Page() {
 
     const initial = async () => {
         setInEdit(mode === 'add');
-        getComponentOpts().then(comps => {
-            setComponentOpts(comps)
-        })
-        fetchCustomComps();
-        fetchSysPromptOpts();
         await fetchAllWorflowData();
         if (mode === 'add') {
             prepareNewWorkflow(paramObj)
@@ -79,15 +71,15 @@ export default function Page() {
         }
     }
 
-    const fetchCustomComps = async () => {
-        const comps = await getCustomComponents();
-        setCustomComps(comps);
-    }
+    // const fetchCustomComps = async () => {
+    //     const comps = await getCustomComponents();
+    //     setCustomComps(comps);
+    // }
 
-    const fetchSysPromptOpts = async () => {
-        const sys_prompts = await getSysprompts();
-        setSysPromptOpts(sys_prompts);
-    }
+    // const fetchSysPromptOpts = async () => {
+    //     const sys_prompts = await getSysprompts();
+    //     setSysPromptOpts(sys_prompts);
+    // }
 
     const fetchAllWorflowData = async () => {
         const wfs = await getFlows('WORKFLOW')
@@ -339,21 +331,6 @@ export default function Page() {
                 hideMiniMap
                 inEdit={inEdit}
                 flowNameMapper={flowNameMapper}
-                componentOpts={componentOpts}
-                sysPromptOpts={sysPromptOpts}
-                customComps={customComps}
-                onAddComponent={async (comp) => {
-                    await createComponent(comp);
-                    await fetchCustomComps();
-                }}
-                onEditComponent={async (comp) => {
-                    await updateComponent(comp);
-                    await fetchCustomComps()
-                }}
-                onDeleteComponent={async ({ id }) => {
-                    await disableComponent(id);
-                    await fetchCustomComps()
-                }}
             />
             <Modal
                 title='Preview & Save as Template'
