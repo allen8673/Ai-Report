@@ -1,6 +1,5 @@
 'use client'
 import { faCloudUpload } from '@fortawesome/free-solid-svg-icons';
-import { faDownload } from '@fortawesome/free-solid-svg-icons/faDownload';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { includes, map, toString } from 'lodash';
 import { Button } from 'primereact/button';
@@ -32,7 +31,7 @@ interface ViewReports {
 
 function PreviewModal({ reportJobs, onClose }:
     {
-        reportJobs: ViewReports,
+        reportJobs?: ViewReports,
         onClose: () => void
     }) {
 
@@ -41,7 +40,7 @@ function PreviewModal({ reportJobs, onClose }:
     const [selectedJob, setSelectedJob] = useState<string>('');
 
     useEffect(() => {
-        setSelectedJob(reportJobs.jobs?.[0]?.JOB_ID || '')
+        setSelectedJob(reportJobs?.jobs?.[0]?.JOB_ID || '')
     }, [reportJobs])
 
     useEffect(() => {
@@ -70,25 +69,28 @@ function PreviewModal({ reportJobs, onClose }:
         className="preview-doc-moda min-w-[50%] min-h-[50%] max-w-[70%]"
         onOk={onClose}
         okLabel="Close"
-        visible={!!true}
+        visible={!!reportJobs}
         contentClassName="flex flex-col gap-[22px]"
         footerClass="flex justify-end"
     >
-        <div className='flex gap-[7px] p'>
-            <Dropdown
-                className='grow'
-                value={selectedJob}
-                options={map<IJob, SelectItem>(reportJobs?.jobs || [], ({ JOB_ID }) => ({ label: JOB_ID, value: JOB_ID }))}
-                onChange={v => {
-                    setSelectedJob(v.value);
-                }}
-            />
+        <div className='flex-h-center gap-[7px] p'>
+            <div className="grow shrink flex-h-center gap-2 ">
+                <h3 className="text-light-weak ">Select finish Job ID:</h3>
+                <Dropdown
+                    className='grow'
+                    value={selectedJob}
+                    options={map<IJob, SelectItem>(reportJobs?.jobs || [], ({ JOB_ID }) => ({ label: JOB_ID, value: JOB_ID }))}
+                    onChange={v => {
+                        setSelectedJob(v.value);
+                    }}
+                />
+            </div>
             <Button
-                className="gap-[7px]"
+                className="h-[40px]"
+                icon='pi pi-download'
                 severity='info'
                 label={'Download'}
                 disabled={!jobContents[selectedJob]}
-                icon={<FontAwesomeIcon icon={faDownload} />}
                 onClick={(): void => {
                     if (!jobContents[selectedJob]) return
                     downloadString(jobContents[selectedJob], selectedJob, 'txt')
@@ -108,9 +110,6 @@ function PreviewModal({ reportJobs, onClose }:
 
             /> :
             <EmptyPane />}
-        {/* {jobContents[selectedJob] ? <Fieldset legend="Preview your report" className="grow" >
-            {jobContents[selectedJob]}
-        </Fieldset> : <EmptyPane />} */}
     </Modal>
 
 }
@@ -228,7 +227,7 @@ export default function WorkflowLayout({
                     }}
                 />
             </Modal>
-            {reportJobs && <PreviewModal reportJobs={reportJobs} onClose={() => setReportJobs(undefined)} />}
+            <PreviewModal reportJobs={reportJobs} onClose={() => setReportJobs(undefined)} />
         </WfLayoutContext.Provider>
     )
 }

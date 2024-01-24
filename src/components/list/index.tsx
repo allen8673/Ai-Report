@@ -37,7 +37,7 @@ export default function List<T,>(props: ListProps<T>) {
     };
 
     return (
-        <div className={`h-full overflow-auto ${className}`} style={style}>
+        <div className={`h-full overflow-hidden ${className}`} style={style}>
             <AutoSizer>
                 {({ width, height }) => {
                     return (

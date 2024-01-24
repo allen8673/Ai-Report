@@ -1,5 +1,5 @@
 'use client'
-import { faAdd, faEye, faPaperPlane, faPen, faPlayCircle } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faPaperPlane, faPen, faPlayCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RouterInfo from "@settings/router";
 import { find } from "lodash";
@@ -121,9 +121,7 @@ function WorkflowPreviewer() {
                                     severity='secondary'
                                     tooltip="Run Workflow"
                                     tooltipOptions={{ position: 'mouse' }}
-                                    icon={
-                                        <FontAwesomeIcon icon={faPlayCircle} />
-                                    }
+                                    icon='pi pi-play'
                                     onClick={() => runWorkflow(cacheWorkflow.id)}
                                 />
                                 <Button
@@ -131,19 +129,15 @@ function WorkflowPreviewer() {
                                     severity='info'
                                     tooltip="Reports"
                                     tooltipOptions={{ position: 'mouse' }}
-                                    icon={
-                                        <FontAwesomeIcon icon={faEye} />
-                                    }
+                                    icon='pi pi-eye'
                                     onClick={() => viewReports(cacheWorkflow.id)}
                                 />
                                 <Button
-                                    className="gap-[7px] h-[40px]"
+                                    className="h-[40px]"
                                     severity='success'
                                     label="Edit Workflow"
                                     tooltipOptions={{ position: 'left' }}
-                                    icon={
-                                        <FontAwesomeIcon icon={faPen} />
-                                    }
+                                    icon='pi pi-pencil'
                                     onClick={() => {
                                         router.push(`${editorUrl}${coverToQueryString({ id: cacheWorkflow.id })}`);
                                     }}
@@ -166,27 +160,41 @@ function ListItem({ key, item, }: { key: string; item: IFlowBase; }) {
                          flex items-center
                          ${cacheWorkflow?.id === item.id ? 'bg-turbo-deep-weak/[.6]' : ''}
                          hover:bg-deep-weak `}>
-            <div className="grow shrink flex flex-col">
-                <div className="text-xl ellipsis overflow-hidden ">{item.name}</div>
+            <div className="grow shrink flex flex-col overflow-hidden">
+                <div className="text-xl ellipsis">{item.name}</div>
                 <i className="ellipsis overflow-hidden text-light-weak">{item.id}</i>
             </div>
-            <Button className={`border-4 min-w-9 min-h-9`} icon='pi pi-ellipsis-h' outlined rounded severity='secondary' />
+            <Button className={`border-4  min-w-[38px] min-h-[38px]`} icon='pi pi-ellipsis-h' outlined rounded severity='secondary' />
         </div>
     )
 }
 
-function WorkflowList({ workflows }: { workflows: IFlowBase[] }) {
-    const { setCacheWorkflow: setSelection } = useWfLayoutContext()
-
-
-    return <List
-        className="overflow-hidden"
-        data={workflows}
-        renderItem={(item, idx) => <ListItem key={`wf-${idx}`} item={item} />}
-        onItemClick={async (item) => {
-            const flow = await getFlow(item.id)
-            setSelection(flow);
-        }} />
+function WorkflowList({ workflows, onAddWF }:
+    {
+        workflows: IFlowBase[];
+        onAddWF?: () => void
+    }) {
+    const { setCacheWorkflow } = useWfLayoutContext()
+    return (
+        <div className="flex flex-col w-full overflow-hidden items-end">
+            <Button
+                className="ellipsis"
+                icon='pi pi-plus'
+                severity="success"
+                label='Add New Workflow'
+                tooltipOptions={{ position: 'left' }}
+                onClick={onAddWF}
+            />
+            <List
+                className="grow shrink w-full mt-3"
+                data={workflows}
+                renderItem={(item, idx) => <ListItem key={`wf-${idx}`} item={item} />}
+                onItemClick={async (item) => {
+                    const flow = await getFlow(item.id)
+                    setCacheWorkflow(flow);
+                }} />
+        </div>
+    )
 }
 
 export default function Page() {
@@ -208,25 +216,13 @@ export default function Page() {
 
     return (
         <div className="page-std">
-            <TitlePane
-                title='WorkFlow'
-                postContent={
-                    <Button icon={<FontAwesomeIcon className='mr-[7px]' icon={faAdd} />}
-                        severity="success"
-                        label='Add New Workflow'
-                        tooltipOptions={{ position: 'left' }}
-                        onClick={() => {
-                            setAddNewFlow(pre => !pre)
-                        }}
-                    />
-                }
-            />
+            <TitlePane title='WorkFlow' />
             <Splitter className='shrink grow' style={{ height: '30px' }} layout='horizontal'>
                 <SplitterPanel className="px-[7px] " size={80}>
                     <WorkflowPreviewer />
                 </SplitterPanel>
                 <SplitterPanel className="overflow-auto px-[7px]" size={20}>
-                    <WorkflowList workflows={workflows} />
+                    <WorkflowList workflows={workflows} onAddWF={() => setAddNewFlow(pre => !pre)} />
                 </SplitterPanel>
             </Splitter>
             <Modal visible={addNewFlow}
