@@ -21,6 +21,7 @@ import List from "@/components/list";
 import Modal from "@/components/modal";
 import EmptyPane from "@/components/panes/empty";
 import TitlePane from "@/components/panes/title";
+import { ListItem } from "@/components/workflow/list-item";
 import { IFlowBase, IFlowNode } from "@/interface/flow";
 import { IJob } from "@/interface/job";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
@@ -149,30 +150,13 @@ function WorkflowPreviewer() {
     )
 }
 
-function ListItem({ key, item, }: { key: string; item: IFlowBase; }) {
-    const { cacheWorkflow } = useWfLayoutContext()
-
-    return (
-        <div key={key} className={`h-[88px] px-3 py-2 text-light m-1.5
-                         border-light border-solid rounded-std 
-                         flex items-center
-                         ${cacheWorkflow?.id === item.id ? 'bg-turbo-deep-weak/[.6]' : ''}
-                         hover:bg-deep-weak `}>
-            <div className="grow shrink flex flex-col overflow-hidden">
-                <div className="text-xl ellipsis">{item.name}</div>
-                <i className="ellipsis overflow-hidden text-light-weak">{item.id}</i>
-            </div>
-            <Button className={`border-4  min-w-[38px] min-h-[38px]`} icon='pi pi-ellipsis-h' outlined rounded severity='secondary' />
-        </div>
-    )
-}
 
 function WorkflowList({ workflows, onAddWF }:
     {
         workflows: IFlowBase[];
         onAddWF?: () => void
     }) {
-    const { setCacheWorkflow } = useWfLayoutContext()
+    const { setCacheWorkflow, cacheWorkflow } = useWfLayoutContext()
     return (
         <div className="flex flex-col w-full overflow-hidden items-end">
             <Button
@@ -186,7 +170,7 @@ function WorkflowList({ workflows, onAddWF }:
             <List
                 className="grow shrink w-full mt-3"
                 data={workflows}
-                renderItem={(item, idx) => <ListItem key={`wf-${idx}`} item={item} />}
+                renderItem={(item, idx) => <ListItem key={`wf-${idx}`} itemData={item} flowData={cacheWorkflow} />}
                 onItemClick={async (item) => {
                     const flow = await getFlow(item.id)
                     setCacheWorkflow(flow);
