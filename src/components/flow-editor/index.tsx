@@ -436,7 +436,74 @@ function EditComponent(props: ModalProps<ICustomCompData>) {
     )
 }
 
-function 
+function ActionBar(props: FlowGraphProps) {
+
+    const { inEdit, customComps, componentOpts, selectedGroup, setSelectedGroup, setEditComp, setOnDragItem, setAddComp } = useFlowGrapContext();
+    const comp_group_ref = useRef<HTMLDivElement>(null);
+    const [compGroups, setCompGroups] = useState<Dictionary<ICustomCompData[]>>({});
+
+    useEffect(() => {
+        setSelectedGroup(undefined)
+    }, [inEdit]);
+
+    useEffect(() => {
+        setSelectedGroup(pre => some(customComps, i => i.apimode === pre) ? pre : undefined)
+        setCompGroups(groupBy(customComps, i => i.apimode))
+    }, [customComps])
+
+    return (
+        <>
+            <Tooltip target={'.actbar-tooltip'} position='top' />
+            <DndList
+                className="w-max-[162px]"
+                items={GET_REPORT_COMPONENTS(props)}
+                disableChangeOrder
+                renderContent={(data) => <ReportComponent {...data} />}
+                onDragStart={(init, item): void => {
+                    setOnDragItem(() => item)
+                }}
+                direction='horizontal'
+            />
+            <Divider className="h-[40px] mx-[4px] " color="red" layout='vertical' />
+            <DndList
+                className="shrink overflow-auto no-scrollbar"
+                items={keys(compGroups)}
+                ref={comp_group_ref}
+                disableChangeOrder
+                isDragDisabled
+                renderContent={(apimode: string) => {
+                    const comp = find(componentOpts, c => c.APIMODE === apimode)
+                    return <CustomComponentGroup comp={comp} />
+                }}
+                direction='horizontal'
+            />
+            <AddButton onClick={() => setAddComp(true)} />
+            {!!selectedGroup &&
+                <div className={`act-bar !w-fit top-[80px]`}
+                    style={{
+                        left:
+                            (comp_group_ref.current?.offsetLeft || 0)
+                    }}
+                >
+                    <DndList
+                        items={compGroups[selectedGroup] || []}
+                        renderContent={(data: ICustomCompData) => (
+                            <CustomComponent
+                                {...data}
+                                onClick={(comp) => {
+                                    setEditComp(comp)
+                                }}
+                            />)}
+                        onDragStart={(init, item): void => {
+                            setOnDragItem(item)
+                        }}
+                        direction='horizontal'
+                    />
+                </div>
+            }
+        </>
+    )
+}
 
 export default function FlowEditor(props: FlowGraphProps) {
 
@@ -445,18 +512,18 @@ export default function FlowEditor(props: FlowGraphProps) {
         inEdit = false,
         graphRef: ref,
         delayRender,
+        actionBarContent,
+        showActionBar,
         ...others
     } = props
 
     const { graphRef } = useGraphRef<IFlowNode, any>(ref);
-    const comp_group_ref = useRef<HTMLDivElement>(null);
     const [initialEdges, setInitialEdges] = useState<Edge<any>[]>([]);
     const [initialNodes, setInitialNodes] = useState<Node<IFlowNode>[]>([]);
     const [openModal, setOpenModal] = useState<IFlowNode>();
     const [addComp, setAddComp] = useState<boolean>(false);
     const [onDragItem, setOnDragItem] = useState<IReportCompData | ICustomCompData>();
     const [editComp, setEditComp] = useState<ICustomCompData>();
-    const [compGroups, setCompGroups] = useState<Dictionary<ICustomCompData[]>>({});
     const [selectedGroup, setSelectedGroup] = useState<string>();
     const [componentOpts, setComponentOpts] = useState<ComponentOpt[]>([]);
     const [customComps, setCustomComps] = useState<ICustomCompData[]>([]);
@@ -528,15 +595,9 @@ export default function FlowEditor(props: FlowGraphProps) {
     }, [flows]);
 
     useEffect(() => {
-        setSelectedGroup(undefined)
         graphRef.current.setNodes(n => ({ ...n, selectable: inEdit, selected: false }));
         graphRef.current.setEdges(e => ({ ...e, deletable: inEdit, selected: false, }));
     }, [inEdit]);
-
-    useEffect(() => {
-        setSelectedGroup(pre => some(customComps, i => i.apimode === pre) ? pre : undefined)
-        setCompGroups(groupBy(customComps, i => i.apimode))
-    }, [customComps])
 
     return (
         <ErrorBoundary>
@@ -545,68 +606,26 @@ export default function FlowEditor(props: FlowGraphProps) {
                     ...props,
                     clickOnSetting,
                     graphRef,
-                    selectedGroup,
-                    setSelectedGroup,
                     onAddComponent,
                     onEditComponent,
                     onDeleteComponent,
+                    selectedGroup,
+                    setSelectedGroup,
                     componentOpts,
                     customComps,
                     sysPromptOpts,
+                    setEditComp,
+                    setOnDragItem,
+                    setAddComp,
                 }}>
                 <div className="flow-editor h-full w-full relative">
-                    {inEdit &&
-                        (<>
+                    {actionBarContent ?
+                        (showActionBar &&
                             <div className={`act-bar main top-[22px]`} >
-                                <Tooltip target={'.actbar-tooltip'} position='top' />
-                                <DndList
-                                    className="w-max-[162px]"
-                                    items={GET_REPORT_COMPONENTS(props)}
-                                    disableChangeOrder
-                                    renderContent={(data) => <ReportComponent {...data} />}
-                                    onDragStart={(init, item): void => {
-                                        setOnDragItem(() => item)
-                                    }}
-                                    direction='horizontal'
-                                />
-                                <Divider className="h-[40px] mx-[4px] " color="red" layout='vertical' />
-                                <DndList
-                                    className="shrink overflow-auto no-scrollbar"
-                                    items={keys(compGroups)}
-                                    ref={comp_group_ref}
-                                    disableChangeOrder
-                                    isDragDisabled
-                                    renderContent={(apimode: string) => {
-                                        const comp = find(componentOpts, c => c.APIMODE === apimode)
-                                        return <CustomComponentGroup comp={comp} />
-                                    }}
-                                    direction='horizontal'
-                                />
-                                <AddButton onClick={() => setAddComp(true)} />
+                                {typeof actionBarContent === 'function' ? actionBarContent(props) : actionBarContent}
                             </div>
-                            {!!selectedGroup &&
-                                <div className={`act-bar !w-fit top-[100px]`}
-                                    style={{
-                                        left:
-                                            (comp_group_ref.current?.offsetLeft || 0) + (comp_group_ref.current?.parentElement?.offsetLeft || 0)
-                                    }}>
-                                    <DndList
-                                        items={compGroups[selectedGroup] || []}
-                                        renderContent={(data: ICustomCompData) => (
-                                            <CustomComponent
-                                                {...data}
-                                                onClick={(comp) => {
-                                                    setEditComp(comp)
-                                                }}
-                                            />)}
-                                        onDragStart={(init, item): void => {
-                                            setOnDragItem(item)
-                                        }}
-                                        direction='horizontal'
-                                    />
-                                </div>
-                            }
-                        </>)
+                        ) :
+                        (inEdit && <div className={`act-bar main top-[22px]`} > <ActionBar {...props} /> </div>)
                     }
                     <Graph
                         initialEdges={initialEdges}

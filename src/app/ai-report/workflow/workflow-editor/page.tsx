@@ -178,190 +178,192 @@ export default function Page() {
         }
     }
 
-    return <div className="page-std">
-        <div className="shrink grow flex flex-col gap-std">
-            <TitlePane title={workflow?.name || 'New Workfow'} postContent={
-                <>
-                    {inEdit ?
-                        <>
-                            <Button icon={<FontAwesomeIcon icon={faTrash} />}
-                                severity='danger'
-                                tooltip="Remove the workflow"
-                                tooltipOptions={{ position: 'bottom' }}
-                                onClick={async () => {
-                                    confirmDialog({
-                                        position: 'top',
-                                        message: `Do you want to delete ${workflow?.name || 'this workflow'}?`,
-                                        header: `Delete Workflow`,
-                                        icon: 'pi pi-info-circle',
-                                        acceptClassName: 'p-button-danger',
-                                        accept: async () => {
-                                            const rsp = await deleteFlow(workflow?.id);
-                                            if (rsp.data.status === 'failure' || rsp.data.status === 'NG') {
-                                                if (rsp.data.message) showMessage({
-                                                    message: rsp.data.message,
-                                                    type: 'error'
-                                                })
-                                                return;
-                                            }
-                                            router.push(wfUrl)
-                                        },
-                                    });
-                                }}
-                            />
-                            <Button icon={<FontAwesomeIcon icon={faCancel} />}
-                                severity='secondary'
-                                tooltip="Cancel"
-                                tooltipOptions={{ position: 'bottom' }}
-                                onClick={async () => {
-                                    confirmDialog({
-                                        position: 'top',
-                                        message: `Are you sure you want to cancel without saving? You will lose every modification.`,
-                                        header: `Cancel modify`,
-                                        icon: 'pi pi-info-circle',
-                                        acceptClassName: 'p-button-danger',
-                                        accept: async () => {
-                                            graphRef.current?.resetAllElements();
-                                            setInEdit(false)
-                                        },
-                                    });
-                                }}
-                            />
-                            <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faSave} />}
-                                label="Save"
-                                tooltipOptions={{ position: 'bottom' }}
-                                onClick={async () => {
-                                    if (!workflow) return;
-                                    const flows: IFlowNode[] = map(graphRef.current?.getNodes() || [], n => ({
-                                        ...n.data, position: n.position
-                                    }));
+    return (
+        <div className="page-std">
+            <div className="shrink grow flex flex-col gap-std">
+                <TitlePane title={workflow?.name || 'New Workfow'} postContent={
+                    <>
+                        {inEdit ?
+                            <>
+                                <Button icon={<FontAwesomeIcon icon={faTrash} />}
+                                    severity='danger'
+                                    tooltip="Remove the workflow"
+                                    tooltipOptions={{ position: 'bottom' }}
+                                    onClick={async () => {
+                                        confirmDialog({
+                                            position: 'top',
+                                            message: `Do you want to delete ${workflow?.name || 'this workflow'}?`,
+                                            header: `Delete Workflow`,
+                                            icon: 'pi pi-info-circle',
+                                            acceptClassName: 'p-button-danger',
+                                            accept: async () => {
+                                                const rsp = await deleteFlow(workflow?.id);
+                                                if (rsp.data.status === 'failure' || rsp.data.status === 'NG') {
+                                                    if (rsp.data.message) showMessage({
+                                                        message: rsp.data.message,
+                                                        type: 'error'
+                                                    })
+                                                    return;
+                                                }
+                                                router.push(wfUrl)
+                                            },
+                                        });
+                                    }}
+                                />
+                                <Button icon={<FontAwesomeIcon icon={faCancel} />}
+                                    severity='secondary'
+                                    tooltip="Cancel"
+                                    tooltipOptions={{ position: 'bottom' }}
+                                    onClick={async () => {
+                                        confirmDialog({
+                                            position: 'top',
+                                            message: `Are you sure you want to cancel without saving? You will lose every modification.`,
+                                            header: `Cancel modify`,
+                                            icon: 'pi pi-info-circle',
+                                            acceptClassName: 'p-button-danger',
+                                            accept: async () => {
+                                                graphRef.current?.resetAllElements();
+                                                setInEdit(false)
+                                            },
+                                        });
+                                    }}
+                                />
+                                <Button className="w-[100px]" icon={<FontAwesomeIcon className='mr-[7px]' icon={faSave} />}
+                                    label="Save"
+                                    tooltipOptions={{ position: 'bottom' }}
+                                    onClick={async () => {
+                                        if (!workflow) return;
+                                        const flows: IFlowNode[] = map(graphRef.current?.getNodes() || [], n => ({
+                                            ...n.data, position: n.position
+                                        }));
 
-                                    const result: IFlow = ({ ...workflow, type: 'workflow', flows });
-                                    calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
+                                        const result: IFlow = ({ ...workflow, type: 'workflow', flows });
+                                        calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
 
-                                    const res = await (await (mode === 'add' ? addFlow : updateFlow)(result)).data
+                                        const res = await (await (mode === 'add' ? addFlow : updateFlow)(result)).data
 
-                                    if (res.status !== 'ok' && res.status !== 'success') {
-                                        showMessage({
-                                            message: res.message || 'Add failure',
-                                            type: 'error'
-                                        })
-                                        return;
-                                    }
-                                    setWorkflow({ ...result, id: res.data?.workflowid || workflow.id });
-                                    setInEdit(false);
-                                    setMode('normal')
-                                }}
-                            />
-                        </> :
-                        <>
-                            <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
-                                disabled={!size(workflow?.flows)}
-                                severity='secondary'
-                                tooltip="Save as template"
-                                tooltipOptions={{ position: 'bottom' }}
-                                onClick={async () => {
-                                    if (!workflow) return;
-                                    if (!ifFlowIsCompleted(workflow.flows)) {
-                                        showMessage({
-                                            message: 'Cannot be saved as a template since the workflow is not completed.',
-                                            type: 'error'
-                                        })
-                                        return
-                                    }
-                                    if (hasDependencyCycle(workflow.id, workflows || [])) {
-                                        showMessage({
-                                            message: 'Cannot be saved as a template since there are some dependency cycles.',
-                                            type: 'error'
-                                        })
-                                        return
-                                    }
-                                    createTemplateNodes(workflow)
-                                        .then(tempNodes => {
-                                            setTemplateNodes(tempNodes)
-                                        })
-                                }}
-                            />
-                            <Button icon={<FontAwesomeIcon icon={faPlayCircle} />}
-                                severity='success'
-                                tooltip="Run Workflow"
-                                tooltipOptions={{ position: 'bottom' }}
-                                onClick={async () => {
-                                    runWorkflow(workflow)
-                                }}
-                            />
-                            <Button icon={<FontAwesomeIcon icon={faEye} />}
-                                severity='info'
-                                tooltip="View Reports"
-                                tooltipOptions={{ position: 'bottom' }}
-                                disabled={!workflow?.id}
-                                onClick={() => {
-                                    if (!workflow?.id) return;
-                                    viewReports(workflow?.id)
-                                }}
-                            />
-                            <Button icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}
-                                className="w-[100px]"
-                                label="Edit"
-                                tooltipOptions={{ position: 'left' }}
-                                onClick={(): void => {
-                                    setInEdit(true);
-                                }}
-                            />
-                        </>}
-                </>}
-            />
-            <FlowEditor
-                className="rounded-std bg-deep"
-                flows={workflow?.flows || []}
-                graphRef={graphRef}
-                hideMiniMap
-                inEdit={inEdit}
-                flowNameMapper={flowNameMapper}
-            />
-            <Modal
-                title='Preview & Save as Template'
-                className='w-[80%] h-[80%]'
-                contentClassName="flex flex-col"
-                visible={!!templateNodes}
-                onOk={() => {
-                    form?.submit()
-                        .then(async ({ name }) => {
-                            await saveToNewTemplate(templateNodes || [], name)
-                        })
-                        .catch(() => {
-                            // 
-                        });
-                }}
-                onCancel={() => {
-                    setTemplateNodes(undefined)
-                }}>
+                                        if (res.status !== 'ok' && res.status !== 'success') {
+                                            showMessage({
+                                                message: res.message || 'Add failure',
+                                                type: 'error'
+                                            })
+                                            return;
+                                        }
+                                        setWorkflow({ ...result, id: res.data?.workflowid || workflow.id });
+                                        setInEdit(false);
+                                        setMode('normal')
+                                    }}
+                                />
+                            </> :
+                            <>
+                                <Button icon={<FontAwesomeIcon icon={faMagicWandSparkles} />}
+                                    disabled={!size(workflow?.flows)}
+                                    severity='secondary'
+                                    tooltip="Save as template"
+                                    tooltipOptions={{ position: 'bottom' }}
+                                    onClick={async () => {
+                                        if (!workflow) return;
+                                        if (!ifFlowIsCompleted(workflow.flows)) {
+                                            showMessage({
+                                                message: 'Cannot be saved as a template since the workflow is not completed.',
+                                                type: 'error'
+                                            })
+                                            return
+                                        }
+                                        if (hasDependencyCycle(workflow.id, workflows || [])) {
+                                            showMessage({
+                                                message: 'Cannot be saved as a template since there are some dependency cycles.',
+                                                type: 'error'
+                                            })
+                                            return
+                                        }
+                                        createTemplateNodes(workflow)
+                                            .then(tempNodes => {
+                                                setTemplateNodes(tempNodes)
+                                            })
+                                    }}
+                                />
+                                <Button icon={<FontAwesomeIcon icon={faPlayCircle} />}
+                                    severity='success'
+                                    tooltip="Run Workflow"
+                                    tooltipOptions={{ position: 'bottom' }}
+                                    onClick={async () => {
+                                        runWorkflow(workflow)
+                                    }}
+                                />
+                                <Button icon={<FontAwesomeIcon icon={faEye} />}
+                                    severity='info'
+                                    tooltip="View Reports"
+                                    tooltipOptions={{ position: 'bottom' }}
+                                    disabled={!workflow?.id}
+                                    onClick={() => {
+                                        if (!workflow?.id) return;
+                                        viewReports(workflow?.id)
+                                    }}
+                                />
+                                <Button icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}
+                                    className="w-[100px]"
+                                    label="Edit"
+                                    tooltipOptions={{ position: 'left' }}
+                                    onClick={(): void => {
+                                        setInEdit(true);
+                                    }}
+                                />
+                            </>}
+                    </>}
+                />
                 <FlowEditor
                     className="rounded-std bg-deep"
-                    flows={templateNodes || []}
+                    flows={workflow?.flows || []}
+                    graphRef={graphRef}
                     hideMiniMap
-                    delayRender={500}
+                    inEdit={inEdit}
+                    flowNameMapper={flowNameMapper}
                 />
-                <Form
-                    className="p-[20px]"
-                    onLoad={(form: FormInstance<IFlow>) => setForm(form)}
-                    onDestroyed={() => {
-                        setForm(undefined)
+                <Modal
+                    title='Preview & Save as Template'
+                    className='w-[80%] h-[80%]'
+                    contentClassName="flex flex-col"
+                    visible={!!templateNodes}
+                    onOk={() => {
+                        form?.submit()
+                            .then(async ({ name }) => {
+                                await saveToNewTemplate(templateNodes || [], name)
+                            })
+                            .catch(() => {
+                                // 
+                            });
                     }}
-                    onSubmit={async ({ name }) => {
-                        await saveToNewTemplate(templateNodes || [], name)
-                    }}
-                >
-                    {
-                        ({ Item }) => (
-                            <>
-                                <Item name={'name'} label="Template Name" rules={{ required: 'Please give a template name!' }}>
-                                    <InputText />
-                                </Item>
-                            </>
-                        )
-                    }</Form>
-            </Modal>
+                    onCancel={() => {
+                        setTemplateNodes(undefined)
+                    }}>
+                    <FlowEditor
+                        className="rounded-std bg-deep"
+                        flows={templateNodes || []}
+                        hideMiniMap
+                        delayRender={500}
+                    />
+                    <Form
+                        className="p-[20px]"
+                        onLoad={(form: FormInstance<IFlow>) => setForm(form)}
+                        onDestroyed={() => {
+                            setForm(undefined)
+                        }}
+                        onSubmit={async ({ name }) => {
+                            await saveToNewTemplate(templateNodes || [], name)
+                        }}
+                    >
+                        {
+                            ({ Item }) => (
+                                <>
+                                    <Item name={'name'} label="Template Name" rules={{ required: 'Please give a template name!' }}>
+                                        <InputText />
+                                    </Item>
+                                </>
+                            )
+                        }</Form>
+                </Modal>
+            </div>
         </div>
-    </div>
+    )
 }

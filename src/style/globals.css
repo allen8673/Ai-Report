@@ -6,6 +6,14 @@
   .flex-center {
     @apply flex items-center justify-center;
   }
+
+  .flex-h-center {
+    @apply flex items-center;
+  }
+
+  .flex-v-center {
+    @apply flex justify-center;
+  }
 }
 
 @layer utilities {

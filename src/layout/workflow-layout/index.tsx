@@ -125,6 +125,7 @@ export default function WorkflowLayout({
     const [runningWF, setRunningWF] = useState<IFlow>();
     const [reportJobs, setReportJobs] = useState<ViewReports>();
     const [disabledUpload, setDisabledUpload] = useState<boolean>();
+    const [cacheWorkflow, setCacheWorkflow] = useState<IFlow>();
     const runWorkflow = async (wf?: IFlow | string) => {
         if (!wf) return;
         const workflow: IFlow | undefined = typeof wf === 'string' ? await getFlow(wf) : wf
@@ -168,6 +169,8 @@ export default function WorkflowLayout({
         <WfLayoutContext.Provider value={{
             runWorkflow,
             viewReports,
+            cacheWorkflow,
+            setCacheWorkflow,
         }}>
             {children}
             <Modal

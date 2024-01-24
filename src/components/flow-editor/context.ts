@@ -5,7 +5,7 @@ import { GraphInstance } from "../graph/graph";
 
 import { FlowGraphProps } from "./type";
 
-import { ComponentOpt, ICustomCompData, IFlowNode, SysPromptOpt } from "@/interface/flow";
+import { ComponentOpt, ICustomCompData, IFlowNode, IReportCompData, SysPromptOpt } from "@/interface/flow";
 
 
 export interface FlowGraphStore extends Omit<FlowGraphProps, 'graphRef'> {
@@ -19,11 +19,17 @@ export interface FlowGraphStore extends Omit<FlowGraphProps, 'graphRef'> {
     componentOpts?: ComponentOpt[];
     customComps?: ICustomCompData[];
     sysPromptOpts?: SysPromptOpt[];
+    setEditComp: Dispatch<SetStateAction<ICustomCompData | undefined>>;
+    setOnDragItem: Dispatch<SetStateAction<ICustomCompData | IReportCompData | undefined>>;
+    setAddComp: Dispatch<SetStateAction<boolean>>;
 }
 
 export const FlowGrapContext = React.createContext<FlowGraphStore>({
     flows: [],
-    setSelectedGroup: () => { }
+    setSelectedGroup: () => { },
+    setEditComp: () => { },
+    setOnDragItem: () => { },
+    setAddComp: () => { },
 });
 
 export const useFlowGrapContext = (): FlowGraphStore => useContext(FlowGrapContext);
