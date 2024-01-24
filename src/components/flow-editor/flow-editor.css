@@ -17,6 +17,7 @@
     min-height: 58px;
     min-width: 58px;
     text-wrap: nowrap;
+    overflow: hidden;
 
     &.main {
         left: 22px;

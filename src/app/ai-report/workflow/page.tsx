@@ -133,7 +133,6 @@ function WorkflowPreviewer() {
                                 />
                                 <Button
                                     className="h-[40px]"
-                                    severity='success'
                                     label="Edit Workflow"
                                     tooltipOptions={{ position: 'left' }}
                                     icon='pi pi-pencil'

@@ -16,7 +16,8 @@ export interface FlowGraphProps extends Omit<GraphProps<IFlowNode>,
     inEdit?: boolean;
     flowNameMapper?: FlowNameMapper;
     delayRender?: number;
-    actionBarContent?: React.ReactElement | ((props: FlowGraphProps) => React.ReactElement);
+    actionBarContent?: React.ReactElement | ((graphProps: FlowGraphProps, actbar: React.ReactElement) => React.ReactElement);
+    actionBarClass?: string;
     showActionBar?: boolean;
 }
 

@@ -436,9 +436,18 @@ function EditComponent(props: ModalProps<ICustomCompData>) {
     )
 }
 
-function ActionBar(props: FlowGraphProps) {
+function ActionBtns(props: FlowGraphProps) {
 
-    const { inEdit, customComps, componentOpts, selectedGroup, setSelectedGroup, setEditComp, setOnDragItem, setAddComp } = useFlowGrapContext();
+    const {
+        inEdit,
+        customComps,
+        componentOpts,
+        selectedGroup,
+        setSelectedGroup,
+        setEditComp,
+        setOnDragItem,
+        setAddComp
+    } = useFlowGrapContext();
     const comp_group_ref = useRef<HTMLDivElement>(null);
     const [compGroups, setCompGroups] = useState<Dictionary<ICustomCompData[]>>({});
 
@@ -513,6 +522,7 @@ export default function FlowEditor(props: FlowGraphProps) {
         graphRef: ref,
         delayRender,
         actionBarContent,
+        actionBarClass,
         showActionBar,
         ...others
     } = props
@@ -621,11 +631,15 @@ export default function FlowEditor(props: FlowGraphProps) {
                 <div className="flow-editor h-full w-full relative">
                     {actionBarContent ?
                         (showActionBar &&
-                            <div className={`act-bar main top-[22px]`} >
-                                {typeof actionBarContent === 'function' ? actionBarContent(props) : actionBarContent}
+                            <div className={`act-bar h-[68px] main top-[22px] ${actionBarClass || ''}`} >
+                                {
+                                    typeof actionBarContent === 'function' ?
+                                        actionBarContent(props, <div className="flex-h-center"><ActionBtns {...props} /></div>) :
+                                        actionBarContent
+                                }
                             </div>
                         ) :
-                        (inEdit && <div className={`act-bar main top-[22px]`} > <ActionBar {...props} /> </div>)
+                        (inEdit && <div className={`act-bar h-[68px] main top-[22px]`} > <ActionBtns {...props} /> </div>)
                     }
                     <Graph
                         initialEdges={initialEdges}
