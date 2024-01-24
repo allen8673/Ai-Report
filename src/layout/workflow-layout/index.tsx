@@ -15,7 +15,6 @@ import { getFlow } from '@/api-helpers/flow-api';
 import { checkJob, downloadJob, getJobs, runReport } from '@/api-helpers/report-api';
 import CodeEditor from '@/components/code-editor';
 import FileGroupUploader, { useFileGroupUploader } from '@/components/file-group-uploader';
-// import FileUploader from '@/components/file-uploader';
 import { ifFlowIsCompleted } from '@/components/flow-editor/lib';
 import Modal from '@/components/modal';
 import EmptyPane from '@/components/panes/empty';
@@ -27,7 +26,6 @@ interface ViewReports {
     workflowId: string;
     jobs: IJob[];
 }
-
 
 function PreviewModal({ reportJobs, onClose }:
     {
@@ -65,53 +63,54 @@ function PreviewModal({ reportJobs, onClose }:
             });
     }, [selectedJob])
 
-    return <Modal
-        className="preview-doc-moda min-w-[50%] min-h-[50%] max-w-[70%]"
-        onOk={onClose}
-        okLabel="Close"
-        visible={!!reportJobs}
-        contentClassName="flex flex-col gap-[22px]"
-        footerClass="flex justify-end"
-    >
-        <div className='flex-h-center gap-[7px] p'>
-            <div className="grow shrink flex-h-center gap-2 ">
-                <h3 className="text-light-weak ">Select finish Job ID:</h3>
-                <Dropdown
-                    className='grow'
-                    value={selectedJob}
-                    options={map<IJob, SelectItem>(reportJobs?.jobs || [], ({ JOB_ID }) => ({ label: JOB_ID, value: JOB_ID }))}
-                    onChange={v => {
-                        setSelectedJob(v.value);
+    return (
+        <Modal
+            className="preview-doc-moda min-w-[50%] min-h-[50%] max-w-[70%]"
+            onOk={onClose}
+            okLabel="Close"
+            visible={!!reportJobs}
+            contentClassName="flex flex-col gap-[22px]"
+            footerClass="flex justify-end"
+        >
+            <div className='flex-h-center gap-[7px] p'>
+                <div className="grow shrink flex-h-center gap-2 ">
+                    <h3 className="text-light-weak ">Select finish Job ID:</h3>
+                    <Dropdown
+                        className='grow'
+                        value={selectedJob}
+                        options={map<IJob, SelectItem>(reportJobs?.jobs || [], ({ JOB_ID }) => ({ label: JOB_ID, value: JOB_ID }))}
+                        onChange={v => {
+                            setSelectedJob(v.value);
+                        }}
+                    />
+                </div>
+                <Button
+                    className="h-[40px]"
+                    icon='pi pi-download'
+                    severity='info'
+                    label={'Download'}
+                    disabled={!jobContents[selectedJob]}
+                    onClick={(): void => {
+                        if (!jobContents[selectedJob]) return
+                        downloadString(jobContents[selectedJob], selectedJob, 'txt')
                     }}
                 />
             </div>
-            <Button
-                className="h-[40px]"
-                icon='pi pi-download'
-                severity='info'
-                label={'Download'}
-                disabled={!jobContents[selectedJob]}
-                onClick={(): void => {
-                    if (!jobContents[selectedJob]) return
-                    downloadString(jobContents[selectedJob], selectedJob, 'txt')
-                }}
-            />
-        </div>
-        {jobContents[selectedJob] ?
-            <CodeEditor
-                hiddenBar
-                language={'text'}
-                className='grow border-solid border-light-weak rounded-std-sm'
-                value={jobContents[selectedJob]}
-                options={{
-                    readOnly: true,
-                    automaticLayout: true,
-                }}
+            {jobContents[selectedJob] ?
+                <CodeEditor
+                    hiddenBar
+                    language={'text'}
+                    className='grow border-solid border-light-weak rounded-std-sm'
+                    value={jobContents[selectedJob]}
+                    options={{
+                        readOnly: true,
+                        automaticLayout: true,
+                    }}
 
-            /> :
-            <EmptyPane />}
-    </Modal>
-
+                /> :
+                <EmptyPane />}
+        </Modal>
+    )
 }
 
 export default function WorkflowLayout({

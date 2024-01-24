@@ -1,6 +1,5 @@
 'use client'
-import { faEye, faPaperPlane, faPen, faPlayCircle } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import RouterInfo from "@settings/router";
 import { find } from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
