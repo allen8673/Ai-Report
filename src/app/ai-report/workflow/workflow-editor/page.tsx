@@ -41,10 +41,7 @@ export default function Page() {
     const [workflow, setWorkflow] = useState<IFlow>();
     const [workflows, setWorkflows] = useState<IFlowBase[]>();
     const [inEdit, setInEdit] = useState<boolean>();
-    // const [componentOpts, setComponentOpts] = useState<ComponentOpt[]>([])
     const [templateNodes, setTemplateNodes] = useState<IFlowNode[]>();
-    // const [customComps, setCustomComps] = useState<ICustomCompData[]>([]);
-    // const [sysPromptOpts, setSysPromptOpts] = useState<SysPromptOpt[]>([]);
 
     const flowNameMapper: FlowNameMapper = useMemo(() => {
         if (!workflows) return {};
@@ -70,16 +67,6 @@ export default function Page() {
             fetchWorkflow(paramObj.id || '')
         }
     }
-
-    // const fetchCustomComps = async () => {
-    //     const comps = await getCustomComponents();
-    //     setCustomComps(comps);
-    // }
-
-    // const fetchSysPromptOpts = async () => {
-    //     const sys_prompts = await getSysprompts();
-    //     setSysPromptOpts(sys_prompts);
-    // }
 
     const fetchAllWorflowData = async () => {
         const wfs = await getFlows('WORKFLOW')
