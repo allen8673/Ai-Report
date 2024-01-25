@@ -33,21 +33,24 @@ export function FlowListItem({ key, item, }: ListItemProps) {
 
 export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSelected }: FlowListProps) {
 
-    const [selectedFlow, setSelectedFlow] = useState<IFlowBase | undefined>(defaultSelectedItem)
+    const [selectedFlow, setSelectedFlow] = useState<IFlowBase | undefined>(defaultSelectedItem);
+    const showActBar: boolean = !!onAddWF;
 
     return (
         <FlowListContext.Provider value={{ selectedFlow, setSelectedFlow }}>
             <div className="flex flex-col py-[22px] px-[18px] w-full overflow-hidden items-end bg-deep rounded-std">
-                <div className="act-bar justify-end w-full py-2">
-                    <Button
-                        className="ellipsis"
-                        icon='pi pi-plus'
-                        severity="success"
-                        label='Add New Workflow'
-                        tooltipOptions={{ position: 'left' }}
-                        onClick={onAddWF}
-                    />
-                </div>
+                {showActBar &&
+                    <div className="act-bar justify-end w-full py-2">
+                        {!!onAddWF && <Button
+                            className="ellipsis"
+                            icon='pi pi-plus'
+                            severity="success"
+                            label='Add New Workflow'
+                            tooltipOptions={{ position: 'left' }}
+                            onClick={onAddWF}
+                        />}
+                    </div>
+                }
                 <List
                     className="grow shrink w-full mt-1"
                     data={flows}
