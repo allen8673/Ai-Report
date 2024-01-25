@@ -98,7 +98,8 @@ export const mock_workflows: IFlow[] = [
                 },
                 "forwards": []
             },
-        ]
+        ],
+        VERSION: 1
     },
     {
         type: 'workflow',
@@ -219,7 +220,9 @@ export const mock_workflows: IFlow[] = [
         ],
         "rootNdeId": [
             "tmp_20dd7c1a-3c41-4410-9cfc-2624042bda8e"
-        ]
+        ],
+        VERSION: 1
+
     },
     {
         type: 'workflow',
@@ -296,7 +299,9 @@ export const mock_workflows: IFlow[] = [
         ],
         "rootNdeId": [
             "tmp_cfccecc2-8bf5-4e3a-9386-ca30f2ad5b49"
-        ]
+        ],
+        VERSION: 1
+
     }
 ]
 
@@ -343,6 +348,7 @@ export const mock_templates: IFlow[] = [
                 ]
             }
         ],
+        VERSION: 1
     },
     {
         type: 'template',
@@ -439,7 +445,8 @@ export const mock_templates: IFlow[] = [
                     "e369cd2b-6e2f-472e-aeef-97147b4d2782"
                 ]
             }
-        ]
+        ],
+        VERSION: 1
     }
 ]
 
