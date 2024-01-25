@@ -141,8 +141,8 @@ export default function Page() {
 
     return <div className="page-std">
         <TitlePane title='Template' />
-        <Splitter className='shrink grow' style={{ height: '300px' }} layout='horizontal'>
-            <SplitterPanel className="px-[7px] " size={80}>
+        <Splitter className='shrink grow' style={{ height: '30px' }} layout='horizontal'>
+            <SplitterPanel className="px-[7px]" size={80}>
                 <TemplatePreviewer
                     template={template}
                     onClickEdit={async (tmp) => {
@@ -165,7 +165,6 @@ export default function Page() {
                         setTemplate(tmp);
                     }}
                 />
-
             </SplitterPanel>
         </Splitter>
         <EditTemplateModal

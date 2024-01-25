@@ -38,7 +38,7 @@ export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSe
 
     return (
         <FlowListContext.Provider value={{ selectedFlow, setSelectedFlow }}>
-            <div className="flex flex-col py-[22px] px-[18px] w-full overflow-hidden items-end bg-deep rounded-std">
+            <div className="flex flex-col py-[22px] px-[18px] w-full h-full overflow-hidden items-end bg-deep rounded-std">
                 {showActBar &&
                     <div className="act-bar justify-end w-full py-2">
                         {!!onAddWF && <Button
