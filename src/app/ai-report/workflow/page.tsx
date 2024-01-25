@@ -151,7 +151,8 @@ function WorkflowPreviewer() {
 
 export default function Page() {
     const router = useRouter();
-    const { cacheWorkflow, setCacheWorkflow } = useWfLayoutContext()
+    const { cacheWorkflow, setCacheWorkflow } = useWfLayoutContext();
+
     const [workflows, setWorkflows] = useState<IFlowBase[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<FormData>>();
@@ -186,7 +187,8 @@ export default function Page() {
                     />
                 </SplitterPanel>
             </Splitter>
-            <Modal visible={addNewFlow}
+            <Modal
+                visible={addNewFlow}
                 onOk={() => {
                     form?.submit()
                         .then(({ name, template }) => {
