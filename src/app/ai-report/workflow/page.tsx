@@ -14,14 +14,13 @@ import { getAll, getFlow } from "@/api-helpers/flow-api";
 import { getJobItemStatus, getJobsOngoing } from "@/api-helpers/report-api";
 import { coverToQueryString } from "@/api-helpers/url-helper";
 import FlowEditor from "@/components/flow-editor";
+import FlowList from "@/components/flow-list";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph";
-import List from "@/components/list";
 import Modal from "@/components/modal";
 import EmptyPane from "@/components/panes/empty";
 import TitlePane from "@/components/panes/title";
-import { ListItem } from "@/components/workflow/list-item";
 import { IFlowBase, IFlowNode } from "@/interface/flow";
 import { IJob } from "@/interface/job";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
@@ -150,37 +149,9 @@ function WorkflowPreviewer() {
     )
 }
 
-
-function WorkflowList({ workflows, onAddWF }:
-    {
-        workflows: IFlowBase[];
-        onAddWF?: () => void
-    }) {
-    const { setCacheWorkflow, cacheWorkflow } = useWfLayoutContext()
-    return (
-        <div className="flex flex-col w-full overflow-hidden items-end">
-            <Button
-                className="ellipsis"
-                icon='pi pi-plus'
-                severity="success"
-                label='Add New Workflow'
-                tooltipOptions={{ position: 'left' }}
-                onClick={onAddWF}
-            />
-            <List
-                className="grow shrink w-full mt-3"
-                data={workflows}
-                renderItem={(item, idx) => <ListItem key={`wf-${idx}`} itemData={item} flowData={cacheWorkflow} />}
-                onItemClick={async (item) => {
-                    const flow = await getFlow(item.id)
-                    setCacheWorkflow(flow);
-                }} />
-        </div>
-    )
-}
-
 export default function Page() {
     const router = useRouter();
+    const { setCacheWorkflow } = useWfLayoutContext()
     const [workflows, setWorkflows] = useState<IFlowBase[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<FormData>>();
@@ -204,7 +175,14 @@ export default function Page() {
                     <WorkflowPreviewer />
                 </SplitterPanel>
                 <SplitterPanel className="overflow-auto px-[7px]" size={20}>
-                    <WorkflowList workflows={workflows} onAddWF={() => setAddNewFlow(pre => !pre)} />
+                    <FlowList
+                        flows={workflows}
+                        onAddWF={() => setAddNewFlow(pre => !pre)}
+                        onItemSelected={async (item) => {
+                            const flow = await getFlow(item.id)
+                            setCacheWorkflow(flow);
+                        }}
+                    />
                 </SplitterPanel>
             </Splitter>
             <Modal visible={addNewFlow}
