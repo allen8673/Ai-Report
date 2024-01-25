@@ -631,7 +631,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                 <div className="flow-editor h-full w-full relative">
                     {actionBarContent ?
                         (showActionBar &&
-                            <div className={`act-bar h-[68px] main top-[22px] ${actionBarClass || ''}`} >
+                            <div className={`act-bar main top-[22px] ${actionBarClass || ''}`} >
                                 {
                                     typeof actionBarContent === 'function' ?
                                         actionBarContent(props, <div className="flex-h-center"><ActionBtns {...props} /></div>) :

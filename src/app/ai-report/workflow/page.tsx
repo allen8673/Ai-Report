@@ -102,7 +102,7 @@ function WorkflowPreviewer() {
                     }}
                     showActionBar
                     actionBarContent={
-                        <div className="flex-h-center w-full px-[18px]">
+                        <div className="flex-h-center w-full">
                             <div className="grow shrink flex-h-center gap-2 ">
                                 <h3 className="text-light-weak ">Select on going Job ID:</h3>
                                 <Dropdown
@@ -112,7 +112,7 @@ function WorkflowPreviewer() {
                                 />
                             </div>
                             <div
-                                className="flex gap-[7px] px-[12px]"
+                                className="flex gap-[7px]"
                                 role='presentation'
                                 onClick={(e) => e.stopPropagation()}>
                                 <Button
@@ -151,7 +151,7 @@ function WorkflowPreviewer() {
 
 export default function Page() {
     const router = useRouter();
-    const { setCacheWorkflow } = useWfLayoutContext()
+    const { cacheWorkflow, setCacheWorkflow } = useWfLayoutContext()
     const [workflows, setWorkflows] = useState<IFlowBase[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<FormData>>();
@@ -176,6 +176,7 @@ export default function Page() {
                 </SplitterPanel>
                 <SplitterPanel className="overflow-auto px-[7px]" size={20}>
                     <FlowList
+                        defaultSelectedItem={cacheWorkflow}
                         flows={workflows}
                         onAddWF={() => setAddNewFlow(pre => !pre)}
                         onItemSelected={async (item) => {

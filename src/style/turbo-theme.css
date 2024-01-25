@@ -170,3 +170,13 @@
 .p-button {
     box-shadow: none;
 }
+
+.act-bar {
+    @apply rounded-std bg-deep-weak/[.5] flex items-center;
+    padding: 7px 21px;
+    height: 68px;
+    min-height: 58px;
+    min-width: 58px;
+    text-wrap: nowrap;
+    overflow: hidden;
+}
