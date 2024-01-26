@@ -25,6 +25,7 @@ import { IFlowBase, IFlowNode } from "@/interface/flow";
 import { IJob } from "@/interface/job";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import { getFullUrl } from "@/lib/router";
+import { usePolling } from "@/lib/utils";
 
 const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
 interface FormData {
@@ -39,7 +40,7 @@ function WorkflowPreviewer() {
     const router = useRouter();
     const [jobs, setJobs] = useState<IJob[]>([]);
     const [jobId, setJobId] = useState<string>();
-    const [executor, setExecutor] = useState<NodeJS.Timeout>()
+    const { executePolling } = usePolling()
 
     useEffect(() => {
         if (!cacheWorkflow) {
@@ -55,35 +56,22 @@ function WorkflowPreviewer() {
             })
     }, [cacheWorkflow]);
 
-    const stopChechJobStatus = () => {
-        if (executor != undefined) {
-            clearInterval(executor)
-        }
-    }
-
-    const executeChechJobStatus = async (_jobId?: string) => {
-        const checkJobStatus = async (_jobId: string) => {
-            const jobStatus = await getJobItemStatus(_jobId);
-            graphRef.current?.setNodes(n => {
-                const status = find(jobStatus, js => js.ITEM_ID === n.id)
-                if (!!status) n.data.status = status.STATUS;
-                return n
-            })
-        }
-        stopChechJobStatus();
-        if (!_jobId) return;
-        await checkJobStatus(_jobId);
-        const _executor = setInterval(async () => await checkJobStatus(_jobId), 5000);
-        setExecutor(_executor)
+    const checkJobStatus = async (_jobId: string) => {
+        const jobStatus = await getJobItemStatus(_jobId);
+        graphRef.current?.setNodes(n => {
+            const status = find(jobStatus, js => js.ITEM_ID === n.id)
+            if (!!status) n.data.status = status.STATUS;
+            return n
+        })
     }
 
     useEffect(() => {
-        executeChechJobStatus(jobId);
+        executePolling(async () => {
+            if (!jobId) return false;
+            await checkJobStatus(jobId);
+            return true
+        });
     }, [jobId]);
-
-    useEffect(() => {
-        return stopChechJobStatus;
-    }, [executor]);
 
     return (
         cacheWorkflow?.flows ?
