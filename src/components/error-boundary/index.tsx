@@ -3,13 +3,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PropsWithChildren } from "react";
 import { FallbackProps, ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
-export interface ErrorBoundaryProps {
-
+export interface ErrorBoundaryProps extends FallbackProps {
 }
 
-function Fallback({ error, }: FallbackProps) {
+function Fallback({ error }: ErrorBoundaryProps) {
     // Call resetErrorBoundary() to reset the error boundary and retry the render.
-
     return (
         <div className={`
         w-full h-full p-3 bg-failure/[.2] 
