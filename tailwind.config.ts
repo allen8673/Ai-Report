@@ -74,6 +74,22 @@ const config: Config = {
           DEFAULT: 'rgba(161, 98, 7, 1)',
           deep: 'rgba(113, 63, 18)',
         },
+        primary: {
+          DEFAULT: '#9C27B0',
+          deep: '#8c239e',
+        },
+        info: {
+          DEFAULT: '#0288D1',
+          deep: '#027abc',
+        },
+        secondary: {
+          DEFAULT: '#607D8B',
+          deep: '#56717d',
+        },
+        danger: {
+          DEFAULT: '#D32F2F',
+          deep: '#c02929'
+        },
         nics: {
           light: '#c3cb04',
           deep: '#069493',
