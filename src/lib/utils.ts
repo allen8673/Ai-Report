@@ -33,7 +33,7 @@ export function usePolling() {
         const _executor = setInterval(async () => {
             const res = await callbackFn();
             if (!res) stopPolling();
-        }, toNumber(process.env.NEXT_PUBLIC_POLLING_INTERVAL || 10000));
+        }, toNumber(process.env.NEXT_PUBLIC_POLLING_INTERVAL || 30000));
         setExecutor(_executor)
     }
 
