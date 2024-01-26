@@ -18,6 +18,7 @@ import FileGroupUploader, { useFileGroupUploader } from '@/components/file-group
 import { ifFlowIsCompleted } from '@/components/flow-editor/lib';
 import Modal from '@/components/modal';
 import EmptyPane from '@/components/panes/empty';
+import LoadingPane from '@/components/panes/loading';
 import { IFlow } from '@/interface/flow';
 import { IJob } from '@/interface/job';
 import { downloadString } from '@/lib/utils';
@@ -112,7 +113,6 @@ function PreviewModal({ reportJobs, onClose }:
         </Modal>
     )
 }
-
 export default function WorkflowLayout({
     children,
 }: {
@@ -120,31 +120,33 @@ export default function WorkflowLayout({
 }) {
     const { showMessage } = useLayoutContext();
     const { uploaderRef } = useFileGroupUploader()
-    const [runningWF, setRunningWF] = useState<IFlow>();
+    const [runningWF, setRunningWF] = useState<IFlow | boolean>();
     const [reportJobs, setReportJobs] = useState<ViewReports>();
     const [disabledUpload, setDisabledUpload] = useState<boolean>();
     const [cacheWorkflow, setCacheWorkflow] = useState<IFlow>();
     const runWorkflow = async (wf?: IFlow | string) => {
         if (!wf) return;
-        const workflow: IFlow | undefined = typeof wf === 'string' ? await getFlow(wf) : wf
-
+        setRunningWF(true);
+        const workflow: IFlow | undefined = typeof wf === 'string' ? await getFlow(wf) : wf;
         const check_res = await checkJob(workflow?.id || '')
         if (check_res.status === 'NG') {
             showMessage({
                 message: check_res.message || '',
                 type: 'error'
-            })
-            return
+            });
+            setRunningWF(false);
+            return;
         }
 
         if (!ifFlowIsCompleted(workflow?.flows)) {
             showMessage({
                 message: `Cannot run '${workflow?.name}'(${workflow?.id}) since the workflow is not completed.`,
                 type: 'error'
-            })
-            return
+            });
+            setRunningWF(false);
+            return;
         }
-        setRunningWF(workflow)
+        setRunningWF(workflow || false)
     }
     const viewReports = (workflowId: string) => {
         setReportJobs({ workflowId, jobs: [] });
@@ -174,7 +176,7 @@ export default function WorkflowLayout({
             <Modal
                 title="Upload your files"
                 visible={!!runningWF}
-                onOk={() => setRunningWF(undefined)}
+                onOk={() => setRunningWF(false)}
                 footerClass="flex justify-end"
                 okLabel="Cancel"
                 footerPrefix={
@@ -190,41 +192,45 @@ export default function WorkflowLayout({
                     />
                 }
             >
-                <FileGroupUploader
-                    uploaderRef={uploaderRef}
-                    hideUploadButton
-                    uploadLabel="Upload & Run"
-                    grouping={runningWF?.flows.filter(f => includes(['Input', 'Report'], f.type)).sort(a => a.type === 'Input' ? 1 : 0).map(f => f.name || '')}
-                    onUpload={fileGroups => {
-                        const files = fileGroups['Upload'];
-                        if (!runningWF || !files?.length) return;
-                        const formData = new FormData();
-                        for (const i in files) {
-                            formData.append('files', files[i])
-                        }
-                        formData.append('userId', '23224');
-                        formData.append('workflowId', runningWF.id);
-                        formData.append('version', '1');
+                {typeof runningWF === 'boolean' ?
+                    <LoadingPane className='h-80' title='Checking' /> :
+                    <FileGroupUploader
+                        uploaderRef={uploaderRef}
+                        hideUploadButton
+                        uploadLabel="Upload & Run"
+                        grouping={runningWF?.flows.filter(f => includes(['Input', 'Report'], f.type)).sort(a => a.type === 'Input' ? 1 : 0).map(f => f.name || '')}
+                        onUpload={fileGroups => {
+                            const files = fileGroups['Upload'];
+                            if (!runningWF || !files?.length) return;
+                            const formData = new FormData();
+                            for (const i in files) {
+                                formData.append('files', files[i])
+                            }
+                            formData.append('userId', '23224');
+                            formData.append('workflowId', runningWF.id);
+                            formData.append('version', '1');
 
-                        runReport(formData).then((res) => {
-                            showMessage({
-                                message: res.message || 'success',
-                                type: 'success'
-                            })
-                            setRunningWF(undefined);
-                        }).catch((error) => {
-                            showMessage({
-                                message: toString(error),
-                                type: 'error'
-                            })
-                        });
+                            runReport(formData).then((res) => {
+                                showMessage({
+                                    message: res.message || 'success',
+                                    type: 'success'
+                                })
+                                setRunningWF(false);
+                            }).catch((error) => {
+                                showMessage({
+                                    message: toString(error),
+                                    type: 'error'
+                                })
+                            });
 
-                    }}
-                    onChange={fileGroups => {
-                        const files = fileGroups['Upload'];
-                        setDisabledUpload(!files?.length)
-                    }}
-                />
+                        }}
+                        onChange={fileGroups => {
+                            const files = fileGroups['Upload'];
+                            setDisabledUpload(!files?.length)
+                        }}
+                    />
+                }
+
             </Modal>
             <PreviewModal reportJobs={reportJobs} onClose={() => setReportJobs(undefined)} />
         </WfLayoutContext.Provider>
