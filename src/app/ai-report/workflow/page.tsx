@@ -5,6 +5,7 @@ import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
+import { MenuItem } from "primereact/menuitem";
 import { SelectItem } from "primereact/selectitem";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useEffect, useState } from 'react'
@@ -150,12 +151,37 @@ function WorkflowPreviewer() {
 
 export default function Page() {
     const router = useRouter();
-    const { cacheWorkflow, setCacheWorkflow } = useWfLayoutContext();
+    const { runWorkflow, viewReports, cacheWorkflow, setCacheWorkflow } = useWfLayoutContext();
 
     const [workflows, setWorkflows] = useState<IFlowBase[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<FormData>>();
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([]);
+
+    const renderMenus = (item: IFlowBase): MenuItem[] => [
+        {
+            label: 'Edit Workflow',
+            icon: 'pi pi-pencil',
+            command: () => {
+                router.push(`${editorUrl}${coverToQueryString({ id: item.id })}`);
+            }
+        },
+        {
+            label: 'Reports',
+            icon: 'pi pi-eye',
+            command: () => {
+                viewReports(item.id)
+            }
+        },
+        {
+            label: 'Run Workflow',
+            icon: 'pi pi-play',
+            command: () => {
+                runWorkflow(item.id)
+            },
+        },
+    ]
+
 
     const getAllData = async () => {
         const { workflow, template } = await getAll() || {};
@@ -183,6 +209,7 @@ export default function Page() {
                             const flow = await getFlow(item.id)
                             setCacheWorkflow(flow);
                         }}
+                        renderMenus={renderMenus}
                     />
                 </SplitterPanel>
             </Splitter>

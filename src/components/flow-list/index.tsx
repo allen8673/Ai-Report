@@ -1,4 +1,7 @@
+import { map } from "lodash";
 import { Button } from "primereact/button";
+import { SpeedDial } from "primereact/speeddial";
+import { Tooltip } from "primereact/tooltip";
 import { useState } from "react";
 
 import List from "../list";
@@ -8,8 +11,10 @@ import { FlowListProps, ListItemProps } from "./flow-list";
 
 import { IFlowBase } from "@/interface/flow";
 
-export function FlowListItem({ key, item, }: ListItemProps) {
-    const { selectedFlow } = useFlowListContext();
+
+export function FlowListItem({ key, item }: ListItemProps) {
+    const { selectedFlow, renderMenus } = useFlowListContext();
+
     return (
         <div key={key} className={`h-[88px] px-3 py-2 text-light m-1.5
                          border-light border-solid rounded-std 
@@ -20,24 +25,32 @@ export function FlowListItem({ key, item, }: ListItemProps) {
                 <div className="text-xl ellipsis">{item.name}</div>
                 <i className="ellipsis overflow-hidden text-light-weak">{item.id}</i>
             </div>
-            <Button
-                className={`border-4  min-w-[38px] min-h-[38px]`}
-                icon='pi pi-ellipsis-h'
-                outlined
-                rounded
-                severity='secondary'
-            />
+            <div role='presentation' onClick={e => e.stopPropagation()}>
+                <SpeedDial
+                    direction='left'
+                    className="item-speeddial flex-h-center right-5 top-8"
+                    buttonClassName="w-[38px] h-[38px] border-light-weak border-2 bg-deep-weak"
+                    showIcon={'pi pi-ellipsis-h'}
+                    model={map(renderMenus?.(item), i => ({
+                        ...i,
+                        className: `bg-light-weak hover:bg-turbo-deep-weak w-[38px] h-[38px] ${i.className || ''}`
+                    }))}
+                    hideOnClickOutside={false}
+                />
+            </div>
+
         </div>
     )
 }
 
-export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSelected }: FlowListProps) {
+export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSelected, renderMenus }: FlowListProps) {
 
     const [selectedFlow, setSelectedFlow] = useState<IFlowBase | undefined>(defaultSelectedItem);
     const showActBar: boolean = !!onAddWF;
 
     return (
-        <FlowListContext.Provider value={{ selectedFlow, setSelectedFlow }}>
+        <FlowListContext.Provider value={{ selectedFlow, setSelectedFlow, renderMenus }}>
+            <Tooltip target=".item-speeddial .p-speeddial-action" position='top' />
             <div className="flex flex-col py-[22px] px-[18px] w-full h-full overflow-hidden items-end bg-deep rounded-std">
                 {showActBar &&
                     <div className="act-bar justify-end w-full py-2">
