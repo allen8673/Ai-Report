@@ -162,6 +162,7 @@ export default function Page() {
         {
             label: 'Edit Workflow',
             icon: 'pi pi-pencil',
+            className: 'bg-primary/[.8] hover:bg-primary-deep',
             command: () => {
                 router.push(`${editorUrl}${coverToQueryString({ id: item.id })}`);
             }
@@ -169,6 +170,7 @@ export default function Page() {
         {
             label: 'Reports',
             icon: 'pi pi-eye',
+            className: 'bg-info/[.8] hover:bg-info-deep',
             command: () => {
                 viewReports(item.id)
             }
@@ -176,12 +178,12 @@ export default function Page() {
         {
             label: 'Run Workflow',
             icon: 'pi pi-play',
+            className: 'bg-secondary/[.8] hover:bg-secondary-deep',
             command: () => {
                 runWorkflow(item.id)
             },
         },
-    ]
-
+    ];
 
     const getAllData = async () => {
         const { workflow, template } = await getAll() || {};

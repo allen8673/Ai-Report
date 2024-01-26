@@ -2,6 +2,7 @@
 import { map } from 'lodash';
 import { Button } from 'primereact/button';
 import { confirmDialog } from 'primereact/confirmdialog';
+import { MenuItem } from 'primereact/menuitem';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import { useEffect, useState } from 'react';
 
@@ -103,14 +104,12 @@ function TemplatePreviewer({ template, onClickEdit, onDelete }: TemplatePreviewe
                                 accept: () => {
                                     onDelete?.(template)
                                 }
-
                             });
                         }}
                     />
                     <Button
                         className="h-[40px]"
                         icon='pi pi-pencil'
-                        severity='info'
                         label="Edit template"
                         tooltipOptions={{ position: 'left' }}
                         onClick={() => onClickEdit?.(template)}
@@ -128,6 +127,42 @@ export default function Page() {
     const [template, setTemplate] = useState<IFlow>();
     const [editTemp, setEditTemp] = useState<IFlow>();
     const { showMessage } = useLayoutContext();
+
+    const onDeleteTemplate = async (tmpId: string) => {
+        const rsp = await deleteFlow(tmpId);
+        if (rsp.data.status === 'failure') return;
+        await fetchTemplates();
+        setTemplate(pre => pre?.id === tmpId ? undefined : pre)
+    }
+
+    const renderMenus = (item: IFlowBase): MenuItem[] => [
+        {
+            label: 'Edit Workflow',
+            icon: 'pi pi-pencil',
+            className: 'bg-primary/[.8] hover:bg-primary-deep',
+            command: async () => {
+                const tmp = await getFlow(item.id)
+                setEditTemp(tmp);
+            }
+        },
+        {
+            label: 'Remove Template',
+            icon: 'pi pi-trash',
+            className: 'bg-danger/[.8] hover:bg-danger-deep',
+            command: () => {
+                confirmDialog({
+                    position: 'top',
+                    message: `Do you want to remove ${item?.name || 'this template'}?`,
+                    header: `Remove Template`,
+                    icon: 'pi pi-info-circle',
+                    acceptClassName: 'p-button-danger',
+                    accept: async () => {
+                        await onDeleteTemplate(item.id);
+                    }
+                });
+            }
+        },
+    ];
 
     const fetchTemplates = async () => {
         const tmps = await getFlows('TEMPLATE');
@@ -147,12 +182,7 @@ export default function Page() {
                     onClickEdit={async (tmp) => {
                         setEditTemp(tmp)
                     }}
-                    onDelete={async (tmp) => {
-                        const rsp = await deleteFlow(tmp?.id);
-                        if (rsp.data.status === 'failure') return;
-                        await fetchTemplates();
-                        setTemplate(pre => pre?.id === tmp.id ? undefined : pre)
-                    }}
+                    onDelete={async (tmp) => await onDeleteTemplate(tmp.id)}
                 />
             </SplitterPanel>
             <SplitterPanel className="overflow-auto px-[7px]" size={20}>
@@ -163,6 +193,7 @@ export default function Page() {
                         const tmp = await getFlow(item.id)
                         setTemplate(tmp);
                     }}
+                    renderMenus={renderMenus}
                 />
             </SplitterPanel>
         </Splitter>

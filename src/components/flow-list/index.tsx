@@ -10,6 +10,7 @@ import { FlowListContext, useFlowListContext } from "./context";
 import { FlowListProps, ListItemProps } from "./flow-list";
 
 import { IFlowBase } from "@/interface/flow";
+import { cn } from "@/lib/utils";
 
 
 export function FlowListItem({ key, item }: ListItemProps) {
@@ -40,7 +41,7 @@ export function FlowListItem({ key, item }: ListItemProps) {
                         />)}
                     model={map(renderMenus?.(item), i => ({
                         ...i,
-                        className: `bg-light-weak hover:bg-turbo-deep-weak w-[38px] h-[38px] ${i.className || ''}`
+                        className: cn(`bg-deep/[.8] hover:bg-light-weak w-[38px] h-[38px]`, i.className)
                     }))}
                 />
             </div>
