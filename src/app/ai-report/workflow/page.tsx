@@ -1,5 +1,4 @@
 'use client'
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import RouterInfo from "@settings/router";
 import { find } from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
@@ -145,7 +144,7 @@ function WorkflowPreviewer() {
                     }
                 />
             </div> :
-            <EmptyPane icon={faPaperPlane} title='Select a workflow to show the graph' />
+            <EmptyPane icon='pi-send' title='Select a workflow to show the graph' />
     )
 }
 

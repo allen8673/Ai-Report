@@ -1,5 +1,4 @@
 'use client'
-import { faPaperPlane } from '@fortawesome/free-regular-svg-icons';
 import { map } from 'lodash';
 import { Button } from 'primereact/button';
 import { confirmDialog } from 'primereact/confirmdialog';
@@ -120,7 +119,7 @@ function TemplatePreviewer({ template, onClickEdit, onDelete }: TemplatePreviewe
             }
             showActionBar
         /> :
-        <EmptyPane icon={faPaperPlane} title='Select a template to show the graph' />
+        <EmptyPane icon='pi-send' title='Select a template to show the graph' />
 }
 
 export default function Page() {
