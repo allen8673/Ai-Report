@@ -120,7 +120,7 @@ export default function WorkflowLayout({
 }) {
     const { showMessage } = useLayoutContext();
     const { uploaderRef } = useFileGroupUploader()
-    const [runningWF, setRunningWF] = useState<IFlow | boolean>();
+    const [runningWF, setRunningWF] = useState<IFlow | boolean>(false);
     const [reportJobs, setReportJobs] = useState<ViewReports>();
     const [disabledUpload, setDisabledUpload] = useState<boolean>();
     const [cacheWorkflow, setCacheWorkflow] = useState<IFlow>();
@@ -146,7 +146,10 @@ export default function WorkflowLayout({
             setRunningWF(false);
             return;
         }
-        setRunningWF(workflow || false)
+        setRunningWF(pre => {
+            if (!pre) return pre;
+            return workflow || false
+        })
     }
     const viewReports = (workflowId: string) => {
         setReportJobs({ workflowId, jobs: [] });

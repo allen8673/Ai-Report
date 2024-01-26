@@ -14,6 +14,7 @@ import { IFlowBase } from "@/interface/flow";
 
 export function FlowListItem({ key, item }: ListItemProps) {
     const { selectedFlow, renderMenus } = useFlowListContext();
+    const [openMenu, setOpenMenu] = useState<boolean>(false)
 
     return (
         <div key={key} className={`h-[88px] px-3 py-2 text-light m-1.5
@@ -28,14 +29,19 @@ export function FlowListItem({ key, item }: ListItemProps) {
             <div role='presentation' onClick={e => e.stopPropagation()}>
                 <SpeedDial
                     direction='left'
-                    className="item-speeddial flex-h-center right-5 top-8"
+                    className={`item-speeddial flex-h-center right-5 top-8 ${openMenu ? 'p-speeddial-opened' : ''}`}
+                    onMouseLeave={() => setOpenMenu(false)}
                     buttonClassName="w-[38px] h-[38px] border-light-weak border-2 bg-deep-weak"
-                    showIcon={'pi pi-ellipsis-h'}
+                    buttonTemplate={opt => (
+                        <Button
+                            className={opt.className}
+                            onMouseEnter={() => setOpenMenu(true)}
+                            icon={'pi pi-ellipsis-h'}
+                        />)}
                     model={map(renderMenus?.(item), i => ({
                         ...i,
                         className: `bg-light-weak hover:bg-turbo-deep-weak w-[38px] h-[38px] ${i.className || ''}`
                     }))}
-                    hideOnClickOutside={false}
                 />
             </div>
 
