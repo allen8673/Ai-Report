@@ -3,10 +3,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PropsWithChildren } from "react";
 import { FallbackProps, ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
-export interface ErrorBoundaryProps extends FallbackProps {
-}
+export interface ErrorBoundaryProps { }
 
-function Fallback({ error }: ErrorBoundaryProps) {
+function Fallback({ error }: FallbackProps) {
     // Call resetErrorBoundary() to reset the error boundary and retry the render.
     return (
         <div className={`
