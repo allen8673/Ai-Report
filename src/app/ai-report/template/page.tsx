@@ -139,7 +139,7 @@ export default function Page() {
         {
             label: 'Edit Workflow',
             icon: 'pi pi-pencil',
-            className: 'bg-primary/[.8] hover:bg-primary-deep',
+            className: 'bg-primary hover:bg-primary-600',
             command: async () => {
                 const tmp = await getFlow(item.id)
                 setEditTemp(tmp);
@@ -148,7 +148,7 @@ export default function Page() {
         {
             label: 'Remove Template',
             icon: 'pi pi-trash',
-            className: 'bg-danger/[.8] hover:bg-danger-deep',
+            className: 'bg-danger hover:bg-danger-deep',
             command: () => {
                 confirmDialog({
                     position: 'top',

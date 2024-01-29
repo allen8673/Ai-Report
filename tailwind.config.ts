@@ -74,10 +74,10 @@ const config: Config = {
           DEFAULT: 'rgba(161, 98, 7, 1)',
           deep: 'rgba(113, 63, 18)',
         },
-        primary: {
-          DEFAULT: '#9C27B0',
-          deep: '#8c239e',
-        },
+        // primary: {
+        //   DEFAULT: '#9C27B0',
+        //   deep: '#8c239e',
+        // },
         info: {
           DEFAULT: '#0288D1',
           deep: '#027abc',
