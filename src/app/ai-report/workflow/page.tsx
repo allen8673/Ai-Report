@@ -25,7 +25,7 @@ import { IFlowBase, IFlowNode } from "@/interface/flow";
 import { IJob } from "@/interface/job";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import { getFullUrl } from "@/lib/router";
-import { usePolling } from "@/lib/utils";
+import { useLongPolling } from "@/lib/utils";
 
 const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
 interface FormData {
@@ -40,7 +40,7 @@ function WorkflowPreviewer() {
     const router = useRouter();
     const [jobs, setJobs] = useState<IJob[]>([]);
     const [jobId, setJobId] = useState<string>();
-    const { executePolling } = usePolling()
+    const { startLongPolling } = useLongPolling();
 
     useEffect(() => {
         if (!cacheWorkflow) {
@@ -66,11 +66,11 @@ function WorkflowPreviewer() {
     }
 
     useEffect(() => {
-        executePolling(async () => {
+        startLongPolling(async () => {
             if (!jobId) return false;
             await checkJobStatus(jobId);
             return true
-        });
+        })
     }, [jobId]);
 
     return (
