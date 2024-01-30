@@ -27,25 +27,36 @@ export function FlowListItem({ key, item }: ListItemProps) {
                 <div className="text-xl ellipsis">{item.name}</div>
                 <i className="ellipsis overflow-hidden text-light-weak">{item.id}</i>
             </div>
-            <div role='presentation' onClick={e => e.stopPropagation()}>
-                <SpeedDial
-                    direction='left'
-                    className={`item-speeddial flex-h-center right-5 top-8 ${openMenu ? 'p-speeddial-opened' : ''}`}
-                    onMouseLeave={() => setOpenMenu(false)}
-                    buttonClassName="w-[38px] h-[38px] border-light-weak border-2 bg-deep-weak"
-                    buttonTemplate={opt => (
-                        <Button
-                            className={opt.className}
-                            onMouseEnter={() => setOpenMenu(true)}
-                            icon={'pi pi-ellipsis-h'}
-                        />)}
-                    model={map(renderMenus?.(item), i => ({
-                        ...i,
-                        className: cn(`bg-deep/[.8] hover:bg-light-weak w-[38px] h-[38px]`, i.className)
-                    }))}
-                />
-            </div>
-
+            <SpeedDial
+                direction='left'
+                className={`item-speeddial flex-h-center right-5 top-8 ${openMenu ? 'p-speeddial-opened' : ''}`}
+                onMouseLeave={() => setOpenMenu(false)}
+                buttonClassName="w-[38px] h-[38px] border-light-weak border-2 bg-deep-weak"
+                buttonTemplate={opt => (
+                    <Button
+                        className={opt.className}
+                        onMouseEnter={() => setOpenMenu(true)}
+                        icon={'pi pi-ellipsis-h'}
+                    />)}
+                model={map(renderMenus?.(item), i => ({
+                    ...i,
+                    className: cn(`bg-deep/[.8] hover:bg-light-weak w-[38px] h-[38px]`, i.className),
+                    template: (item, options) => {
+                        return (
+                            <Button
+                                className={cn(options.className, item.className, 'border-none')}
+                                icon={item.icon}
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    item.command?.({ originalEvent: e, item })
+                                }}
+                                tooltip={item.label}
+                                tooltipOptions={{ position: 'top' }}
+                            />
+                        )
+                    }
+                }))}
+            />
         </div>
     )
 }
