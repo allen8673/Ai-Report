@@ -97,7 +97,7 @@ function PreviewModal({ reportJobs, onClose }:
                     }}
                 />
             </div>
-            <EmptyPane onClick={() => alert('123')} isEmpty={!jobContents[selectedJob]}>
+            <EmptyPane isEmpty={!jobContents[selectedJob]}>
                 <CodeEditor
                     hiddenBar
                     language={'text'}
