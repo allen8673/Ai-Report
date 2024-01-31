@@ -1,4 +1,3 @@
-import { faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { confirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
@@ -101,8 +100,7 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
                             absolute inset-0 px-[12px] bg-warning-deep opacity-30
                             flex items-center flex-row-reverse 
                             `}>
-                                <FontAwesomeIcon className={`font-medium text-5xl text-warning-light`} icon={faWarning} />
-                                {/* <i className="pi pi-exclamation-triangle font-medium text-5xl text-warning-light" /> */}
+                                <i className="pi pi-exclamation-triangle font-medium text-5xl text-warning-light" />
                             </div>
                         }
                         <div className={`flex items-center rounded-std-sm text-light`}>
