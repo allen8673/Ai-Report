@@ -1,4 +1,4 @@
-import { IconDefinition, faCheck, faCloud, faExclamation, faQuestion, faWarning, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCloud, faWarning, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { confirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
@@ -14,30 +14,30 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
     if (!status || status === 'none') return <></>
 
     let status_color = 'bg-deep-weak';
-    let icon: IconDefinition = faQuestion
+    let _icon: string = 'pi-question';
 
     switch (status) {
         case 'success':
             status_color = 'bg-success';
-            icon = faCheck
+            _icon = 'pi-check-circle'
             break;
         case 'failure':
             status_color = 'bg-failure';
-            icon = faXmark
+            _icon = 'pi-times-circle'
+            break;
+        case 'warning':
+            status_color = 'bg-warning';
+            _icon = 'pi-exclamation-circle'
             break;
         case 'wait':
-            status_color = 'bg-warning';
-            icon = faExclamation
+            _icon = 'pi pi-spin pi-spinner'
             break;
     }
 
     return (
         <div className={`status icon gradient text-light `}>
             <div className={` ${status_color} flex-center`}>
-                <FontAwesomeIcon
-                    className={`h-[16px] w-[16px] flex-center ${status_color}`}
-                    icon={icon}
-                />
+                <i className={`pi ${_icon}`} />
             </div>
         </div>
     )
@@ -70,7 +70,6 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
 
     return (
         <>
-            {/* <Tooltip target={'.tip-icon'} mouseTrack position='left' /> */}
             <Tooltip target={'.wf-name'} mouseTrack position='top' />
             {!!editable &&
                 <div className={`tip-icon icon gradient ${clickable ? "cursor-pointer" : ''}
@@ -81,6 +80,7 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
                         role='presentation'
                         onClick={removeNode}
                     >
+                        {/* <i className=''/> */}
                         <FontAwesomeIcon
                             className='h-[16px] w-[16px] flex-center '
                             icon={inEdit ? faXmark : faCloud}
