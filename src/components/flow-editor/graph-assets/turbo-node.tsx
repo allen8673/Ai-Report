@@ -17,7 +17,7 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
     let _icon: string = 'pi-question';
 
     switch (status) {
-        case 'success':
+        case 'done':
             status_color = 'bg-success';
             _icon = 'pi-check-circle'
             break;
