@@ -1,4 +1,4 @@
-import { faCloud, faWarning, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { confirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
@@ -71,7 +71,7 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
     return (
         <>
             <Tooltip target={'.wf-name'} mouseTrack position='top' />
-            {!!editable &&
+            {!!editable && inEdit &&
                 <div className={`tip-icon icon gradient ${clickable ? "cursor-pointer" : ''}
                     ${iconHighlight ? 'text-light' : 'text-light-weak'} 
                     ${(inEdit && deletable) ? `hover:text-light ` : ''}
@@ -80,11 +80,7 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
                         role='presentation'
                         onClick={removeNode}
                     >
-                        {/* <i className=''/> */}
-                        <FontAwesomeIcon
-                            className='h-[16px] w-[16px] flex-center '
-                            icon={inEdit ? faXmark : faCloud}
-                        />
+                        <i className='pi pi-times' />
                     </div>
                 </div >}
             {getStatusIcon(data.status)}
