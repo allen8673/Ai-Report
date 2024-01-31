@@ -97,7 +97,7 @@ function PreviewModal({ reportJobs, onClose }:
                     }}
                 />
             </div>
-            {jobContents[selectedJob] ?
+            <EmptyPane onClick={() => alert('123')} isEmpty={!jobContents[selectedJob]}>
                 <CodeEditor
                     hiddenBar
                     language={'text'}
@@ -107,9 +107,8 @@ function PreviewModal({ reportJobs, onClose }:
                         readOnly: true,
                         automaticLayout: true,
                     }}
-
-                /> :
-                <EmptyPane />}
+                />
+            </EmptyPane>
         </Modal>
     )
 }

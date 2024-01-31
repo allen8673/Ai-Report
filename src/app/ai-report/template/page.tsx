@@ -63,62 +63,65 @@ function EditTemplateModal({ editTemp, onOk, onCancel }: EditTemplateModalProps)
 
 interface TemplatePreviewerProps {
     template?: IFlow;
-    onClickEdit?: (tmp: IFlow) => void;
-    onDelete?: (tmp: IFlow) => void
+    onClickEdit?: (tmp?: IFlow) => void;
+    onDelete?: (tmp?: IFlow) => void
 }
 
 function TemplatePreviewer({ template, onClickEdit, onDelete }: TemplatePreviewerProps) {
     const { graphRef } = useGraphRef<IFlowNode, any>();
 
-    return template?.flows ?
-        <FlowEditor
-            flows={template.flows}
-            graphRef={graphRef}
-            hideMiniMap
-            hideCtrls
-            fitView
-            fitViewOptions={{ duration: 1000 }}
-            onNodesChange={(changes) => {
-                if (changes.length > 1) {
-                    graphRef.current.reactFlowInstance?.fitView({ duration: 500 })
+    return (
+        <EmptyPane icon='pi-send' title='Select a template to show the graph' isEmpty={!!template?.flows}>
+            <FlowEditor
+                flows={template?.flows || []}
+                graphRef={graphRef}
+                hideMiniMap
+                hideCtrls
+                fitView
+                fitViewOptions={{ duration: 1000 }}
+                onNodesChange={(changes) => {
+                    if (changes.length > 1) {
+                        graphRef.current.reactFlowInstance?.fitView({ duration: 500 })
+                    }
+                }}
+                actionBarContent={
+                    <div
+                        className="flex-h-center gap-[7px] justify-end w-full"
+                        role='presentation'
+                        onClick={(e) => e.stopPropagation()}>
+                        <Button
+                            className="py-0 px-[0px] h-[40px]"
+                            icon='pi pi-trash'
+                            severity='danger'
+                            tooltip="Remove Template"
+                            tooltipOptions={{ position: 'left' }}
+                            onClick={() => {
+                                confirmDialog({
+                                    position: 'top',
+                                    message: `Do you want to remove ${template?.name || 'this template'}?`,
+                                    header: `Remove Template`,
+                                    icon: 'pi pi-info-circle',
+                                    acceptClassName: 'p-button-danger',
+                                    accept: () => {
+                                        onDelete?.(template)
+                                    }
+                                });
+                            }}
+                        />
+                        <Button
+                            className="h-[40px]"
+                            icon='pi pi-pencil'
+                            label="Edit template"
+                            tooltipOptions={{ position: 'left' }}
+                            onClick={() => onClickEdit?.(template)}
+                        />
+                    </div>
                 }
-            }}
-            actionBarContent={
-                <div
-                    className="flex-h-center gap-[7px] justify-end w-full"
-                    role='presentation'
-                    onClick={(e) => e.stopPropagation()}>
-                    <Button
-                        className="py-0 px-[0px] h-[40px]"
-                        icon='pi pi-trash'
-                        severity='danger'
-                        tooltip="Remove Template"
-                        tooltipOptions={{ position: 'left' }}
-                        onClick={() => {
-                            confirmDialog({
-                                position: 'top',
-                                message: `Do you want to remove ${template?.name || 'this template'}?`,
-                                header: `Remove Template`,
-                                icon: 'pi pi-info-circle',
-                                acceptClassName: 'p-button-danger',
-                                accept: () => {
-                                    onDelete?.(template)
-                                }
-                            });
-                        }}
-                    />
-                    <Button
-                        className="h-[40px]"
-                        icon='pi pi-pencil'
-                        label="Edit template"
-                        tooltipOptions={{ position: 'left' }}
-                        onClick={() => onClickEdit?.(template)}
-                    />
-                </div>
-            }
-            showActionBar
-        /> :
-        <EmptyPane icon='pi-send' title='Select a template to show the graph' />
+                showActionBar
+            />
+        </EmptyPane>
+    )
+
 }
 
 export default function Page() {
@@ -182,7 +185,10 @@ export default function Page() {
                     onClickEdit={async (tmp) => {
                         setEditTemp(tmp)
                     }}
-                    onDelete={async (tmp) => await onDeleteTemplate(tmp.id)}
+                    onDelete={async (tmp) => {
+                        if (!tmp) return;
+                        await onDeleteTemplate(tmp.id)
+                    }}
                 />
             </SplitterPanel>
             <SplitterPanel className="overflow-auto px-[7px]" size={20}>

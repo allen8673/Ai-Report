@@ -168,17 +168,20 @@ export default function FileGroupUploader(props: GroupingFileUploaderProps) {
                             >
                                 <div className="bg-deep overflow-hidden">
 
-                                    {!!files?.length ?
-                                        map(files, f => (
-                                            <ItemTemplate group={group} file={f} />
-                                        )) :
-                                        <EmptyPane
-                                            title={`Click here to select files for ${group}`}
-                                            onClick={() => {
-                                                openFileSelector(group)
-                                            }}
-                                        />
-                                    }
+                                    <EmptyPane
+                                        isEmpty={!files?.length}
+                                        title={`Click here to select files for ${group}`}
+                                        onClick={() => {
+                                            openFileSelector(group)
+                                        }}
+                                    >
+                                        {
+                                            map(files, f => (
+                                                <ItemTemplate group={group} file={f} />
+                                            ))
+                                        }
+                                    </EmptyPane>
+
                                 </div>
                             </AccordionTab >
                         )

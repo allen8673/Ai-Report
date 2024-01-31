@@ -74,66 +74,64 @@ function WorkflowPreviewer() {
     }, [jobId]);
 
     return (
-        cacheWorkflow?.flows ?
-            <div className="w-full h-full relative">
-                <FlowEditor
-                    flows={cacheWorkflow.flows}
-                    graphRef={graphRef}
-                    hideMiniMap
-                    hideCtrls
-                    fitView
-                    fitViewOptions={{ duration: 1000 }}
-                    onNodesChange={(changes) => {
-                        if (changes.length > 1) {
-                            graphRef.current.reactFlowInstance?.fitView({ duration: 500 })
-                        }
-                    }}
-                    showActionBar
-                    actionBarContent={
-                        <div className="flex-h-center w-full">
-                            <div className="grow shrink flex-h-center gap-2 ">
-                                <h3 className="text-light-weak ">Select on going Job ID:</h3>
-                                <Dropdown
-                                    value={jobId}
-                                    options={jobs?.map(i => ({ label: i.JOB_ID, value: i.JOB_ID }))}
-                                    onChange={e => setJobId(e.value)}
-                                />
-                            </div>
-                            <div
-                                className="flex gap-[7px]"
-                                role='presentation'
-                                onClick={(e) => e.stopPropagation()}>
-                                <Button
-                                    className="py-0 px-[0px] h-[40px]"
-                                    severity='secondary'
-                                    tooltip="Run Workflow"
-                                    tooltipOptions={{ position: 'mouse' }}
-                                    icon='pi pi-play'
-                                    onClick={() => runWorkflow(cacheWorkflow.id)}
-                                />
-                                <Button
-                                    className="py-0 px-[0px] h-[40px]"
-                                    severity='info'
-                                    tooltip="Reports"
-                                    tooltipOptions={{ position: 'mouse' }}
-                                    icon='pi pi-eye'
-                                    onClick={() => viewReports(cacheWorkflow.id)}
-                                />
-                                <Button
-                                    className="h-[40px]"
-                                    label="Edit Workflow"
-                                    tooltipOptions={{ position: 'left' }}
-                                    icon='pi pi-pencil'
-                                    onClick={() => {
-                                        router.push(`${editorUrl}${coverToQueryString({ id: cacheWorkflow.id })}`);
-                                    }}
-                                />
-                            </div >
-                        </div>
+        <EmptyPane icon='pi-send' title='Select a workflow to show the graph' isEmpty={!cacheWorkflow?.flows}>
+            <FlowEditor
+                flows={cacheWorkflow?.flows || []}
+                graphRef={graphRef}
+                hideMiniMap
+                hideCtrls
+                fitView
+                fitViewOptions={{ duration: 1000 }}
+                onNodesChange={(changes) => {
+                    if (changes.length > 1) {
+                        graphRef.current.reactFlowInstance?.fitView({ duration: 500 })
                     }
-                />
-            </div> :
-            <EmptyPane icon='pi-send' title='Select a workflow to show the graph' />
+                }}
+                showActionBar
+                actionBarContent={
+                    <div className="flex-h-center w-full">
+                        <div className="grow shrink flex-h-center gap-2 ">
+                            <h3 className="text-light-weak ">Select on going Job ID:</h3>
+                            <Dropdown
+                                value={jobId}
+                                options={jobs?.map(i => ({ label: i.JOB_ID, value: i.JOB_ID }))}
+                                onChange={e => setJobId(e.value)}
+                            />
+                        </div>
+                        <div
+                            className="flex gap-[7px]"
+                            role='presentation'
+                            onClick={(e) => e.stopPropagation()}>
+                            <Button
+                                className="py-0 px-[0px] h-[40px]"
+                                severity='secondary'
+                                tooltip="Run Workflow"
+                                tooltipOptions={{ position: 'mouse' }}
+                                icon='pi pi-play'
+                                onClick={() => runWorkflow(cacheWorkflow?.id)}
+                            />
+                            <Button
+                                className="py-0 px-[0px] h-[40px]"
+                                severity='info'
+                                tooltip="Reports"
+                                tooltipOptions={{ position: 'mouse' }}
+                                icon='pi pi-eye'
+                                onClick={() => viewReports(cacheWorkflow?.id || '')}
+                            />
+                            <Button
+                                className="h-[40px]"
+                                label="Edit Workflow"
+                                tooltipOptions={{ position: 'left' }}
+                                icon='pi pi-pencil'
+                                onClick={() => {
+                                    router.push(`${editorUrl}${coverToQueryString({ id: cacheWorkflow?.id || '' })}`);
+                                }}
+                            />
+                        </div >
+                    </div>
+                }
+            />
+        </EmptyPane>
     )
 }
 
