@@ -69,7 +69,10 @@ export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSe
     return (
         <FlowListContext.Provider value={{ selectedFlow, setSelectedFlow, renderMenus }}>
             <Tooltip target=".item-speeddial .p-speeddial-action" position='top' />
-            <div className="flex flex-col py-[22px] px-[18px] w-full h-full overflow-hidden items-end bg-deep rounded-std">
+            <div className={`
+            py-[22px] px-[18px] w-full h-full overflow-hidden
+            bg-deep rounded-std border-solid border-light-weak/[.2]
+            flex flex-col items-end`}>
                 {showActBar &&
                     <div className="act-bar justify-end w-full py-2">
                         {!!onAddWF && <Button

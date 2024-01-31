@@ -18,7 +18,7 @@ export default function EmptyPane({ title, icon, className, onClick, isEmpty = t
             text-light/[.3] text-xl 
             w-full h-full 
             flex flex-col grow justify-center items-center
-            border-solid border-light-weak rounded-std-sm
+            border-solid border-light-weak rounded-std
             `, (!!onClick ? 'cursor-pointer' : ""), className)}
             onClick={isEmpty && onClick}
             role='presentation'
