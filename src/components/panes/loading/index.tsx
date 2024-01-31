@@ -1,14 +1,15 @@
-import { MouseEventHandler } from "react";
+import { MouseEventHandler, PropsWithChildren } from "react";
 
 import { cn } from "@/lib/utils";
 
 interface LoadingPaneProps {
     title?: string;
     className?: string;
-    onClick?: MouseEventHandler<HTMLDivElement>
+    onClick?: MouseEventHandler<HTMLDivElement>;
+    loading?: boolean;
 }
-export default function LoadingPane({ title, className, onClick }: LoadingPaneProps) {
-    return (
+export default function LoadingPane({ title, className, onClick, loading, children }: PropsWithChildren<LoadingPaneProps>) {
+    return loading ? (
         <div
             className={cn(`
             p-16
@@ -23,5 +24,6 @@ export default function LoadingPane({ title, className, onClick }: LoadingPanePr
         >
             <i className="pi pi-spin pi-spinner" style={{ fontSize: '2rem' }} />
             <p className='my-0'>{title || 'Loading'}</p>
-        </div>)
+        </div>
+    ) : children
 }

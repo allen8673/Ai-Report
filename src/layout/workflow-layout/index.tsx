@@ -15,6 +15,7 @@ import { getFlow } from '@/api-helpers/flow-api';
 import { checkJob, downloadJob, getJobs, runReport } from '@/api-helpers/report-api';
 import CodeEditor from '@/components/code-editor';
 import FileGroupUploader, { useFileGroupUploader } from '@/components/file-group-uploader';
+import { FileGroups } from '@/components/file-group-uploader/file-group-uploader';
 import { ifFlowIsCompleted } from '@/components/flow-editor/lib';
 import Modal from '@/components/modal';
 import EmptyPane from '@/components/panes/empty';
@@ -167,6 +168,36 @@ export default function WorkflowLayout({
             })
     }
 
+    const onUpload = (fileGroups: FileGroups) => {
+        const files = fileGroups['Upload'];
+        if (!runningWF || !files?.length) return;
+        const formData = new FormData();
+        for (const i in files) {
+            formData.append('files', files[i])
+        }
+        formData.append('userId', '23224');
+        formData.append('workflowId', (runningWF as IFlow)?.id);
+        formData.append('version', '1');
+
+        runReport(formData).then((res) => {
+            showMessage({
+                message: res.message || 'success',
+                type: 'success'
+            })
+            setRunningWF(false);
+        }).catch((error) => {
+            showMessage({
+                message: toString(error),
+                type: 'error'
+            })
+        });
+    }
+
+    const onChange = (fileGroups: FileGroups) => {
+        const files = fileGroups['Upload'];
+        setDisabledUpload(!files?.length)
+    }
+
     return (
         <WfLayoutContext.Provider value={{
             runWorkflow,
@@ -194,44 +225,16 @@ export default function WorkflowLayout({
                     />
                 }
             >
-                {typeof runningWF === 'boolean' ?
-                    <LoadingPane className='h-80' title='Checking' /> :
+                <LoadingPane className='h-80' title='Checking' loading={typeof runningWF === 'boolean'}>
                     <FileGroupUploader
                         uploaderRef={uploaderRef}
                         hideUploadButton
                         uploadLabel="Upload & Run"
-                        grouping={runningWF?.flows.filter(f => includes(['Input', 'Report'], f.type)).sort(a => a.type === 'Input' ? 1 : 0).map(f => f.name || '')}
-                        onUpload={fileGroups => {
-                            const files = fileGroups['Upload'];
-                            if (!runningWF || !files?.length) return;
-                            const formData = new FormData();
-                            for (const i in files) {
-                                formData.append('files', files[i])
-                            }
-                            formData.append('userId', '23224');
-                            formData.append('workflowId', runningWF.id);
-                            formData.append('version', '1');
-
-                            runReport(formData).then((res) => {
-                                showMessage({
-                                    message: res.message || 'success',
-                                    type: 'success'
-                                })
-                                setRunningWF(false);
-                            }).catch((error) => {
-                                showMessage({
-                                    message: toString(error),
-                                    type: 'error'
-                                })
-                            });
-
-                        }}
-                        onChange={fileGroups => {
-                            const files = fileGroups['Upload'];
-                            setDisabledUpload(!files?.length)
-                        }}
+                        grouping={(runningWF as IFlow)?.flows?.filter(f => includes(['Input', 'Report'], f.type)).sort(a => a.type === 'Input' ? 1 : 0).map(f => f.name || '')}
+                        onUpload={onUpload}
+                        onChange={onChange}
                     />
-                }
+                </LoadingPane>
 
             </Modal>
             <PreviewModal reportJobs={reportJobs} onClose={() => setReportJobs(undefined)} />
