@@ -15,6 +15,13 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
     let icon: string = 'pi-question';
 
     switch (status) {
+        case 'wait':
+            icon = 'pi pi-spin pi-spinner'
+            break;
+        case 'ongoing':
+            status_color = 'bg-success';
+            icon = 'pi-spin pi-sync'
+            break;
         case 'done':
             status_color = 'bg-success';
             icon = 'pi-check-circle'
@@ -27,9 +34,7 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
             status_color = 'bg-warning';
             icon = 'pi-exclamation-circle'
             break;
-        case 'wait':
-            icon = 'pi pi-spin pi-spinner'
-            break;
+
     }
 
     return (

@@ -14,7 +14,7 @@ export interface IFlow extends IFlowBase {
 }
 
 export type FlowType = 'Input' | 'Output' | 'Normal' | 'Workflow' | 'Report';
-export type FlowStatus = 'none' | 'done' | 'failure' | 'warning' | 'wait';
+export type FlowStatus = 'none' | 'wait' | 'ongoing' | 'done' | 'failure' | 'warning';
 
 export interface ComponentOpt {
     COMP_ID: string;
