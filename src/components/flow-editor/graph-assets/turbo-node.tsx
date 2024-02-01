@@ -1,4 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { confirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import React, { ReactNode } from "react";
@@ -13,30 +12,30 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
     if (!status || status === 'none') return <></>
 
     let status_color = 'bg-deep-weak';
-    let _icon: string = 'pi-question';
+    let icon: string = 'pi-question';
 
     switch (status) {
         case 'done':
             status_color = 'bg-success';
-            _icon = 'pi-check-circle'
+            icon = 'pi-check-circle'
             break;
         case 'failure':
             status_color = 'bg-failure';
-            _icon = 'pi-times-circle'
+            icon = 'pi-times-circle'
             break;
         case 'warning':
             status_color = 'bg-warning';
-            _icon = 'pi-exclamation-circle'
+            icon = 'pi-exclamation-circle'
             break;
         case 'wait':
-            _icon = 'pi pi-spin pi-spinner'
+            icon = 'pi pi-spin pi-spinner'
             break;
     }
 
     return (
         <div className={`status icon gradient text-light `}>
             <div className={` ${status_color} flex-center`}>
-                <i className={`pi ${_icon}`} />
+                <i className={`pi ${icon}`} />
             </div>
         </div>
     )
@@ -104,7 +103,7 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
                             </div>
                         }
                         <div className={`flex items-center rounded-std-sm text-light`}>
-                            <FontAwesomeIcon className='text-[30px] mr-[8px] mt-[2px]' icon={icon} color={'white'} />
+                            <i className={`pi ${icon} text-3xl mr-[8px]`} />
                             <div className='grow shrink overflow-hidden'>
                                 <div className="text-[20px] mb-[2px] leading-1 ellipsis wf-name"
                                     data-pr-tooltip={data.name}

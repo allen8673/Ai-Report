@@ -1,4 +1,3 @@
-import { IconDefinition, faUpload, faDownload, faBrain, faShareNodes, faFileLines } from '@fortawesome/free-solid-svg-icons'
 import { filter } from 'lodash';
 import { Edge, MarkerType } from 'reactflow';
 
@@ -46,34 +45,34 @@ export const flowInfoMap: {
     [type in FlowType]: {
         nodeType: '' | 'start' | 'end';
         nodeName?: string;
-        icon: IconDefinition;
+        icon: string;
         editable?: boolean
     }
 } = {
     'Input': {
         nodeType: 'start',
-        icon: faUpload,
+        icon: 'pi-upload',
         nodeName: 'Upload',
     },
     'Output': {
         nodeType: 'end',
         nodeName: 'Done',
-        icon: faDownload,
+        icon: 'pi-download',
     },
     'Normal': {
         nodeType: '',
-        icon: faBrain,
+        icon: 'pi-comment',
         editable: true
     },
     'Workflow': {
         nodeType: '',
-        icon: faShareNodes,
+        icon: 'pi-share-alt',
         editable: true
     },
 
     'Report': {
         nodeType: '',
-        icon: faFileLines,
+        icon: 'pi-file',
         editable: true
     }
 }
