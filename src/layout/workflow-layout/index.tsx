@@ -29,6 +29,11 @@ interface ViewReports {
     jobs: IJob[];
 }
 
+interface RunningWF {
+    workflow?: IFlow
+    callback?: () => void
+}
+
 function PreviewModal({ reportJobs, onClose }:
     {
         reportJobs?: ViewReports,
@@ -113,6 +118,7 @@ function PreviewModal({ reportJobs, onClose }:
         </Modal>
     )
 }
+
 export default function WorkflowLayout({
     children,
 }: {
@@ -120,13 +126,13 @@ export default function WorkflowLayout({
 }) {
     const { showMessage } = useLayoutContext();
     const { uploaderRef } = useFileGroupUploader()
-    const [runningWF, setRunningWF] = useState<IFlow | boolean>(false);
+    const [runningWF, setRunningWF] = useState<RunningWF>();
     const [reportJobs, setReportJobs] = useState<ViewReports>();
     const [disabledUpload, setDisabledUpload] = useState<boolean>();
     const [cacheWorkflow, setCacheWorkflow] = useState<IFlow>();
-    const runWorkflow = async (wf?: IFlow | string) => {
+    const runWorkflow = async (wf?: IFlow | string, callback?: () => void) => {
         if (!wf) return;
-        setRunningWF(true);
+        setRunningWF({ callback });
         const workflow: IFlow | undefined = typeof wf === 'string' ? await getFlow(wf) : wf;
         const check_res = await checkJob(workflow?.id || '')
         if (check_res.status === 'NG') {
@@ -134,7 +140,7 @@ export default function WorkflowLayout({
                 message: check_res.message || '',
                 type: 'error'
             });
-            setRunningWF(false);
+            setRunningWF(undefined);
             return;
         }
 
@@ -143,12 +149,12 @@ export default function WorkflowLayout({
                 message: `Cannot run '${workflow?.name}'(${workflow?.id}) since the workflow is not completed.`,
                 type: 'error'
             });
-            setRunningWF(false);
+            setRunningWF(undefined);
             return;
         }
         setRunningWF(pre => {
             if (!pre) return pre;
-            return workflow || false
+            return !!workflow ? { workflow, callback } : undefined
         })
     }
     const viewReports = (workflowId: string) => {
@@ -170,21 +176,22 @@ export default function WorkflowLayout({
 
     const onUpload = (fileGroups: FileGroups) => {
         const files = fileGroups['Upload'];
-        if (!runningWF || !files?.length) return;
+        if (!runningWF || !runningWF?.workflow || !files?.length) return;
         const formData = new FormData();
         for (const i in files) {
             formData.append('files', files[i])
         }
         formData.append('userId', '23224');
-        formData.append('workflowId', (runningWF as IFlow)?.id);
+        formData.append('workflowId', runningWF.workflow.id || '');
         formData.append('version', '1');
 
-        runReport(formData).then((res) => {
+        runReport(formData).then(async (res) => {
             showMessage({
                 message: res.message || 'success',
                 type: 'success'
             })
-            setRunningWF(false);
+            await runningWF.callback?.();
+            setRunningWF(undefined);
         }).catch((error) => {
             showMessage({
                 message: toString(error),
@@ -209,7 +216,7 @@ export default function WorkflowLayout({
             <Modal
                 title="Upload your files"
                 visible={!!runningWF}
-                onOk={() => setRunningWF(false)}
+                onOk={() => setRunningWF(undefined)}
                 footerClass="flex justify-end"
                 okLabel="Cancel"
                 footerPrefix={
@@ -225,12 +232,12 @@ export default function WorkflowLayout({
                     />
                 }
             >
-                <LoadingPane className='h-80' title='Checking' loading={typeof runningWF === 'boolean'}>
+                <LoadingPane className='h-80' title='Checking' loading={!runningWF?.workflow}>
                     <FileGroupUploader
                         uploaderRef={uploaderRef}
                         hideUploadButton
                         uploadLabel="Upload & Run"
-                        grouping={(runningWF as IFlow)?.flows?.filter(f => includes(['Input', 'Report'], f.type)).sort(a => a.type === 'Input' ? 1 : 0).map(f => f.name || '')}
+                        grouping={runningWF?.workflow?.flows?.filter(f => includes(['Input', 'Report'], f.type)).sort(a => a.type === 'Input' ? 1 : 0).map(f => f.name || '')}
                         onUpload={onUpload}
                         onChange={onChange}
                     />

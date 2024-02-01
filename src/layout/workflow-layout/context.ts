@@ -4,7 +4,7 @@ import React from "react";
 import { IFlow } from "@/interface/flow";
 
 export interface WfLayoutStore {
-    runWorkflow: (wf?: IFlow | string) => void;
+    runWorkflow: (wf?: IFlow | string, callback?: () => void) => void;
     viewReports: (workflowId: string) => void;
     cacheWorkflow?: IFlow;
     setCacheWorkflow: Dispatch<SetStateAction<IFlow | undefined>>

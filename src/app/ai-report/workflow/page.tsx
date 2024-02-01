@@ -1,6 +1,6 @@
 'use client'
 import RouterInfo from "@settings/router";
-import { find } from "lodash";
+import { find, some } from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
@@ -21,7 +21,7 @@ import { useGraphRef } from "@/components/graph";
 import Modal from "@/components/modal";
 import EmptyPane from "@/components/panes/empty";
 import TitlePane from "@/components/panes/title";
-import { IFlowBase, IFlowNode } from "@/interface/flow";
+import { IFlow, IFlowBase, IFlowNode } from "@/interface/flow";
 import { IJob } from "@/interface/job";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import { getFullUrl } from "@/lib/router";
@@ -43,18 +43,18 @@ function WorkflowPreviewer() {
     const { startLongPolling } = useLongPolling();
 
     useEffect(() => {
-        if (!cacheWorkflow) {
+        fetchJobs(cacheWorkflow);
+    }, [cacheWorkflow]);
+
+    const fetchJobs = async (wf?: IFlow) => {
+        if (!wf) {
             setJobs([]);
             return;
         }
-        getJobsOngoing(cacheWorkflow.id)
-            .then(res => {
-                setJobId(res?.[0]?.JOB_ID)
-                setJobs(res || []);
-            }).catch(() => {
-
-            })
-    }, [cacheWorkflow]);
+        const _jobs = await getJobsOngoing(wf.id);
+        setJobId(_jobs?.[0]?.JOB_ID)
+        setJobs(_jobs || []);
+    }
 
     const checkJobStatus = async (_jobId: string) => {
         const jobStatus = await getJobItemStatus(_jobId);
@@ -63,13 +63,22 @@ function WorkflowPreviewer() {
             if (!!status) n.data.status = status.STATUS;
             return n
         })
+        const running: boolean = some(jobStatus, js => (js.STATUS === 'wait' || js.STATUS === 'ongoing'));
+        return running;
+    }
+
+    const onRunWorkflow = () => {
+        runWorkflow(cacheWorkflow?.id, () => fetchJobs(cacheWorkflow))
     }
 
     useEffect(() => {
         startLongPolling(async () => {
             if (!jobId) return false;
-            await checkJobStatus(jobId);
-            return true
+            const running = await checkJobStatus(jobId);
+            if (!running) {
+                fetchJobs(cacheWorkflow)
+            }
+            return running
         })
     }, [jobId]);
 
@@ -108,7 +117,7 @@ function WorkflowPreviewer() {
                                 tooltip="Run Workflow"
                                 tooltipOptions={{ position: 'mouse' }}
                                 icon='pi pi-play'
-                                onClick={() => runWorkflow(cacheWorkflow?.id)}
+                                onClick={onRunWorkflow}
                             />
                             <Button
                                 className="py-0 px-[0px] h-[40px]"
