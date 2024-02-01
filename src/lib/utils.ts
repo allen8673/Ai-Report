@@ -19,7 +19,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 
-const POLLING_INTERVAL = toNumber(process.env.NEXT_PUBLIC_POLLING_INTERVAL || 30000);
+const POLLING_INTERVAL = toNumber(process.env.NEXT_PUBLIC_POLLING_INTERVAL || 30) * 1000;
 export function usePolling() {
     const [executor, setExecutor] = useState<NodeJS.Timeout>();
 
