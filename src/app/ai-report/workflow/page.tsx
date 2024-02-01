@@ -96,7 +96,6 @@ function WorkflowPreviewer() {
                         graphRef.current.reactFlowInstance?.fitView({ duration: 500 })
                     }
                 }}
-                showActionBar
                 actionBarContent={
                     <div className="flex-h-center w-full">
                         <div className="grow shrink flex-h-center gap-2 ">

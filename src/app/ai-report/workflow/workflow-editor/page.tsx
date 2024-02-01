@@ -322,7 +322,6 @@ export default function Page() {
                         return <><div>{inEdit && actionBtns}</div> <div className="flex gap-2 px-[18px]">{wfActionBtns}</div></>
                     }}
                     actionBarClass='justify-between'
-                    showActionBar
                     flowNameMapper={flowNameMapper}
                 />
                 <Modal

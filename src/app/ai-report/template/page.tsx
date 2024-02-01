@@ -117,7 +117,6 @@ function TemplatePreviewer({ template, onClickEdit, onDelete }: TemplatePreviewe
                         />
                     </div>
                 }
-                showActionBar
             />
         </EmptyPane>
     )

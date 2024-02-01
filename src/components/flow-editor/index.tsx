@@ -449,11 +449,9 @@ function ActionBtns(props: FlowGraphProps) {
         setAddComp
     } = useFlowGrapContext();
 
-
-
     const comp_group_ref = useRef<HTMLDivElement>(null);
+    const position = comp_group_ref.current?.getBoundingClientRect();
     const [compGroups, setCompGroups] = useState<Dictionary<ICustomCompData[]>>({});
-
 
     useEffect(() => {
         setSelectedGroup(undefined)
@@ -462,7 +460,7 @@ function ActionBtns(props: FlowGraphProps) {
     useEffect(() => {
         setSelectedGroup(pre => some(customComps, i => i.apimode === pre) ? pre : undefined)
         setCompGroups(groupBy(customComps, i => i.apimode))
-    }, [customComps])
+    }, [customComps]);
 
     return (
         <>
@@ -492,10 +490,10 @@ function ActionBtns(props: FlowGraphProps) {
             />
             <AddButton onClick={() => setAddComp(true)} />
             {!!selectedGroup &&
-                <div className={`act-bar !w-fit top-[80px]`}
+                <div className={`fixed act-bar !h-fit !w-fit py-0 px-2`}
                     style={{
-                        left:
-                            (comp_group_ref.current?.offsetLeft || 0)
+                        left: position?.x,
+                        top: (position?.y || 0) + 70
                     }}
                 >
                     <DndList
@@ -527,7 +525,6 @@ export default function FlowEditor(props: FlowGraphProps) {
         delayRender,
         actionBarContent,
         actionBarClass,
-        showActionBar,
         ...others
     } = props
 
@@ -634,7 +631,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                 }}>
                 <div className="flow-editor h-full w-full relative">
                     {actionBarContent ?
-                        (showActionBar &&
+                        (
                             <div className={`act-bar main top-[22px] ${actionBarClass || ''}`} >
                                 {
                                     typeof actionBarContent === 'function' ?
@@ -643,7 +640,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                                 }
                             </div>
                         ) :
-                        (inEdit && <div className={`act-bar h-[68px] main top-[22px]`} > <ActionBtns {...props} /> </div>)
+                        (inEdit && <div className={`act-bar main h-[68px] top-[22px]`} > <ActionBtns {...props} /> </div>)
                     }
                     <Graph
                         initialEdges={initialEdges}
