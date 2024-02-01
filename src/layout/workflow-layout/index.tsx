@@ -1,6 +1,4 @@
 'use client'
-import { faCloudUpload } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { includes, map, toString } from 'lodash';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -223,7 +221,7 @@ export default function WorkflowLayout({
                     <Button
                         className='custom-upload-btn p-button-rounded p-button-outlined border-2'
                         label={'Upload & Run'}
-                        icon={<FontAwesomeIcon className="w-[18px] h-[18px] p-[3px]" icon={faCloudUpload} />}
+                        icon='pi pi-upload'
                         style={{ color: '#2a8af6' }}
                         onClick={() => {
                             uploaderRef.current.upload()

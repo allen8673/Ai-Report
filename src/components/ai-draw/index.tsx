@@ -78,9 +78,11 @@ export default function AiDraw({ className }: AiDrawProps) {
                         extention={
                             ({ setContent }) =>
                                 <Button
+                                    icon='pi pi-upload'
                                     severity='info'
-                                    onClick={() => setContent(OPEN_AI_SYSTEM_PROMPT)}>Apply Default Prompt
-                                </Button>
+                                    onClick={() => setContent(OPEN_AI_SYSTEM_PROMPT)}
+                                    label="Apply Default Prompt"
+                                />
                         }
                     />
                 </SplitterPanel>

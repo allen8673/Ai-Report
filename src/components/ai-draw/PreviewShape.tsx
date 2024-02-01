@@ -1,6 +1,4 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-// import { faCode } from '@fortawesome/free-solid-svg-icons'
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import RouterInfo from '@settings/router'
 import {
@@ -131,27 +129,6 @@ export class PreviewShapeUtil extends BaseBoxShapeUtil<PreviewShape> {
 								borderRadius: 'var(--radius-2)',
 							}}
 						/>
-						{/* <div
-							className={`
-							!absolute !top-[15px] !right-[-35px]
-							!w-[40px] !h-[60px]
-							!bg-red
-							!flex !flex-col !items-center !justify-center gap-2`}
-							style={{
-								pointerEvents: 'all',
-							}}
-						>
-							<FontAwesomeIcon
-								className={`
-								p-[7px] rounded-std-sm
-								flex-center bg-deep-weak 
-								text-[12px] text-light`}
-								style={{
-									pointerEvents: 'all',
-								}}
-								icon={faCode}
-								onMouseEnter={copyHtml} />
-						</div> */}
 						<div
 							style={{
 								textAlign: 'center',

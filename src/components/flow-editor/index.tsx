@@ -448,8 +448,12 @@ function ActionBtns(props: FlowGraphProps) {
         setOnDragItem,
         setAddComp
     } = useFlowGrapContext();
+
+
+
     const comp_group_ref = useRef<HTMLDivElement>(null);
     const [compGroups, setCompGroups] = useState<Dictionary<ICustomCompData[]>>({});
+
 
     useEffect(() => {
         setSelectedGroup(undefined)

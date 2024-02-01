@@ -1,6 +1,4 @@
 'use client'
-import { faAdd, faCloudUpload, faEraser, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { concat, map } from "lodash";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
@@ -28,7 +26,7 @@ function ItemTemplate({ group, file }: ItemTemplateProps) {
                 <Button
                     type='button'
                     severity='danger'
-                    icon={<FontAwesomeIcon icon={faTrash} />}
+                    icon='pi pi-trash'
                     onClick={() => deleteFile?.(group, file)}
                 />
             </div>
@@ -53,11 +51,10 @@ function HeaderTemplate({ group, opts }: HeaderTemplateProps) {
             </span>
             <span className="flex-center gap-2">
                 <Button
-                    className="custom-choose-btn p-button-rounded border-2"
+                    className="custom-choose-btn p-button-rounded border-2 "
                     outlined
                     style={{ color: 'rgba(185, 28, 28, 1)' }}
-                    size='small'
-                    icon={<FontAwesomeIcon className="w-[18px] h-[18px]  p-[3px]" icon={faEraser} />}
+                    icon='pi pi-eraser'
                     onClick={(e) => {
                         e.stopPropagation();
                         deleteGroup(group)
@@ -67,8 +64,7 @@ function HeaderTemplate({ group, opts }: HeaderTemplateProps) {
                     className="custom-choose-btn p-button-rounded border-2"
                     outlined
                     style={{ color: '#BA4AFF' }}
-                    size='small'
-                    icon={<FontAwesomeIcon className="w-[18px] h-[18px]  p-[3px]" icon={faAdd} />}
+                    icon='pi pi-plus'
                     onClick={(e) => {
                         e.stopPropagation();
                         openFileSelector(group)
@@ -192,7 +188,7 @@ export default function FileGroupUploader(props: GroupingFileUploaderProps) {
                         <Button
                             className='custom-upload-btn p-button-rounded p-button-outlined border-2'
                             label={uploadLabel || 'Upload Files'}
-                            icon={<FontAwesomeIcon className="w-[18px] h-[18px] p-[3px]" icon={faCloudUpload} />}
+                            icon={'pi pi-upload'}
                             style={{ color: '#2a8af6' }}
                             onClick={() => onUpload(fileGroups)}
                         />

@@ -1,5 +1,3 @@
-import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PropsWithChildren } from "react";
 import { FallbackProps, ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
@@ -18,7 +16,7 @@ function Fallback({ error }: FallbackProps) {
             flex items-center gap-2 
             text-3xl font-bold text-failure-light font-bold 
             `}>
-                <FontAwesomeIcon icon={faTriangleExclamation} />
+                <i className="pi pi-exclamation-triangle text-3xl" />
                 Something went wrong
             </p>
             <pre className={`

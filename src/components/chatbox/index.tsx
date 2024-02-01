@@ -1,5 +1,3 @@
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons/faPaperPlane";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
@@ -35,9 +33,10 @@ export default function Chatbox({ initialValue: value, buttonLabel, extention, o
         <div className="w-full flex gap-2 justify-end py-2">
             {typeof extention === 'function' ? extention({ setContent }) : extention}
             <Button
-                icon={<FontAwesomeIcon className='mr-[7px]' icon={faPaperPlane} />}
+                icon='pi pi-send'
                 onClick={() => onSend?.(content)}
-            >{buttonLabel || 'Send'}</Button>
+                label={buttonLabel || 'Send'}
+            />
         </div>
     </div>
 
