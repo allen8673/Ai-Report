@@ -43,7 +43,7 @@ export default function SideMenu({ bgMainview }: { bgMainview?: boolean }) {
                     flex flex-col items-center gap-std-sm z-1`,
                     bgMainview ? "shadow-[0px_0px_15px_-3px] shadow-light-weak" : ""
                 )}>
-                <i className={cn('pi pi-bars', '!text-4xl', 'text-[#fff]')} />
+                <i className={cn('pi pi-bars', '!text-3xl', 'text-[#fff]')} />
                 <Divider align="center" className='my-1 w-9' />
                 <div className='flex flex-col grow shrink gap-[6px]'>
                     {_.map(navigations, n => {
@@ -74,7 +74,7 @@ export default function SideMenu({ bgMainview }: { bgMainview?: boolean }) {
                         style={{ transform: 'translate(60px ,40px)' }}
                     />
                     <i className={`
-                        pi pi-user text-[#fff] !text-4xl p-2 rounded-std-sm 
+                        pi pi-user text-[#fff] !text-3xl p-2 rounded-std-sm 
                         cursor-pointer
                         hover:bg-deep-weak 
                     `}
