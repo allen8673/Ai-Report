@@ -1,9 +1,8 @@
-import { IconDefinition, faBarsProgress, faFlask, faHome, faMagicWandSparkles } from "@fortawesome/free-solid-svg-icons";
 
 export interface IRouter {
     title: string;
     folder: string;
-    icon?: IconDefinition;
+    icon?: string;
     parent?: keyof IRouterInfo;
     isNavigation?: boolean;
 }
@@ -31,7 +30,7 @@ const RouterInfo: IRouterInfo = {
     },
     HOME: {
         title: 'Ai Report',
-        icon: faHome,
+        icon: 'pi-home',
         folder: 'home',
         isNavigation: true,
         parent: "AI_REPORT",
@@ -39,34 +38,32 @@ const RouterInfo: IRouterInfo = {
     WORKFLOW: {
         title: 'Workflow',
         folder: 'workflow',
-        icon: faBarsProgress,
+        icon: 'pi-sitemap',
         isNavigation: true,
         parent: "AI_REPORT"
     },
     WORKFLOW_EDITOR: {
         title: 'Workflow',
         folder: 'workflow-editor',
-        icon: faBarsProgress,
         parent: "WORKFLOW"
     },
     TEMPLATE: {
         title: 'Template',
         folder: 'template',
-        icon: faMagicWandSparkles,
+        icon: 'pi-th-large',
         isNavigation: true,
         parent: "AI_REPORT"
     },
     DRAW: {
         title: 'Ai Draw',
         folder: 'draw',
-        icon: faFlask,
+        icon: 'pi-code',
         isNavigation: true,
         parent: "AI_REPORT"
     },
     PREVIEW: {
         title: '',
         folder: 'preview',
-        isNavigation: false,
         parent: 'DRAW'
     }
 }

@@ -1,11 +1,9 @@
 'use client'
-import { faFire, faQuestion, faUser } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RouterInfo from '@settings/router';
 import _ from 'lodash';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Button } from 'primereact/button';
+import { Divider } from 'primereact/divider';
 import { MenuItem } from 'primereact/menuitem';
 import { TieredMenu } from 'primereact/tieredmenu';
 import { Tooltip } from 'primereact/tooltip';
@@ -21,7 +19,7 @@ export default function SideMenu({ bgMainview }: { bgMainview?: boolean }) {
     const userItems: MenuItem[] = [
         {
             label: 'Profiles',
-            icon: 'pi pi-fw pi-user',
+            icon: 'pi pi-fw pi-user-edit',
         },
         {
             separator: true
@@ -39,11 +37,12 @@ export default function SideMenu({ bgMainview }: { bgMainview?: boolean }) {
         <>
             <Tooltip target={'.link-btn'} position='right' />
             <div className={`
-                bg-deep rounded-std w-[60px] min-w-[60px] py-std
-                flex flex-col items-center gap-std z-1
-                ${bgMainview ? "shadow-[0px_0px_15px_-3px] shadow-light-weak" : ""}
+                    bg-deep rounded-std w-[60px] min-w-[60px] py-std
+                    flex flex-col items-center gap-std-sm z-1
+                    ${bgMainview ? "shadow-[0px_0px_15px_-3px] shadow-light-weak" : ""}
                 `}>
-                <FontAwesomeIcon className='text-[30px]' icon={faFire} color={'white'} />
+                <i className='pi pi-bars text-4xl text-[#fff]' />
+                <Divider align="center" className='my-1 w-9' />
                 <div className='flex flex-col grow shrink gap-[6px]'>
                     {_.map(navigations, n => {
                         const url = getFullUrl(n);
@@ -51,11 +50,15 @@ export default function SideMenu({ bgMainview }: { bgMainview?: boolean }) {
                         return (
                             <Link
                                 key={n.title}
-                                className={`link-btn flex-center p-[7px] ${onselected ? "text-light border-solid rounded-std-sm rounded-light" : 'text-light-weak'}`}
+                                className={`
+                                    link-btn flex-center px-1 py-1 no-underline
+                                    ${onselected ? "text-light" : 'text-light-weak'}
+                                `}
                                 href={url || "/"}
                                 data-pr-tooltip={n.title}
+
                             >
-                                <FontAwesomeIcon className={`flex-center text-[20px]  hover:text-light`} icon={n.icon || faQuestion} />
+                                <i className={`${onselected ? 'text-3xl' : 'text-xl'}  pi ${n.icon}`} />
                             </Link>
                         )
                     })}
@@ -66,18 +69,15 @@ export default function SideMenu({ bgMainview }: { bgMainview?: boolean }) {
                         popup
                         ref={userMenu}
                         breakpoint="176px"
-                        style={{ transform: 'translate(40px ,34px)' }}
+                        style={{ transform: 'translate(60px ,40px)' }}
                     />
-                    <Button
-                        unstyled
-                        icon={<FontAwesomeIcon className='text-[30px]' icon={faUser} color={'white'} />}
-                        className={`
-                        flex-center p-2 bg-inherit border-none rounded-std-sm
-                        hover:bg-deep-weak [&>span]:w-0
-                        `}
-                        onClick={(e) => {
-                            userMenu.current?.toggle(e)
-                        }}
+                    <i className={`
+                        pi pi-user text-[#fff] text-4xl p-2 rounded-std-sm 
+                        cursor-pointer
+                        hover:bg-deep-weak 
+                    `}
+                        role='presentation'
+                        onClick={e => userMenu.current?.toggle(e)}
                     />
                 </div>
             </div>
