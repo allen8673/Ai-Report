@@ -11,6 +11,7 @@ import { useRef } from 'react';
 
 import { userSignOut } from '@/lib/auth';
 import { getFullUrl } from '@/lib/router';
+import { cn } from '@/lib/utils';
 
 export default function SideMenu({ bgMainview }: { bgMainview?: boolean }) {
     const pathname = usePathname();
@@ -36,12 +37,13 @@ export default function SideMenu({ bgMainview }: { bgMainview?: boolean }) {
     return (
         <>
             <Tooltip target={'.link-btn'} position='right' />
-            <div className={`
+            <div className={
+                cn(`
                     bg-deep rounded-std w-[60px] min-w-[60px] py-std
-                    flex flex-col items-center gap-std-sm z-1
-                    ${bgMainview ? "shadow-[0px_0px_15px_-3px] shadow-light-weak" : ""}
-                `}>
-                <i className='pi pi-bars text-4xl text-[#fff]' />
+                    flex flex-col items-center gap-std-sm z-1`,
+                    bgMainview ? "shadow-[0px_0px_15px_-3px] shadow-light-weak" : ""
+                )}>
+                <i className={cn('pi pi-bars', 'text-4xl', 'text-[#fff]')} />
                 <Divider align="center" className='my-1 w-9' />
                 <div className='flex flex-col grow shrink gap-[6px]'>
                     {_.map(navigations, n => {
@@ -50,15 +52,15 @@ export default function SideMenu({ bgMainview }: { bgMainview?: boolean }) {
                         return (
                             <Link
                                 key={n.title}
-                                className={`
-                                    link-btn flex-center px-1 py-1 no-underline
-                                    ${onselected ? "text-light" : 'text-light-weak'}
-                                `}
+                                className={
+                                    cn(`link-btn flex-center px-1 py-1 no-underline`,
+                                        onselected ? "text-light" : 'text-light-weak')
+                                }
                                 href={url || "/"}
                                 data-pr-tooltip={n.title}
 
                             >
-                                <i className={`${onselected ? 'text-3xl' : 'text-xl'}  pi ${n.icon}`} />
+                                <i className={cn(`pi ${n.icon}`, onselected ? 'text-3xl' : 'text-xl')} />
                             </Link>
                         )
                     })}
