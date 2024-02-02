@@ -126,7 +126,8 @@ export default function WorkflowLayout({
     const { uploaderRef } = useFileGroupUploader()
     const [runningWF, setRunningWF] = useState<RunningWF>();
     const [reportJobs, setReportJobs] = useState<ViewReports>();
-    const [disabledUpload, setDisabledUpload] = useState<boolean>();
+    const [disabledUpload, setDisabledUpload] = useState<boolean>(true);
+    const [uploading, setUploading] = useState<boolean>();
     const [cacheWorkflow, setCacheWorkflow] = useState<IFlow>();
     const runWorkflow = async (wf?: IFlow | string, callback?: () => void) => {
         if (!wf) return;
@@ -183,6 +184,7 @@ export default function WorkflowLayout({
         formData.append('workflowId', runningWF.workflow.id || '');
         formData.append('version', '1');
 
+        setUploading(true);
         runReport(formData).then(async (res) => {
             showMessage({
                 message: res.message || 'success',
@@ -195,6 +197,9 @@ export default function WorkflowLayout({
                 message: toString(error),
                 type: 'error'
             })
+        }).finally(() => {
+            setDisabledUpload(false);
+            setUploading(false);
         });
     }
 
@@ -223,6 +228,7 @@ export default function WorkflowLayout({
                         label={'Upload & Run'}
                         icon='pi pi-upload'
                         style={{ color: '#2a8af6' }}
+                        loading={uploading}
                         onClick={() => {
                             uploaderRef.current.upload()
                         }}
