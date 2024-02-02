@@ -60,7 +60,7 @@ export default function SideMenu({ bgMainview }: { bgMainview?: boolean }) {
                                 data-pr-tooltip={n.title}
 
                             >
-                                <i className={cn(`pi ${n.icon}`, onselected ? '!text-3xl' : '!text-xl')} />
+                                <i className={cn(`pi ${n.icon}`, onselected ? '!text-2xl' : '!text-xl')} />
                             </Link>
                         )
                     })}
