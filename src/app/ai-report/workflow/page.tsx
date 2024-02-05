@@ -59,12 +59,12 @@ function WorkflowPreviewer() {
             }
 
             if (!!pre && pre.JOB_ID === _job?.JOB_ID) {
-                return pre.STATUS === _job.STATUS ? pre : _job
+                return pre.STATUS === _job?.STATUS ? pre : _job
             }
 
             return defVal
         });
-        return some(_jobs, j => j.STATUS !== 'finish')
+        return some(_jobs, j => j?.STATUS !== 'finish')
     }
 
     const checkJobStatus = async (_jobId: IJob) => {
@@ -73,7 +73,7 @@ function WorkflowPreviewer() {
         graphRef.current?.setNodes(n => {
             const status = find(jobStatus?.ITEMS, js => js.ITEM_ID === n.id);
 
-            if (jobStatus.STATUS === 'finish') {
+            if (jobStatus?.STATUS === 'finish') {
                 n.data.status = undefined;
                 n.data.reportData = n.data.type === "Output" ? jobStatus.REPORTDATA : status?.REPORTDATA;
                 return n;
@@ -93,7 +93,7 @@ function WorkflowPreviewer() {
     const reanderOption = (item: IJob) => {
         return (
             <div className="flex-h-center gap-2">
-                <i className={`pi ${item.STATUS === 'finish' ? 'pi-check-circle text-success' : 'pi-spin pi-spinner'}  text-sm`} />
+                <i className={`pi ${item?.STATUS === 'finish' ? 'pi-check-circle text-success' : 'pi-spin pi-spinner'}  text-sm`} />
                 {(!!item.JOBNAME ?
                     <b>{item.JOBNAME}</b> :
                     <i>{item.CREATE_TIME.replaceAll('-', '').replaceAll(':', '').replace(' ', '-').substring(0, 15)}</i>
