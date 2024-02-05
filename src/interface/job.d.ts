@@ -4,12 +4,13 @@ export interface IJob {
     JOB_ID: string;
     WORKFLOW_ID: string;
     VERSION: number;
-    Create_User: string;
-    Create_Time: string;
-    Modify_User: string;
-    Modify_Time: string;
+    CREATE_USER: string;
+    CREATE_TIME: string;
+    MODIFY_USER: string;
+    MODIFY_TIME: string;
     STATUS: string;
-    ERR_MSG?: string
+    ERR_MSG?: string;
+    JOBNAME?: string;
 }
 
 export interface IJobStatus {
@@ -18,4 +19,9 @@ export interface IJobStatus {
     ITEM_ID: string;
     VERSION: number;
     STATUS: FlowStatus;
+}
+
+export interface IJobList {
+    finish: IJob[];
+    ongoing: IJob[];
 }

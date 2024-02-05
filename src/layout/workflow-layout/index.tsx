@@ -2,6 +2,7 @@
 import { includes, map, toString } from 'lodash';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
+import { InputText } from 'primereact/inputtext';
 import { SelectItem } from 'primereact/selectitem';
 import React, { useEffect, useState } from 'react'
 
@@ -117,18 +118,115 @@ function PreviewModal({ reportJobs, onClose }:
     )
 }
 
+function UploadModal({ runningWF, setRunningWF }:
+    {
+        runningWF?: RunningWF;
+        setRunningWF: React.Dispatch<React.SetStateAction<RunningWF | undefined>>
+    }) {
+
+    const { uploaderRef } = useFileGroupUploader();
+    const { showMessage } = useLayoutContext();
+
+    const [disabledUpload, setDisabledUpload] = useState<boolean>(true);
+    const [uploading, setUploading] = useState<boolean>();
+    const [jobname, setJobname] = useState<string>();
+
+    useEffect(() => {
+        setJobname(pre => !!runningWF ? pre : undefined)
+    }, [runningWF])
+
+    const onUpload = (fileGroups: FileGroups) => {
+        const files = fileGroups['Upload'];
+        if (!runningWF || !runningWF?.workflow || !files?.length) return;
+        const formData = new FormData();
+        for (const i in files) {
+            formData.append('files', files[i])
+        }
+        formData.append('userId', '23224');
+        formData.append('workflowId', runningWF.workflow.id || '');
+        formData.append('version', '1');
+        if (!!jobname) {
+            formData.append('jobname', jobname);
+        }
+
+        setUploading(true);
+        runReport(formData)
+            .then(async (res) => {
+                showMessage({
+                    message: res.message || 'success',
+                    type: 'success'
+                })
+                await runningWF.callback?.();
+                setRunningWF(undefined);
+            })
+            .catch((error) => {
+                showMessage({
+                    message: toString(error),
+                    type: 'error'
+                })
+            })
+            .finally(() => {
+                setDisabledUpload(false);
+                setUploading(false);
+            });
+    }
+
+    const onChange = (fileGroups: FileGroups) => {
+        const files = fileGroups['Upload'];
+        setDisabledUpload(!files?.length)
+    }
+
+    return (<Modal
+        title="Upload your files"
+        visible={!!runningWF}
+        onOk={() => setRunningWF(undefined)}
+        footerClass="flex justify-end"
+        okLabel="Cancel"
+        footerPrefix={
+            <Button
+                className='custom-upload-btn p-button-rounded p-button-outlined border-2'
+                label={'Upload & Run'}
+                icon='pi pi-upload'
+                style={{ color: '#2a8af6' }}
+                loading={uploading}
+                onClick={() => {
+                    uploaderRef.current.upload()
+                }}
+                disabled={disabledUpload}
+            />
+        }
+    >
+        <LoadingPane className='h-80' title='Checking' loading={!runningWF?.workflow}>
+            <div className='flex-h-center gap-2 font-bold mb-2'>
+                <label htmlFor='jobname' className="text-light-weak">Job Name:</label>
+                <InputText
+                    id='jobname'
+                    value={jobname}
+                    onChange={e => setJobname(e.target.value)}
+                />
+            </div>
+            <FileGroupUploader
+                uploaderRef={uploaderRef}
+                hideUploadButton
+                uploadLabel="Upload & Run"
+                grouping={runningWF?.workflow?.flows?.filter(f => includes(['Input', 'Report'], f.type)).sort(a => a.type === 'Input' ? 1 : 0).map(f => f.name || '')}
+                onUpload={onUpload}
+                onChange={onChange}
+            />
+        </LoadingPane>
+    </Modal>)
+}
+
 export default function WorkflowLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
     const { showMessage } = useLayoutContext();
-    const { uploaderRef } = useFileGroupUploader()
     const [runningWF, setRunningWF] = useState<RunningWF>();
     const [reportJobs, setReportJobs] = useState<ViewReports>();
-    const [disabledUpload, setDisabledUpload] = useState<boolean>(true);
-    const [uploading, setUploading] = useState<boolean>();
     const [cacheWorkflow, setCacheWorkflow] = useState<IFlow>();
+
     const runWorkflow = async (wf?: IFlow | string, callback?: () => void) => {
         if (!wf) return;
         setRunningWF({ callback });
@@ -156,6 +254,7 @@ export default function WorkflowLayout({
             return !!workflow ? { workflow, callback } : undefined
         })
     }
+
     const viewReports = (workflowId: string) => {
         setReportJobs({ workflowId, jobs: [] });
         getJobs(workflowId)
@@ -173,41 +272,6 @@ export default function WorkflowLayout({
             })
     }
 
-    const onUpload = (fileGroups: FileGroups) => {
-        const files = fileGroups['Upload'];
-        if (!runningWF || !runningWF?.workflow || !files?.length) return;
-        const formData = new FormData();
-        for (const i in files) {
-            formData.append('files', files[i])
-        }
-        formData.append('userId', '23224');
-        formData.append('workflowId', runningWF.workflow.id || '');
-        formData.append('version', '1');
-
-        setUploading(true);
-        runReport(formData).then(async (res) => {
-            showMessage({
-                message: res.message || 'success',
-                type: 'success'
-            })
-            await runningWF.callback?.();
-            setRunningWF(undefined);
-        }).catch((error) => {
-            showMessage({
-                message: toString(error),
-                type: 'error'
-            })
-        }).finally(() => {
-            setDisabledUpload(false);
-            setUploading(false);
-        });
-    }
-
-    const onChange = (fileGroups: FileGroups) => {
-        const files = fileGroups['Upload'];
-        setDisabledUpload(!files?.length)
-    }
-
     return (
         <WfLayoutContext.Provider value={{
             runWorkflow,
@@ -216,39 +280,8 @@ export default function WorkflowLayout({
             setCacheWorkflow,
         }}>
             {children}
-            <Modal
-                title="Upload your files"
-                visible={!!runningWF}
-                onOk={() => setRunningWF(undefined)}
-                footerClass="flex justify-end"
-                okLabel="Cancel"
-                footerPrefix={
-                    <Button
-                        className='custom-upload-btn p-button-rounded p-button-outlined border-2'
-                        label={'Upload & Run'}
-                        icon='pi pi-upload'
-                        style={{ color: '#2a8af6' }}
-                        loading={uploading}
-                        onClick={() => {
-                            uploaderRef.current.upload()
-                        }}
-                        disabled={disabledUpload}
-                    />
-                }
-            >
-                <LoadingPane className='h-80' title='Checking' loading={!runningWF?.workflow}>
-                    <FileGroupUploader
-                        uploaderRef={uploaderRef}
-                        hideUploadButton
-                        uploadLabel="Upload & Run"
-                        grouping={runningWF?.workflow?.flows?.filter(f => includes(['Input', 'Report'], f.type)).sort(a => a.type === 'Input' ? 1 : 0).map(f => f.name || '')}
-                        onUpload={onUpload}
-                        onChange={onChange}
-                    />
-                </LoadingPane>
-
-            </Modal>
-            <PreviewModal reportJobs={reportJobs} onClose={() => setReportJobs(undefined)} />
+            <UploadModal {...{ runningWF, setRunningWF }} />
+            <PreviewModal {...{ reportJobs, onClose: () => setReportJobs(undefined) }} />
         </WfLayoutContext.Provider>
     )
 }
