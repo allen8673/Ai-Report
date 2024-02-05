@@ -52,7 +52,7 @@ function WorkflowPreviewer() {
         const _jobs = concat(joblists?.ongoing || [], joblists?.finish || []);
         setJobs(pre => isEqual(pre, _jobs) ? pre : _jobs);
         setJob(pre => {
-            const defVal = pre || joblists?.ongoing?.[0] || joblists?.finish?.[0];
+            const defVal = joblists?.ongoing?.[0] || joblists?.finish?.[0];
             const _job = find(_jobs, i => i.JOB_ID === jobId)
             if (forceSelect) {
                 return _job || defVal
@@ -62,7 +62,7 @@ function WorkflowPreviewer() {
                 return pre.STATUS === _job?.STATUS ? pre : _job
             }
 
-            return defVal
+            return pre || defVal
         });
         return some(_jobs, j => j?.STATUS !== 'finish')
     }
@@ -117,7 +117,7 @@ function WorkflowPreviewer() {
     }
 
     useEffect(() => {
-        fetchJobs(cacheWorkflow);
+        fetchJobs(cacheWorkflow, '', true);
     }, [cacheWorkflow]);
 
     useEffect(() => {
