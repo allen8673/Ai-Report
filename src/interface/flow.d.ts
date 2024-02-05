@@ -56,7 +56,7 @@ export interface IFlowNode extends IFlowNodeBase {
     prompt?: string;
     depth?: number;
     workflowid?: string;
-    report?: any;
+    reportData?: string;
     running?: boolean;
     status?: FlowStatus;
     workflowstatus?: 'disable' | 'enable' | '';

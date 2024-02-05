@@ -1,9 +1,9 @@
 'use client'
 import RouterInfo from "@settings/router";
-import { concat, find, some } from "lodash";
+import { concat, find, isEqual, some } from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
-import { Dropdown } from "primereact/dropdown";
+import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { MenuItem } from "primereact/menuitem";
 import { SelectItem } from "primereact/selectitem";
@@ -22,7 +22,7 @@ import Modal from "@/components/modal";
 import EmptyPane from "@/components/panes/empty";
 import TitlePane from "@/components/panes/title";
 import { IFlow, IFlowBase, IFlowNode } from "@/interface/flow";
-import { IJob, IJobList } from "@/interface/job";
+import { IJob } from "@/interface/job";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import { getFullUrl } from "@/lib/router";
 import { useLongPolling } from "@/lib/utils";
@@ -34,62 +34,105 @@ interface FormData {
     template?: string
 }
 
-interface IJobOpt extends IJob {
-    isFinish: boolean;
-    value: string
-}
-
-const EMPTY_JOBLIST: IJobList = { finish: [], ongoing: [] }
-
 function WorkflowPreviewer() {
     const { graphRef } = useGraphRef<IFlowNode, any>();
     const { runWorkflow, viewReports, cacheWorkflow } = useWfLayoutContext()
     const router = useRouter();
-    const [jobs, setJobs] = useState<IJobList>(EMPTY_JOBLIST);
-    const [jobId, setJobId] = useState<string>();
-    const { startLongPolling } = useLongPolling();
+    const [jobs, setJobs] = useState<IJob[]>([]);
+    const [job, setJob] = useState<IJob>();
+    const { startLongPolling: statusLongPolling } = useLongPolling();
+    const { startLongPolling: jobsLongPolling } = useLongPolling();
+
+    const fetchJobs = async (wf?: IFlow, jobId?: string, forceSelect?: boolean) => {
+        if (!wf) {
+            setJobs([]);
+            return false;
+        }
+        const joblists = await getJobslist(wf.id);
+        const _jobs = concat(joblists?.ongoing || [], joblists?.finish || []);
+        setJobs(pre => isEqual(pre, _jobs) ? pre : _jobs);
+        setJob(pre => {
+            const defVal = pre || joblists?.ongoing?.[0] || joblists?.finish?.[0];
+            const _job = find(_jobs, i => i.JOB_ID === jobId)
+            if (forceSelect) {
+                return _job || defVal
+            }
+
+            if (!!pre && pre.JOB_ID === _job?.JOB_ID) {
+                return pre.STATUS === _job.STATUS ? pre : _job
+            }
+
+            return defVal
+        });
+        return some(_jobs, j => j.STATUS !== 'finish')
+    }
+
+    const checkJobStatus = async (_jobId: IJob) => {
+        const jobStatus = await getJobItemStatus(_jobId.JOB_ID);
+        if (!jobStatus) return false;
+        graphRef.current?.setNodes(n => {
+            const status = find(jobStatus?.ITEMS, js => js.ITEM_ID === n.id);
+
+            if (jobStatus.STATUS === 'finish') {
+                n.data.status = undefined;
+                n.data.reportData = n.data.type === "Output" ? jobStatus.REPORTDATA : status?.REPORTDATA;
+                return n;
+            } else {
+                n.data.reportData = undefined
+                n.data.status = status?.STATUS;
+                return n;
+            }
+        })
+        return jobStatus?.STATUS !== 'finish';
+    }
+
+    const onRunWorkflow = () => {
+        runWorkflow(cacheWorkflow?.id, (jobId: string) => fetchJobs(cacheWorkflow, jobId, true))
+    }
+
+    const reanderOption = (item: IJob) => {
+        return (
+            <div className="flex-h-center gap-2">
+                <i className={`pi ${item.STATUS === 'finish' ? 'pi-check-circle text-success' : 'pi-spin pi-spinner'}  text-sm`} />
+                {(!!item.JOBNAME ?
+                    <b>{item.JOBNAME}</b> :
+                    <i>{item.CREATE_TIME.replaceAll('-', '').replaceAll(':', '').replace(' ', '-').substring(0, 15)}</i>
+                )}
+                <span className="italic text-light-weak/[.8] text-sm">{`(${item.JOB_ID})`}</span>
+            </div>
+        );
+    }
+
+    const valueTemplate = (opt: IJob, { value, placeholder }: DropdownProps) => {
+        const selectedItem: IJob | undefined = opt || value;
+        if (selectedItem) {
+            return reanderOption(opt)
+        }
+
+        return <i className="text-light-weak">{placeholder}</i>;
+    }
+
+    const itemTemplate = (opt: IJob) => {
+        return reanderOption(opt)
+    }
 
     useEffect(() => {
         fetchJobs(cacheWorkflow);
     }, [cacheWorkflow]);
 
-    const fetchJobs = async (wf?: IFlow) => {
-        if (!wf) {
-            setJobs(EMPTY_JOBLIST);
-            return;
-        }
-        const _jobs = await getJobslist(wf.id);
-        setJobId(_jobs?.ongoing?.[0]?.JOB_ID || _jobs?.finish?.[0]?.JOB_ID)
-        setJobs(_jobs || EMPTY_JOBLIST);
-    }
-
-    const checkJobStatus = async (_jobId: string) => {
-        const jobStatus = await getJobItemStatus(_jobId);
-        console.log('trace jobStatus', jobStatus)
-        if (!jobStatus) return false;
-        graphRef.current?.setNodes(n => {
-            const status = find(jobStatus, js => js.ITEM_ID === n.id)
-            if (!!status) n.data.status = status.STATUS;
-            return n
+    useEffect(() => {
+        jobsLongPolling(async () => {
+            if (!jobs.length) return false
+            return await fetchJobs(cacheWorkflow, job?.JOB_ID);
         })
-        const running: boolean = some(jobStatus, js => (js.STATUS === 'wait' || js.STATUS === 'ongoing'));
-        return running;
-    }
-
-    const onRunWorkflow = () => {
-        runWorkflow(cacheWorkflow?.id, () => fetchJobs(cacheWorkflow))
-    }
+    }, [jobs]);
 
     useEffect(() => {
-        startLongPolling(async () => {
-            if (!jobId) return false;
-            const running = await checkJobStatus(jobId);
-            if (!running) {
-                fetchJobs(cacheWorkflow)
-            }
-            return running
+        statusLongPolling(async () => {
+            if (!job) return false;
+            return await checkJobStatus(job)
         })
-    }, [jobId]);
+    }, [job]);
 
     return (
         <EmptyPane icon='pi-send' title='Select a workflow to show the graph' isEmpty={!cacheWorkflow?.flows}>
@@ -111,36 +154,13 @@ function WorkflowPreviewer() {
                             <label htmlFor='jobids' className="text-light-weak">Select Job ID:</label>
                             <Dropdown
                                 id='jobids'
-                                value={jobId}
-                                valueTemplate={(opt: IJobOpt, props) => {
-                                    if (opt) {
-                                        return (
-                                            <div className="flex-h-center gap-2">
-                                                <i className={`pi ${opt.isFinish ? 'pi-check-circle text-success' : 'pi-spin pi-spinner'}  text-sm`} />
-                                                {(!!opt.JOBNAME ? <b>{opt.JOBNAME}</b> : <i>unnamed job</i>)}
-                                                <span className="italic text-light-weak/[.8] text-sm">{`(${opt.JOB_ID})`}</span>
-                                            </div>
-                                        );
-                                    }
-
-                                    return <i className="text-light-weak">{props.placeholder}</i>;
-                                }}
-                                itemTemplate={(opt: IJobOpt) => {
-                                    return (
-                                        <div className="flex-h-center gap-2">
-                                            <i className={`pi ${opt.isFinish ? 'pi-check-circle text-success' : 'pi-spin pi-spinner'}  text-sm`} />
-                                            {(!!opt.JOBNAME ? <b>{opt.JOBNAME}</b> : <i>unnamed job</i>)}
-                                            <span className="italic text-light-weak/[.8] text-sm">{`(${opt.JOB_ID})`}</span>
-                                        </div>)
-                                }}
-                                options={concat(
-                                    jobs.ongoing?.map<IJobOpt>(i => ({ ...i, value: i.JOB_ID, isFinish: false, })),
-                                    jobs.finish?.map<IJobOpt>(i => ({ ...i, value: i.JOB_ID, isFinish: true, })),
-                                )}
-                                optionLabel="name"
+                                value={job}
+                                valueTemplate={valueTemplate}
+                                itemTemplate={itemTemplate}
+                                options={jobs}
+                                optionLabel="JOBNAME"
                                 onChange={e => {
-                                    console.log('trace e', e.value)
-                                    setJobId(e.value)
+                                    setJob(e.value)
                                 }}
                                 placeholder="Select Job ID"
                             />

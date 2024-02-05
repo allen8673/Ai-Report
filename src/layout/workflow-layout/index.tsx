@@ -30,7 +30,7 @@ interface ViewReports {
 
 interface RunningWF {
     workflow?: IFlow
-    callback?: () => void
+    callback?: (jobId: string) => void
 }
 
 function PreviewModal({ reportJobs, onClose }:
@@ -156,7 +156,7 @@ function UploadModal({ runningWF, setRunningWF }:
                     message: res.message || 'success',
                     type: 'success'
                 })
-                await runningWF.callback?.();
+                await runningWF.callback?.(res.data || '');
                 setRunningWF(undefined);
             })
             .catch((error) => {
@@ -198,9 +198,11 @@ function UploadModal({ runningWF, setRunningWF }:
     >
         <LoadingPane className='h-80' title='Checking' loading={!runningWF?.workflow}>
             <div className='flex-h-center gap-2 font-bold mb-2'>
-                <label htmlFor='jobname' className="text-light-weak">Job Name:</label>
+                <label htmlFor='jobname' className="text-light-weak whitespace-nowrap">Job Name:</label>
                 <InputText
+                    className='w-full'
                     id='jobname'
+                    placeholder='Optionally enter a job name for easy identification.'
                     value={jobname}
                     onChange={e => setJobname(e.target.value)}
                 />
@@ -227,7 +229,7 @@ export default function WorkflowLayout({
     const [reportJobs, setReportJobs] = useState<ViewReports>();
     const [cacheWorkflow, setCacheWorkflow] = useState<IFlow>();
 
-    const runWorkflow = async (wf?: IFlow | string, callback?: () => void) => {
+    const runWorkflow = async (wf?: IFlow | string, callback?: (jobId: string) => void) => {
         if (!wf) return;
         setRunningWF({ callback });
         const workflow: IFlow | undefined = typeof wf === 'string' ? await getFlow(wf) : wf;

@@ -14,11 +14,21 @@ export interface IJob {
 }
 
 export interface IJobStatus {
+    CREATE_TIME: string;
+    ITEMS: IJobItem[];
+    JOBNAME?: string;
+    JOB_ID: string;
+    REPORTDATA?: string;
+    STATUS: 'finish' | 'not finish'
+}
+
+export interface IJobItem {
     JOB_ID: string;
     WORKFLOW_ID: string;
     ITEM_ID: string;
     VERSION: number;
     STATUS: FlowStatus;
+    REPORTDATA?: string;
 }
 
 export interface IJobList {

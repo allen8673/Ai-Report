@@ -7,6 +7,7 @@ import { flowInfoMap } from "../configuration";
 import { useFlowGrapContext } from '../context';
 
 import { FlowStatus, IFlowNode } from '@/interface/flow';
+import { downloadString } from '@/lib/utils';
 
 const getStatusIcon = (status?: FlowStatus): ReactNode => {
     if (!status || status === 'none') return <></>
@@ -47,11 +48,11 @@ const getStatusIcon = (status?: FlowStatus): ReactNode => {
 }
 
 function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
-    const { id, data, } = elm;
-    const { running, workflowstatus } = data || {}
+    const { id, data } = elm;
+    const { running, workflowstatus, reportData } = data || {}
     const { nodeType, icon, nodeName, editable } = flowInfoMap[data.type] || {}
     const { inEdit, clickOnSetting, flowNameMapper, graphRef } = useFlowGrapContext();
-    const iconHighlight = !!data.prompt || !!data.report
+    const iconHighlight = !!data.prompt;
     const deletable = editable
     const clickable = inEdit;
 
@@ -87,6 +88,19 @@ function TurboNodeInstance(elm: NodeProps<IFlowNode>) {
                     </div>
                 </div >}
             {getStatusIcon(data.status)}
+            {!!reportData && (
+                <div className={`status icon gradient text-light cursor-pointer`}
+                    role='presentation'
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        downloadString(reportData, data.name || id);
+                    }}
+                >
+                    <div className={`bg-light-weak  flex-center`}>
+                        <i className={`pi pi-arrow-down`} />
+                    </div>
+                </div>)
+            }
             <div className={`wrapper gradient
             overflow-hidden
             p-[1px]

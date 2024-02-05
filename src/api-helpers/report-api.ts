@@ -23,7 +23,7 @@ export const checkJob = async (flowid: string) => {
 
 
 export const getJobItemStatus = async (jobid: string) => {
-    return (await apiCaller.get<ApiResult<IJobStatus[]>>(`${process.env.NEXT_PUBLIC_REPORT}/getJobItemStatus/${jobid}`)).data.data
+    return (await apiCaller.get<ApiResult<IJobStatus>>(`${process.env.NEXT_PUBLIC_REPORT}/getJobItemStatus/${jobid}`)).data.data
 }
 
 export const getJobslist = async (workflowId: string) => {
