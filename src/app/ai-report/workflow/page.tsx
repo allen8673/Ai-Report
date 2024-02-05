@@ -36,7 +36,7 @@ interface FormData {
 
 function WorkflowPreviewer() {
     const { graphRef } = useGraphRef<IFlowNode, any>();
-    const { runWorkflow, viewReports, cacheWorkflow } = useWfLayoutContext()
+    const { runWorkflow, cacheWorkflow } = useWfLayoutContext()
     const router = useRouter();
     const [jobs, setJobs] = useState<IJob[]>([]);
     const [job, setJob] = useState<IJob>();
@@ -177,14 +177,14 @@ function WorkflowPreviewer() {
                                 icon='pi pi-play'
                                 onClick={onRunWorkflow}
                             />
-                            <Button
+                            {/* <Button
                                 className="py-0 px-[0px] h-[40px]"
                                 severity='info'
                                 tooltip="Reports"
                                 tooltipOptions={{ position: 'mouse' }}
                                 icon='pi pi-eye'
                                 onClick={() => viewReports(cacheWorkflow?.id || '')}
-                            />
+                            /> */}
                             <Button
                                 className="h-[40px]"
                                 label="Edit Workflow"
@@ -204,7 +204,7 @@ function WorkflowPreviewer() {
 
 export default function Page() {
     const router = useRouter();
-    const { runWorkflow, viewReports, cacheWorkflow, setCacheWorkflow } = useWfLayoutContext();
+    const { runWorkflow, cacheWorkflow, setCacheWorkflow } = useWfLayoutContext();
 
     const [workflows, setWorkflows] = useState<IFlowBase[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
@@ -220,14 +220,14 @@ export default function Page() {
                 router.push(`${editorUrl}${coverToQueryString({ id: item.id })}`);
             }
         },
-        {
-            label: 'Reports',
-            icon: 'pi pi-eye',
-            className: 'bg-info hover:bg-info-deep',
-            command: () => {
-                viewReports(item.id)
-            }
-        },
+        // {
+        //     label: 'Reports',
+        //     icon: 'pi pi-eye',
+        //     className: 'bg-info hover:bg-info-deep',
+        //     command: () => {
+        //         viewReports(item.id)
+        //     }
+        // },
         {
             label: 'Run Workflow',
             icon: 'pi pi-play',

@@ -1,5 +1,5 @@
 'use client'
-import { faCancel, faEye, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCancel, faMagicWandSparkles, faPen, faPlayCircle, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RouterInfo from "@settings/router";
 import { map, size } from "lodash";
@@ -38,7 +38,7 @@ export default function Page() {
     const [mode, setMode] = useState<EditMode>(!!paramObj.id ? 'normal' : 'add')
     const { graphRef } = useGraphRef<IFlowNode, any>();
     const { showMessage } = useLayoutContext();
-    const { runWorkflow, viewReports } = useWfLayoutContext()
+    const { runWorkflow } = useWfLayoutContext()
 
     const [workflow, setWorkflow] = useState<IFlow>();
     const [workflows, setWorkflows] = useState<IFlowBase[]>();
@@ -288,7 +288,7 @@ export default function Page() {
                     runWorkflow(workflow)
                 }}
             />
-            <Button icon={<FontAwesomeIcon icon={faEye} />}
+            {/* <Button icon={<FontAwesomeIcon icon={faEye} />}
                 severity='info'
                 tooltip="View Reports"
                 tooltipOptions={{ position: 'bottom' }}
@@ -297,7 +297,7 @@ export default function Page() {
                     if (!workflow?.id) return;
                     viewReports(workflow?.id)
                 }}
-            />
+            /> */}
             <Button icon={<FontAwesomeIcon className='mr-[7px]' icon={faPen} />}
                 className="w-[100px]"
                 label="Edit"
