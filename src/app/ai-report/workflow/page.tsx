@@ -93,7 +93,7 @@ function WorkflowPreviewer() {
     const reanderOption = (item: IJob) => {
         return (
             <div className="flex-h-center gap-2">
-                <i className={`pi ${item?.STATUS === 'finish' ? 'pi-check-circle text-success' : 'pi-spin pi-spinner'}  text-sm`} />
+                <i className={`pi ${item.STATUS === 'finish' ? 'pi-check-circle text-success' : 'pi-spin pi-spinner'}  text-sm`} />
                 {(!!item.JOBNAME ?
                     <b>{item.JOBNAME}</b> :
                     <i>{item.CREATE_TIME.replaceAll('-', '').replaceAll(':', '').replace(' ', '-').substring(0, 15)}</i>
@@ -103,10 +103,10 @@ function WorkflowPreviewer() {
         );
     }
 
-    const valueTemplate = (opt: IJob, { value, placeholder }: DropdownProps) => {
+    const valueTemplate = (opt: IJob | null, { value, placeholder }: DropdownProps) => {
         const selectedItem: IJob | undefined = opt || value;
         if (selectedItem) {
-            return reanderOption(opt)
+            return reanderOption(selectedItem)
         }
 
         return <i className="text-light-weak">{placeholder}</i>;
