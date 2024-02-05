@@ -68,8 +68,7 @@ function WorkflowPreviewer() {
     }
 
     const checkJobStatus = async (_jobId: IJob) => {
-        const jobStatus = await getJobItemStatus(_jobId.JOB_ID);
-        if (!jobStatus) return false;
+        const jobStatus = await getJobItemStatus(_jobId.JOB_ID) || { ITEMS: [], STATUS: 'finish', REPORTDATA: '' };
         graphRef.current?.setNodes(n => {
             const status = find(jobStatus?.ITEMS, js => js.ITEM_ID === n.id);
 
