@@ -3,7 +3,7 @@ import RouterInfo from "@settings/router";
 import { concat, find, isEqual, some } from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
-import { Dropdown, DropdownProps } from "primereact/dropdown";
+import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { MenuItem } from "primereact/menuitem";
 import { SelectItem } from "primereact/selectitem";
@@ -19,6 +19,7 @@ import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
 import { useGraphRef } from "@/components/graph";
 import Modal from "@/components/modal";
+import ObjectDropdown from "@/components/object-dropdown";
 import EmptyPane from "@/components/panes/empty";
 import TitlePane from "@/components/panes/title";
 import { IFlow, IFlowBase, IFlowNode } from "@/interface/flow";
@@ -89,7 +90,8 @@ function WorkflowPreviewer() {
         runWorkflow(cacheWorkflow?.id, (jobId: string) => fetchJobs(cacheWorkflow, jobId, true))
     }
 
-    const reanderOption = (item: IJob) => {
+    const reanderOption = (item?: IJob) => {
+        if (!item) return <></>
         return (
             <div className="flex-h-center gap-2">
                 <i className={`pi ${item.STATUS === 'finish' ? 'pi-check-circle text-success' : 'pi-spin pi-spinner'}  text-sm`} />
@@ -100,19 +102,6 @@ function WorkflowPreviewer() {
                 <span className="italic text-light-weak/[.8] text-sm">{`(${item.JOB_ID})`}</span>
             </div>
         );
-    }
-
-    const valueTemplate = (opt: IJob | null, { value, placeholder }: DropdownProps) => {
-        const selectedItem: IJob | undefined = opt || value;
-        if (selectedItem) {
-            return reanderOption(selectedItem)
-        }
-
-        return <i className="text-light-weak">{placeholder}</i>;
-    }
-
-    const itemTemplate = (opt: IJob) => {
-        return reanderOption(opt)
     }
 
     useEffect(() => {
@@ -151,15 +140,13 @@ function WorkflowPreviewer() {
                     <div className="flex-h-center w-full">
                         <div className="flex-h-center gap-2 grow shrink font-bold">
                             <label htmlFor='jobids' className="text-light-weak">Select Job ID:</label>
-                            <Dropdown
+                            <ObjectDropdown
                                 id='jobids'
-                                value={job}
-                                valueTemplate={valueTemplate}
-                                itemTemplate={itemTemplate}
+                                valueKey="JOB_ID"
+                                reanderOption={reanderOption}
                                 options={jobs}
-                                optionLabel="JOBNAME"
-                                onChange={e => {
-                                    setJob(e.value)
+                                onChange={val => {
+                                    setJob(val)
                                 }}
                                 placeholder="Select Job ID"
                             />
