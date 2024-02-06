@@ -94,7 +94,10 @@ function WorkflowPreviewer() {
         if (!item) return <></>
         return (
             <div className="flex-h-center gap-2">
-                <i className={`pi ${item.STATUS === 'finish' ? 'pi-check-circle text-success' : 'pi-spin pi-spinner'}  text-sm`} />
+                <i className={`pi 
+                               ${item.STATUS === 'finish' ? 'pi-check-circle text-success' : 'pi-spin pi-spinner'}
+                               ${item.STATUS === 'warning' ? 'text-danger font-bold' : ''}
+                               text-sm`} />
                 {(!!item.JOBNAME ?
                     <b>{item.JOBNAME}</b> :
                     <i>{item.CREATE_TIME.replaceAll('-', '').replaceAll(':', '').replace(' ', '-').substring(0, 15)}</i>
