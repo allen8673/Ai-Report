@@ -44,12 +44,12 @@ function WorkflowPreviewer() {
     const { startLongPolling: statusLongPolling } = useLongPolling();
     const { startLongPolling: jobsLongPolling } = useLongPolling();
 
-    const fetchJobs = async (wf?: IFlow, jobId?: string, forceSelect?: boolean) => {
-        if (!wf) {
+    const fetchJobs = async ({ workflow, jobId, forceSelect }: { workflow?: IFlow, jobId?: string, forceSelect?: boolean }) => {
+        if (!workflow) {
             setJobs([]);
             return false;
         }
-        const joblists = await getJobslist(wf.id);
+        const joblists = await getJobslist(workflow.id);
         const _jobs = concat(joblists?.ongoing || [], joblists?.finish || []);
         setJobs(pre => isEqual(pre, _jobs) ? pre : _jobs);
         setJob(pre => {
@@ -87,7 +87,7 @@ function WorkflowPreviewer() {
     }
 
     const onRunWorkflow = () => {
-        runWorkflow(cacheWorkflow?.id, (jobId: string) => fetchJobs(cacheWorkflow, jobId, true))
+        runWorkflow(cacheWorkflow?.id, (jobId: string) => fetchJobs({ workflow: cacheWorkflow, jobId, forceSelect: true }))
     }
 
     const reanderOption = (item?: IJob) => {
@@ -105,13 +105,15 @@ function WorkflowPreviewer() {
     }
 
     useEffect(() => {
-        fetchJobs(cacheWorkflow, '', true);
+        fetchJobs({ workflow: cacheWorkflow, forceSelect: true });
     }, [cacheWorkflow]);
+
+
 
     useEffect(() => {
         jobsLongPolling(async () => {
             if (!jobs.length) return false
-            return await fetchJobs(cacheWorkflow, job?.JOB_ID);
+            return await fetchJobs({ workflow: cacheWorkflow, jobId: job?.JOB_ID });
         })
     }, [jobs]);
 
