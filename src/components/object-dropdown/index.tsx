@@ -21,12 +21,15 @@ export default function ObjectDropdown<T extends { [key: string]: any }>({
     const [keyOptions, setKeyOptions] = useState<string[]>([]);
 
     useEffect(() => {
-        setSelectedKey(value?.[valueKey])
+        _setSelectedItem(value?.[valueKey])
     }, [value])
 
     useEffect(() => {
-        setKeyOptions(map(options, opt => opt[valueKey]))
-        _setSelectedItem(options?.[0]?.[valueKey])
+        const _keyOpts = map(options, opt => opt[valueKey])
+        setKeyOptions(_keyOpts)
+        if (!_keyOpts.includes(selectedKey)) {
+            _setSelectedItem(options?.[0]?.[valueKey])
+        }
     }, [options]);
 
     const _setSelectedItem = (key?: string) => {
@@ -53,8 +56,7 @@ export default function ObjectDropdown<T extends { [key: string]: any }>({
 
     const _onChange = (e: DropdownChangeEvent) => {
         const key: string = e.value;
-        setSelectedKey(key);
-        onChange?.(find(options, [valueKey, key]))
+        _setSelectedItem(key);
     }
 
     return (
