@@ -2,7 +2,7 @@
 import apiCaller from "./api-caller";
 
 import { ApiResult } from "@/interface/api";
-import { ISaveFlow, IFlow, IFlowBase } from "@/interface/flow";
+import { ISaveFlow, IFlow, IFlowBase, AllFlows } from "@/interface/flow";
 
 export const getFlows = async (type: 'WORKFLOW' | "TEMPLATE" = 'WORKFLOW') => {
     const flows = (await apiCaller.get<ApiResult<IFlowBase[]>>(`${process.env.NEXT_PUBLIC_FLOWS_API}/${type}`)).data.data;
@@ -16,10 +16,7 @@ export const getFlow = async (id?: string) => {
 }
 
 export const getAll = async () => {
-    const wfs = (await apiCaller.get<ApiResult<{
-        workflow: IFlowBase[],
-        template: IFlowBase[]
-    }>>(`${process.env.NEXT_PUBLIC_FLOWS_API}/ALL`)).data.data;
+    const wfs = (await apiCaller.get<ApiResult<AllFlows>>(`${process.env.NEXT_PUBLIC_FLOWS_API}/ALL`)).data.data;
     return wfs
 }
 

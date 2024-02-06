@@ -1,5 +1,10 @@
 import { XYPosition } from "reactflow";
 
+export interface AllFlows {
+    workflow: IFlowBase[],
+    template: IFlowBase[]
+}
+
 export interface IFlowBase {
     id: string;
     name: string;
