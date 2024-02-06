@@ -13,12 +13,12 @@ import { IFlowBase } from "@/interface/flow";
 import { cn } from "@/lib/utils";
 
 
-export function FlowListItem({ key, item }: ListItemProps) {
+export function FlowListItem({ itemkey, item }: ListItemProps) {
     const { selectedFlow, renderMenus } = useFlowListContext();
     const [openMenu, setOpenMenu] = useState<boolean>(false)
 
     return (
-        <div key={key} className={`h-[88px] px-3 py-2 text-light m-1.5
+        <div key={itemkey} className={`h-[88px] px-3 py-2 text-light m-1.5
                          border-light border-solid rounded-std 
                          flex items-center
                          ${selectedFlow?.id === item.id ? 'bg-turbo-deep-weak/[.6]' : ''}
@@ -90,7 +90,7 @@ export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSe
                     data={flows}
                     renderItem={(item, idx) => (
                         <FlowListItem
-                            key={`flow-item-${idx}`}
+                            itemkey={`flow-item-${idx}`}
                             item={item}
                         />
                     )}

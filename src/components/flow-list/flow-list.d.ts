@@ -10,6 +10,6 @@ export interface FlowListProps {
 }
 
 export interface ListItemProps {
-    key: string;
+    itemkey: string;
     item: IFlowBase;
 }
