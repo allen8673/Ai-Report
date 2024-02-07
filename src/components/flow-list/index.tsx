@@ -75,7 +75,7 @@ export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSe
                         bg-deep rounded-std border-solid border-light-weak/[.2]
                         flex flex-col items-end`}
             >
-                <LoadingPane loading={loading} className=" border-none" title="Fetching data...">
+                <LoadingPane loading={loading} className=" border-none" title="Fetching list...">
                     {showActBar &&
                         <div className="act-bar justify-end w-full py-2">
                             {!!onAddWF && <Button
