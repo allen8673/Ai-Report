@@ -50,7 +50,6 @@ function NewWorkflowModal({ addNewFlow, templateOpts, setAddNewFlow }: NewWorkfl
     const [form, setForm] = useState<FormInstance<NewWorkflowData>>();
 
     return <Modal
-        className="rounded-std border-solid border-2 border-light-weak/[.5]"
         visible={addNewFlow}
         onOk={() => {
             form?.submit()
@@ -108,7 +107,7 @@ function EditWorkflowModal({ editWf, workflows, onOk, onCancel }: EditWorkflowMo
 
     return (
         <Modal
-            className='w-[90%] h-[90%] rounded-std border-solid border-2 border-light-weak/[.5]'
+            className='w-[90%] h-[90%] '
             footerClass="flex justify-end"
             showHeader={false}
             visible={!!editWf}

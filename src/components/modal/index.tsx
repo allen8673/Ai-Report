@@ -54,7 +54,7 @@ export default function Modal(props: React.PropsWithChildren<ModalProps>) {
                 {footerPostfix}
             </div>}
         visible={visible}
-        className={cn(`w-4 overflow-hidden`, className)}
+        className={cn(`w-4 rounded-std border-solid border-2 border-light-weak/[.5] overflow-hidden`, className)}
         modal
         onMaskClick={cancelByMask ? onCancel : undefined}
         contentClassName={`py-2 ${contentClassName || ''}`}
