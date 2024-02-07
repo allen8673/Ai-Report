@@ -70,7 +70,7 @@ export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSe
     return (
         <FlowListContext.Provider value={{ selectedFlow, setSelectedFlow, renderMenus }}>
             <Tooltip target=".item-speeddial .p-speeddial-action" position='top' />
-            <LoadingPane loading={loading} className="!rounded-std" title="Fetching data...">
+            <LoadingPane loading={loading} className="!rounded-std border-light-weak/[.2]" title="Fetching data...">
                 <div className={`
                         py-[22px] px-[18px] w-full h-full overflow-hidden
                         bg-deep rounded-std border-solid border-light-weak/[.2]
@@ -105,6 +105,6 @@ export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSe
                         }} />
                 </div>
             </LoadingPane>
-        </FlowListContext.Provider>
+        </FlowListContext.Provider >
     )
 }
