@@ -1,19 +1,22 @@
 'use client'
 import RouterInfo from "@settings/router";
-import { concat, find, isEqual, some } from "lodash";
+import { concat, find, isEqual, map, some } from "lodash";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
+import { confirmDialog } from "primereact/confirmdialog";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { MenuItem } from "primereact/menuitem";
 import { SelectItem } from "primereact/selectitem";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 
-import { getAll, getFlow } from "@/api-helpers/flow-api";
+import { getAll, getFlow, updateFlow } from "@/api-helpers/flow-api";
 import { getJobItemStatus, getJobslist } from "@/api-helpers/report-api";
 import { coverToQueryString } from "@/api-helpers/url-helper";
 import FlowEditor from "@/components/flow-editor";
+import { calculateDepth, resetDepth } from "@/components/flow-editor/lib";
+import { FlowNameMapper } from "@/components/flow-editor/type";
 import FlowList from "@/components/flow-list";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
@@ -24,21 +27,130 @@ import EmptyPane from "@/components/panes/empty";
 import TitlePane from "@/components/panes/title";
 import { IFlow, IFlowBase, IFlowNode } from "@/interface/flow";
 import { IJob } from "@/interface/job";
+import { useLayoutContext } from "@/layout/standard-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import { getFullUrl } from "@/lib/router";
 import { useLongPolling } from "@/lib/utils";
 
 const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
-interface FormData {
+
+interface NewWorkflowData {
     id?: string;
     name?: string;
     template?: string
 }
 
-function WorkflowPreviewer() {
+interface NewWorkflowModalProps {
+    addNewFlow?: boolean;
+    templateOpts: SelectItem[];
+    setAddNewFlow: Dispatch<SetStateAction<boolean | undefined>>
+}
+function NewWorkflowModal({ addNewFlow, templateOpts, setAddNewFlow }: NewWorkflowModalProps) {
+    const router = useRouter();
+    const [form, setForm] = useState<FormInstance<NewWorkflowData>>();
+
+    return <Modal
+        className="rounded-std border-solid border-2 border-light-weak/[.5]"
+        visible={addNewFlow}
+        onOk={() => {
+            form?.submit()
+                .then(({ name, template }) => {
+                    const queries: { [key: string]: string | undefined } = { name, template }
+                    router.push(`${editorUrl}${coverToQueryString(queries)}`);
+                }).catch(() => {
+                    // 
+                });
+        }}
+        onCancel={() => {
+            setAddNewFlow(false)
+        }}>
+        <Form
+            onLoad={(form: FormInstance<NewWorkflowData>) => {
+                setForm(form)
+            }}
+            onDestroyed={() => {
+                setForm(undefined)
+            }}
+        >
+            {
+                ({ Item }) => (
+                    <>
+                        <Item name={'name'} label="Workflow Name" rules={{ required: 'Please give a name to workflow!', }}>
+                            <InputText />
+                        </Item>
+                        <Item name={'template'} label="Template">
+                            <Dropdown options={templateOpts} />
+                        </Item>
+                    </>
+                )
+            }
+        </Form>
+    </Modal>
+}
+
+interface EditWorkflowModalProps {
+    editWf?: IFlow;
+    workflows?: IFlowBase[];
+    onOk: (result: IFlow) => void;
+    onCancel: () => void
+}
+function EditWorkflowModal({ editWf, workflows, onOk, onCancel }: EditWorkflowModalProps) {
+    const { graphRef } = useGraphRef<IFlowNode, any>();
+    const flowNameMapper: FlowNameMapper = useMemo(() => {
+        if (!workflows) return {};
+
+        return workflows.reduce<FlowNameMapper>((pre, wf) => {
+            if (wf.id !== editWf?.id) pre[wf.id] = wf.name
+            return pre;
+        }, {})
+
+    }, [workflows])
+
+    return (
+        <Modal
+            className='w-[90%] h-[90%] rounded-std border-solid border-2 border-light-weak/[.5]'
+            footerClass="flex justify-end"
+            showHeader={false}
+            visible={!!editWf}
+            onOk={() => {
+                if (!editWf) return
+                const flows: IFlowNode[] = map(graphRef.current?.getNodes() || [], n => ({
+                    ...n.data, position: n.position
+                }));
+                const result: IFlow = ({ ...editWf, type: 'workflow', flows });
+
+                resetDepth(result.flows);
+                const calculatedIds = calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
+                resetDepth(result.flows, calculatedIds, 9999);
+                onOk(result);
+            }}
+            okLabel='Save'
+            onCancel={() => {
+                onCancel()
+            }}>
+            <FlowEditor
+                flows={editWf?.flows || []}
+                graphRef={graphRef}
+                hideMiniMap
+                hideCtrls
+                fitView
+                fitViewOptions={{ duration: 1000 }}
+                onNodesChange={(changes) => {
+                    if (changes.length > 1) {
+                        graphRef.current.reactFlowInstance?.fitView({ duration: 500 })
+                    }
+                }}
+                inEdit
+                delayRender={500}
+                flowNameMapper={flowNameMapper}
+            />
+        </Modal>
+    )
+}
+
+function WorkflowPreviewer({ onEdit }: { onEdit?: (wf: IFlow) => void }) {
     const { graphRef } = useGraphRef<IFlowNode, any>();
     const { runWorkflow, cacheWorkflow, fetchingWorkflow } = useWfLayoutContext()
-    const router = useRouter();
     const [jobs, setJobs] = useState<IJob[]>([]);
     const [job, setJob] = useState<IJob>();
     const { startLongPolling: statusLongPolling } = useLongPolling();
@@ -194,7 +306,8 @@ function WorkflowPreviewer() {
                                 tooltipOptions={{ position: 'left' }}
                                 icon='pi pi-pencil'
                                 onClick={() => {
-                                    router.push(`${editorUrl}${coverToQueryString({ id: cacheWorkflow?.id || '' })}`);
+                                    if (!cacheWorkflow) return;
+                                    onEdit?.(cacheWorkflow)
                                 }}
                             />
                         </div >
@@ -206,12 +319,13 @@ function WorkflowPreviewer() {
 }
 
 export default function Page() {
-    const router = useRouter();
+    const { showMessage } = useLayoutContext();
     const { runWorkflow, cacheWorkflow, fetchWorkflow } = useWfLayoutContext();
 
     const [workflows, setWorkflows] = useState<IFlowBase[]>([]);
+    const [editWf, setEditWf] = useState<IFlow>();
+
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
-    const [form, setForm] = useState<FormInstance<FormData>>();
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([]);
     const [fetchingFlows, setFetchingFlows] = useState<boolean>();
 
@@ -220,8 +334,9 @@ export default function Page() {
             label: 'Edit Workflow',
             icon: 'pi pi-pencil',
             className: 'bg-primary hover:bg-primary-600',
-            command: () => {
-                router.push(`${editorUrl}${coverToQueryString({ id: item.id })}`);
+            command: async () => {
+                const wf = await getFlow(item.id);
+                setEditWf(wf);
             }
         },
         // {
@@ -262,7 +377,7 @@ export default function Page() {
             <TitlePane title='WorkFlow' />
             <Splitter className='shrink grow' style={{ height: '30px' }} layout='horizontal'>
                 <SplitterPanel className="px-[7px] " size={80}>
-                    <WorkflowPreviewer />
+                    <WorkflowPreviewer onEdit={(wf) => { setEditWf(wf) }} />
                 </SplitterPanel>
                 <SplitterPanel className="overflow-auto px-[7px]" size={20}>
                     <FlowList
@@ -279,42 +394,43 @@ export default function Page() {
                     />
                 </SplitterPanel>
             </Splitter>
-            <Modal
-                visible={addNewFlow}
-                onOk={() => {
-                    form?.submit()
-                        .then(({ name, template }) => {
-                            const queries: { [key: string]: string | undefined } = { name, template }
-                            router.push(`${editorUrl}${coverToQueryString(queries)}`);
-                        }).catch(() => {
-                            // 
+            <NewWorkflowModal {...{ addNewFlow, setAddNewFlow, templateOpts }} />
+            <EditWorkflowModal
+                editWf={editWf}
+                workflows={workflows}
+                onOk={async (result) => {
+                    const res = (await updateFlow(result)).data;
+                    if (res.status === 'ok') {
+                        showMessage({
+                            type: 'success',
+                            message: res.message || 'Success',
                         });
+                        if (result.id === cacheWorkflow?.id) {
+                            fetchWorkflow(async () => {
+                                return await getFlow(result.id)
+                            })
+                        }
+                        setEditWf(undefined);
+                    } else {
+                        showMessage({
+                            type: 'error',
+                            message: res.message || 'error',
+                        });
+                    }
                 }}
                 onCancel={() => {
-                    setAddNewFlow(false)
-                }}>
-                <Form
-                    onLoad={(form: FormInstance<FormData>) => {
-                        setForm(form)
-                    }}
-                    onDestroyed={() => {
-                        setForm(undefined)
-                    }}
-                >
-                    {
-                        ({ Item }) => (
-                            <>
-                                <Item name={'name'} label="Workflow Name" rules={{ required: 'Please give a name to workflow!', }}>
-                                    <InputText />
-                                </Item>
-                                <Item name={'template'} label="Template">
-                                    <Dropdown options={templateOpts} />
-                                </Item>
-                            </>
-                        )
-                    }
-                </Form>
-            </Modal>
+                    confirmDialog({
+                        position: 'top',
+                        message: `Are you sure you want to cancel without saving? You will lose every modification.`,
+                        header: `Cancel modify`,
+                        icon: 'pi pi-info-circle',
+                        acceptClassName: 'p-button-danger',
+                        accept: async () => {
+                            setEditWf(undefined)
+                        },
+                    });
+                }}
+            />
         </div >
     )
 }
