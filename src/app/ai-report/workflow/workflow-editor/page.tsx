@@ -14,7 +14,7 @@ import { addFlow, deleteFlow, getFlow, getFlows, updateFlow } from "@/api-helper
 import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowEditor from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
-import { X_GAP, calculateDepth, expandRefWF, getNewIdTrans, hasDependencyCycle, ifFlowIsCompleted, resetPosition } from "@/components/flow-editor/lib";
+import { X_GAP, calculateDepth, expandRefWF, getNewIdTrans, hasDependencyCycle, ifFlowIsCompleted, resetDepth, resetPosition } from "@/components/flow-editor/lib";
 import { FlowNameMapper } from "@/components/flow-editor/type";
 import Form from "@/components/form";
 import { FormInstance } from "@/components/form/form";
@@ -235,7 +235,9 @@ export default function Page() {
                     }));
 
                     const result: IFlow = ({ ...workflow, type: 'workflow', flows });
-                    calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
+                    resetDepth(result.flows)
+                    const calculatedIds = calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
+                    resetDepth(result.flows, calculatedIds, 9999)
 
                     const res = await (await (mode === 'add' ? addFlow : updateFlow)(result)).data
 

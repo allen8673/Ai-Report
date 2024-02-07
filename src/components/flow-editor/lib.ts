@@ -9,12 +9,23 @@ import { IFlow, IFlowBase, IFlowNode } from "@/interface/flow";
  * @param fullFlows 
  * @param deep 
  */
-export const calculateDepth = (nodes: IFlowNode[], fullFlows: IFlowNode[], deep = 0): void => {
+export const calculateDepth = (nodes: IFlowNode[], fullFlows: IFlowNode[], deep = 0): string[] => {
+    const forwardIds: string[] = nodes.map(n => n.id);
+
     nodes.forEach(node => {
-        const forwars_nodes = filter(fullFlows, n => includes(node.forwards, n.id));
-        calculateDepth(forwars_nodes, fullFlows, deep + 1);
+        const forwardNodes = filter(fullFlows, n => includes(node.forwards, n.id));
+        forwardIds.push(...calculateDepth(forwardNodes, fullFlows, deep + 1));
         node.depth = max([node.depth || 0, deep]);
     });
+
+    return forwardIds.filter((val, idx) => forwardIds.indexOf(val) === idx)
+}
+
+export const resetDepth = (nodes: IFlowNode[], excludeId: string[] = [], deep = 0): void => {
+    nodes.forEach(node => {
+        if (excludeId.includes(node.id)) return;
+        node.depth = deep
+    })
 }
 
 export const X_GAP = 400, Y_GAP = 150;
