@@ -134,7 +134,11 @@ function WorkflowPreviewer() {
     }, [job]);
 
     return (
-        <EmptyPane icon='pi-send' title='Select a workflow to show the graph' isEmpty={!cacheWorkflow?.flows}>
+        <EmptyPane
+            icon='pi-send'
+            title='Select a workflow to show the graph'
+            isEmpty={!cacheWorkflow?.flows && !fetchingWorkflow}
+        >
             <FlowEditor
                 loading={fetchingWorkflow}
                 flows={cacheWorkflow?.flows || []}

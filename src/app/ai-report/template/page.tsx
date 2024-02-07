@@ -72,7 +72,11 @@ function TemplatePreviewer({ template, onClickEdit, onDelete, loading }: Templat
     const { graphRef } = useGraphRef<IFlowNode, any>();
 
     return (
-        <EmptyPane icon='pi-send' title='Select a template to show the graph' isEmpty={!template?.flows}>
+        <EmptyPane
+            icon='pi-send'
+            title='Select a template to show the graph'
+            isEmpty={!template?.flows && !loading}
+        >
             <FlowEditor
                 loading={loading}
                 flows={template?.flows || []}
