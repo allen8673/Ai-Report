@@ -128,6 +128,7 @@ export default function Page() {
     const [templates, setTemplates] = useState<IFlowBase[]>([]);
     const [template, setTemplate] = useState<IFlow>();
     const [editTemp, setEditTemp] = useState<IFlow>();
+    const [fetchingFlows, setFetchingFlows] = useState<boolean>();
     const { showMessage } = useLayoutContext();
 
     const onDeleteTemplate = async (tmpId: string) => {
@@ -167,8 +168,14 @@ export default function Page() {
     ];
 
     const fetchTemplates = async () => {
-        const tmps = await getFlows('TEMPLATE');
-        setTemplates(tmps)
+        try {
+            setFetchingFlows(true);
+            const tmps = await getFlows('TEMPLATE');
+            setTemplates(tmps);
+        } finally {
+            setFetchingFlows(false);
+        }
+
     }
 
     useEffect(() => {
@@ -192,6 +199,7 @@ export default function Page() {
             </SplitterPanel>
             <SplitterPanel className="overflow-auto px-[7px]" size={20}>
                 <FlowList
+                    loading={fetchingFlows}
                     defaultSelectedItem={template}
                     flows={templates}
                     onItemSelected={async (item) => {

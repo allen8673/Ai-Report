@@ -5,6 +5,7 @@ import { Tooltip } from "primereact/tooltip";
 import { useState } from "react";
 
 import List from "../list";
+import LoadingPane from "../panes/loading";
 
 import { FlowListContext, useFlowListContext } from "./context";
 import { FlowListProps, ListItemProps } from "./flow-list";
@@ -61,7 +62,7 @@ export function FlowListItem({ itemkey, item }: ListItemProps) {
     )
 }
 
-export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSelected, renderMenus }: FlowListProps) {
+export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSelected, renderMenus, loading }: FlowListProps) {
 
     const [selectedFlow, setSelectedFlow] = useState<IFlowBase | undefined>(defaultSelectedItem);
     const showActBar: boolean = !!onAddWF;
@@ -69,38 +70,41 @@ export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSe
     return (
         <FlowListContext.Provider value={{ selectedFlow, setSelectedFlow, renderMenus }}>
             <Tooltip target=".item-speeddial .p-speeddial-action" position='top' />
-            <div className={`
-            py-[22px] px-[18px] w-full h-full overflow-hidden
-            bg-deep rounded-std border-solid border-light-weak/[.2]
-            flex flex-col items-end`}>
-                {showActBar &&
-                    <div className="act-bar justify-end w-full py-2">
-                        {!!onAddWF && <Button
-                            className="ellipsis"
-                            icon='pi pi-plus'
-                            severity="success"
-                            label='Add New Workflow'
-                            tooltipOptions={{ position: 'left' }}
-                            onClick={onAddWF}
-                        />}
-                    </div>
-                }
-                <List
-                    className="grow shrink w-full mt-1"
-                    data={flows}
-                    renderItem={(item, idx) => (
-                        <FlowListItem
-                            itemkey={`flow-item-${idx}`}
-                            item={item}
-                        />
-                    )}
-                    onItemClick={(item) => {
-                        setSelectedFlow(() => {
-                            onItemSelected?.(item);
-                            return item;
-                        });
-                    }} />
-            </div>
+            <LoadingPane loading={loading} className="!rounded-std" title="Fetching data...">
+                <div className={`
+                        py-[22px] px-[18px] w-full h-full overflow-hidden
+                        bg-deep rounded-std border-solid border-light-weak/[.2]
+                        flex flex-col items-end`}
+                >
+                    {showActBar &&
+                        <div className="act-bar justify-end w-full py-2">
+                            {!!onAddWF && <Button
+                                className="ellipsis"
+                                icon='pi pi-plus'
+                                severity="success"
+                                label='Add New Workflow'
+                                tooltipOptions={{ position: 'left' }}
+                                onClick={onAddWF}
+                            />}
+                        </div>
+                    }
+                    <List
+                        className="grow shrink w-full mt-1"
+                        data={flows}
+                        renderItem={(item, idx) => (
+                            <FlowListItem
+                                itemkey={`flow-item-${idx}`}
+                                item={item}
+                            />
+                        )}
+                        onItemClick={(item) => {
+                            setSelectedFlow(() => {
+                                onItemSelected?.(item);
+                                return item;
+                            });
+                        }} />
+                </div>
+            </LoadingPane>
         </FlowListContext.Provider>
     )
 }

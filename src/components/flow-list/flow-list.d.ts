@@ -7,6 +7,7 @@ export interface FlowListProps {
     onAddWF?: () => void;
     onItemSelected?: (item: IFlowBase) => void;
     renderMenus?: (item: IFlowBase) => MenuItem[];
+    loading?: boolean;
 }
 
 export interface ListItemProps {

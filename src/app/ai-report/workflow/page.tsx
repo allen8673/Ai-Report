@@ -208,6 +208,7 @@ export default function Page() {
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
     const [form, setForm] = useState<FormInstance<FormData>>();
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([]);
+    const [fetchingFlows, setFetchingFlows] = useState<boolean>();
 
     const renderMenus = (item: IFlowBase): MenuItem[] => [
         {
@@ -237,9 +238,15 @@ export default function Page() {
     ];
 
     const getAllData = async () => {
-        const { workflow, template } = await getAll() || {};
-        setWorkflows(workflow || []);
-        setTemplateOpts(template?.map(t => ({ label: t.name, value: t.id })) || [])
+        try {
+            setFetchingFlows(true)
+            const { workflow, template } = await getAll() || {};
+            setWorkflows(workflow || []);
+            setTemplateOpts(template?.map(t => ({ label: t.name, value: t.id })) || [])
+        } finally {
+            setFetchingFlows(false)
+        }
+
     }
 
     useEffect(() => {
@@ -255,6 +262,7 @@ export default function Page() {
                 </SplitterPanel>
                 <SplitterPanel className="overflow-auto px-[7px]" size={20}>
                     <FlowList
+                        loading={fetchingFlows}
                         defaultSelectedItem={cacheWorkflow}
                         flows={workflows}
                         onAddWF={() => setAddNewFlow(pre => !pre)}
