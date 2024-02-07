@@ -228,6 +228,7 @@ export default function WorkflowLayout({
     const [runningWF, setRunningWF] = useState<RunningWF>();
     const [reportJobs, setReportJobs] = useState<ViewReports>();
     const [cacheWorkflow, setCacheWorkflow] = useState<IFlow>();
+    const [fetchingWorkflow, setfetchingWorkflow] = useState<boolean>();
 
     const runWorkflow = async (wf?: IFlow | string, callback?: (jobId: string) => void) => {
         if (!wf) return;
@@ -274,12 +275,23 @@ export default function WorkflowLayout({
             })
     }
 
+    const fetchWorkflow = async (callback: () => (IFlow | undefined | Promise<IFlow | undefined>)) => {
+        setfetchingWorkflow(true);
+        try {
+            const wf = await callback();
+            setCacheWorkflow(wf);
+        } finally {
+            setfetchingWorkflow(false);
+        }
+    }
+
     return (
         <WfLayoutContext.Provider value={{
             runWorkflow,
             viewReports,
             cacheWorkflow,
-            setCacheWorkflow,
+            fetchWorkflow,
+            fetchingWorkflow
         }}>
             {children}
             <UploadModal {...{ runningWF, setRunningWF }} />

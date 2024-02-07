@@ -64,15 +64,17 @@ function EditTemplateModal({ editTemp, onOk, onCancel }: EditTemplateModalProps)
 interface TemplatePreviewerProps {
     template?: IFlow;
     onClickEdit?: (tmp?: IFlow) => void;
-    onDelete?: (tmp?: IFlow) => void
+    onDelete?: (tmp?: IFlow) => void;
+    loading?: boolean;
 }
 
-function TemplatePreviewer({ template, onClickEdit, onDelete }: TemplatePreviewerProps) {
+function TemplatePreviewer({ template, onClickEdit, onDelete, loading }: TemplatePreviewerProps) {
     const { graphRef } = useGraphRef<IFlowNode, any>();
 
     return (
         <EmptyPane icon='pi-send' title='Select a template to show the graph' isEmpty={!template?.flows}>
             <FlowEditor
+                loading={loading}
                 flows={template?.flows || []}
                 graphRef={graphRef}
                 hideMiniMap
@@ -129,6 +131,7 @@ export default function Page() {
     const [template, setTemplate] = useState<IFlow>();
     const [editTemp, setEditTemp] = useState<IFlow>();
     const [fetchingFlows, setFetchingFlows] = useState<boolean>();
+    const [fetchingTemplate, setFetchingTemplate] = useState<boolean>();
     const { showMessage } = useLayoutContext();
 
     const onDeleteTemplate = async (tmpId: string) => {
@@ -188,6 +191,7 @@ export default function Page() {
             <SplitterPanel className="px-[7px]" size={80}>
                 <TemplatePreviewer
                     template={template}
+                    loading={fetchingTemplate}
                     onClickEdit={async (tmp) => {
                         setEditTemp(tmp)
                     }}
@@ -203,8 +207,13 @@ export default function Page() {
                     defaultSelectedItem={template}
                     flows={templates}
                     onItemSelected={async (item) => {
-                        const tmp = await getFlow(item.id)
-                        setTemplate(tmp);
+                        try {
+                            setFetchingTemplate(true);
+                            const tmp = await getFlow(item.id)
+                            setTemplate(tmp);
+                        } finally {
+                            setFetchingTemplate(false);
+                        }
                     }}
                     renderMenus={renderMenus}
                 />

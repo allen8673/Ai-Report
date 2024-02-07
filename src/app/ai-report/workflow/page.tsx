@@ -37,7 +37,7 @@ interface FormData {
 
 function WorkflowPreviewer() {
     const { graphRef } = useGraphRef<IFlowNode, any>();
-    const { runWorkflow, cacheWorkflow } = useWfLayoutContext()
+    const { runWorkflow, cacheWorkflow, fetchingWorkflow } = useWfLayoutContext()
     const router = useRouter();
     const [jobs, setJobs] = useState<IJob[]>([]);
     const [job, setJob] = useState<IJob>();
@@ -136,6 +136,7 @@ function WorkflowPreviewer() {
     return (
         <EmptyPane icon='pi-send' title='Select a workflow to show the graph' isEmpty={!cacheWorkflow?.flows}>
             <FlowEditor
+                loading={fetchingWorkflow}
                 flows={cacheWorkflow?.flows || []}
                 graphRef={graphRef}
                 hideMiniMap
@@ -202,7 +203,7 @@ function WorkflowPreviewer() {
 
 export default function Page() {
     const router = useRouter();
-    const { runWorkflow, cacheWorkflow, setCacheWorkflow } = useWfLayoutContext();
+    const { runWorkflow, cacheWorkflow, fetchWorkflow } = useWfLayoutContext();
 
     const [workflows, setWorkflows] = useState<IFlowBase[]>([]);
     const [addNewFlow, setAddNewFlow] = useState<boolean>();
@@ -246,7 +247,6 @@ export default function Page() {
         } finally {
             setFetchingFlows(false)
         }
-
     }
 
     useEffect(() => {
@@ -266,9 +266,10 @@ export default function Page() {
                         defaultSelectedItem={cacheWorkflow}
                         flows={workflows}
                         onAddWF={() => setAddNewFlow(pre => !pre)}
-                        onItemSelected={async (item) => {
-                            const flow = await getFlow(item.id)
-                            setCacheWorkflow(flow);
+                        onItemSelected={(item) => {
+                            fetchWorkflow(async () => {
+                                return await getFlow(item.id)
+                            })
                         }}
                         renderMenus={renderMenus}
                     />
