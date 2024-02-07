@@ -1,5 +1,7 @@
 import { FlowStatus } from './flow'
 
+export type JobStatus = 'finish' | 'warning' | 'not finish'
+
 export interface IJob {
     JOB_ID: string;
     WORKFLOW_ID: string;
@@ -8,7 +10,7 @@ export interface IJob {
     CREATE_TIME: string;
     MODIFY_USER: string;
     MODIFY_TIME: string;
-    STATUS: string;
+    STATUS: JobStatus;
     ERR_MSG?: string;
     JOBNAME?: string;
 }
@@ -19,7 +21,7 @@ export interface IJobStatus {
     JOBNAME?: string;
     JOB_ID: string;
     REPORTDATA?: string;
-    STATUS: 'finish' | 'not finish'
+    STATUS: JobStatus
 }
 
 export interface IJobItem {
