@@ -19,6 +19,7 @@ import Form from "../form";
 import { FormInstance } from "../form/form";
 import Graph, { useGraphRef } from "../graph";
 import Modal from "../modal";
+import LoadingPane from "../panes/loading";
 
 import AddButton from "./actbar-assets/add-button";
 import CustomComponent from "./actbar-assets/custom-component";
@@ -525,6 +526,7 @@ export default function FlowEditor(props: FlowGraphProps) {
         delayRender,
         actionBarContent,
         actionBarClass,
+        loading,
         ...others
     } = props
 
@@ -629,106 +631,109 @@ export default function FlowEditor(props: FlowGraphProps) {
                     setOnDragItem,
                     setAddComp,
                 }}>
-                <div className="flow-editor h-full w-full relative">
-                    {actionBarContent ?
-                        (
-                            <div className={`act-bar main top-[22px] ${actionBarClass || ''}`} >
-                                {
-                                    typeof actionBarContent === 'function' ?
-                                        actionBarContent(props, <div className="flex-h-center"><ActionBtns {...props} /></div>) :
-                                        actionBarContent
-                                }
-                            </div>
-                        ) :
-                        (inEdit && <div className={`act-bar main h-[68px] top-[22px]`} > <ActionBtns {...props} /> </div>)
-                    }
-                    <Graph
-                        initialEdges={initialEdges}
-                        initialNodes={initialNodes}
-                        className="rounded-std bg-deep"
-                        nodeTypes={nodeType}
-                        defaultEdgeOptions={EDGE_DEF_SETTING}
-                        readonly={!inEdit}
-                        graphRef={graphRef}
-                        onConnect={(connection: Connection) => {
-                            const { source, target } = connection
-                            if (!source || !target) return;
-                            const id = `${source}=${target}`
-                            graphRef?.current?.addEdge({ id, source, target, ...EDGE_DEF_SETTING });
-                            graphRef?.current?.setNode(source, (pre) => {
-                                pre.data.forwards?.push(target);
-                                return pre
-                            })
-                        }}
-                        onEdgesDelete={(e) => {
-                            const edge = e[0];
-                            if (!edge) return;
-                            const { source, target } = edge;
-                            graphRef.current.setNode(source, pre => {
-                                if (!pre.data.forwards) return pre
-                                const idx = pre.data.forwards?.indexOf(target);
-                                pre.data.forwards.splice(idx, 1);
-                                return pre
-                            })
-                        }}
-                        onNodesChange={(changes) => {
-                            const change = find(changes, ['type', 'remove'])
-                            if (!!change) {
-                                const { id } = change as NodeRemoveChange;
-                                graphRef.current.setNodes(pre => {
-                                    if (!pre.data.forwards?.includes(id)) return pre;
-                                    const idx = pre.data.forwards.indexOf(id);
+
+                <div className="flow-editor h-full w-full relative rounded-std overflow-hidden">
+                    <LoadingPane loading={loading} className="border-none" title="Fetching flow..." >
+                        {actionBarContent ?
+                            (
+                                <div className={`act-bar main top-[22px] ${actionBarClass || ''}`} >
+                                    {
+                                        typeof actionBarContent === 'function' ?
+                                            actionBarContent(props, <div className="flex-h-center"><ActionBtns {...props} /></div>) :
+                                            actionBarContent
+                                    }
+                                </div>
+                            ) :
+                            (inEdit && <div className={`act-bar main h-[68px] top-[22px]`} > <ActionBtns {...props} /> </div>)
+                        }
+                        <Graph
+                            initialEdges={initialEdges}
+                            initialNodes={initialNodes}
+                            className=" bg-deep"
+                            nodeTypes={nodeType}
+                            defaultEdgeOptions={EDGE_DEF_SETTING}
+                            readonly={!inEdit}
+                            graphRef={graphRef}
+                            onConnect={(connection: Connection) => {
+                                const { source, target } = connection
+                                if (!source || !target) return;
+                                const id = `${source}=${target}`
+                                graphRef?.current?.addEdge({ id, source, target, ...EDGE_DEF_SETTING });
+                                graphRef?.current?.setNode(source, (pre) => {
+                                    pre.data.forwards?.push(target);
+                                    return pre
+                                })
+                            }}
+                            onEdgesDelete={(e) => {
+                                const edge = e[0];
+                                if (!edge) return;
+                                const { source, target } = edge;
+                                graphRef.current.setNode(source, pre => {
+                                    if (!pre.data.forwards) return pre
+                                    const idx = pre.data.forwards?.indexOf(target);
                                     pre.data.forwards.splice(idx, 1);
                                     return pre
                                 })
-                            }
-                        }}
-                        onMouseUp={(e, position) => {
-                            if (!onDragItem || !position) return;
-                            const id = `tmp_${v4()}`;
-                            const { comp_type, ...others } = onDragItem
-                            graphRef.current?.addNode({
-                                id, position,
-                                data: {
-                                    ...others,
-                                    type: comp_type,
-                                    id, position, forwards: []
-                                }, type: 'turbo'
-                            });
-                            setOnDragItem(() => undefined);
-                        }}
-                        fitView
-                        {...others}
-                    >
-                        <TurboEdgeAsset />
-                    </Graph>
-                    {/* Customize Prompt Modal */}
-                    <PromptModal
-                        visible={openModal?.type === 'Normal'}
-                        onClose={closeModal}
-                        defaultValues={openModal}
-                    />
-                    {/* Workflow Ref Modal */}
-                    <WorkflowModal
-                        visible={openModal?.type === 'Workflow'}
-                        onClose={closeModal}
-                        defaultValues={openModal}
-                    />
-                    {/* Report Link Modal */}
-                    <ReportModal
-                        visible={openModal?.type === 'Report'}
-                        onClose={closeModal}
-                        defaultValues={openModal}
-                    />
-                    <AddComponent
-                        visible={addComp}
-                        onClose={() => setAddComp(false)}
-                    />
-                    <EditComponent
-                        visible={!!editComp}
-                        defaultValues={editComp}
-                        onClose={() => setEditComp(undefined)}
-                    />
+                            }}
+                            onNodesChange={(changes) => {
+                                const change = find(changes, ['type', 'remove'])
+                                if (!!change) {
+                                    const { id } = change as NodeRemoveChange;
+                                    graphRef.current.setNodes(pre => {
+                                        if (!pre.data.forwards?.includes(id)) return pre;
+                                        const idx = pre.data.forwards.indexOf(id);
+                                        pre.data.forwards.splice(idx, 1);
+                                        return pre
+                                    })
+                                }
+                            }}
+                            onMouseUp={(e, position) => {
+                                if (!onDragItem || !position) return;
+                                const id = `tmp_${v4()}`;
+                                const { comp_type, ...others } = onDragItem
+                                graphRef.current?.addNode({
+                                    id, position,
+                                    data: {
+                                        ...others,
+                                        type: comp_type,
+                                        id, position, forwards: []
+                                    }, type: 'turbo'
+                                });
+                                setOnDragItem(() => undefined);
+                            }}
+                            fitView
+                            {...others}
+                        >
+                            <TurboEdgeAsset />
+                        </Graph>
+                        {/* Customize Prompt Modal */}
+                        <PromptModal
+                            visible={openModal?.type === 'Normal'}
+                            onClose={closeModal}
+                            defaultValues={openModal}
+                        />
+                        {/* Workflow Ref Modal */}
+                        <WorkflowModal
+                            visible={openModal?.type === 'Workflow'}
+                            onClose={closeModal}
+                            defaultValues={openModal}
+                        />
+                        {/* Report Link Modal */}
+                        <ReportModal
+                            visible={openModal?.type === 'Report'}
+                            onClose={closeModal}
+                            defaultValues={openModal}
+                        />
+                        <AddComponent
+                            visible={addComp}
+                            onClose={() => setAddComp(false)}
+                        />
+                        <EditComponent
+                            visible={!!editComp}
+                            defaultValues={editComp}
+                            onClose={() => setEditComp(undefined)}
+                        />
+                    </LoadingPane>
                 </div>
             </FlowGrapContext.Provider>
         </ErrorBoundary >
