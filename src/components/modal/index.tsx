@@ -2,6 +2,8 @@ import { Button } from "primereact/button";
 import { Dialog, DialogProps } from "primereact/dialog";
 import React from "react";
 
+import { cn } from "@/lib/utils";
+
 export interface ModalProps extends Omit<DialogProps,
     'header'
     | 'closable'
@@ -24,6 +26,7 @@ export interface ModalProps extends Omit<DialogProps,
 
 export default function Modal(props: React.PropsWithChildren<ModalProps>) {
     const {
+        className,
         children,
         title,
         onOk,
@@ -51,7 +54,7 @@ export default function Modal(props: React.PropsWithChildren<ModalProps>) {
                 {footerPostfix}
             </div>}
         visible={visible}
-        className="w-4"
+        className={cn(`w-4 overflow-hidden`, className)}
         modal
         onMaskClick={cancelByMask ? onCancel : undefined}
         contentClassName={`py-2 ${contentClassName || ''}`}
