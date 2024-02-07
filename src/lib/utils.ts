@@ -49,13 +49,13 @@ export function usePolling() {
 
 }
 
-interface Job {
+interface LongPollingJob {
     id: string,
     excuteFn: () => Promise<boolean>
 }
 
 export function useLongPolling() {
-    const [job, setJob] = useState<Job>();
+    const [job, setJob] = useState<LongPollingJob>();
 
     useEffect(() => {
         if (!!job) {
@@ -71,7 +71,7 @@ export function useLongPolling() {
         setJob({ id: v4(), excuteFn: callbackFn })
     }
 
-    const executeLongPolling = async (_job: Job) => {
+    const executeLongPolling = async (_job: LongPollingJob) => {
         const res = await _job.excuteFn();
         if (!res) return;
         setTimeout(() => {
