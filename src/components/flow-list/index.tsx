@@ -70,12 +70,12 @@ export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSe
     return (
         <FlowListContext.Provider value={{ selectedFlow, setSelectedFlow, renderMenus }}>
             <Tooltip target=".item-speeddial .p-speeddial-action" position='top' />
-            <LoadingPane loading={loading} className="!rounded-std border-light-weak/[.2]" title="Fetching data...">
-                <div className={`
+            <div className={`
                         py-[22px] px-[18px] w-full h-full overflow-hidden
                         bg-deep rounded-std border-solid border-light-weak/[.2]
                         flex flex-col items-end`}
-                >
+            >
+                <LoadingPane loading={loading} className=" border-none" title="Fetching data...">
                     {showActBar &&
                         <div className="act-bar justify-end w-full py-2">
                             {!!onAddWF && <Button
@@ -103,8 +103,8 @@ export default function FlowList({ flows, defaultSelectedItem, onAddWF, onItemSe
                                 return item;
                             });
                         }} />
-                </div>
-            </LoadingPane>
+                </LoadingPane>
+            </div>
         </FlowListContext.Provider >
     )
 }
