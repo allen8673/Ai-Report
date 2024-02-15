@@ -1,7 +1,5 @@
 'use client'
-import RouterInfo from "@settings/router";
 import { concat, find, isEqual, map, some } from "lodash";
-import { useRouter } from "next/dist/client/components/navigation";
 import { Button } from "primereact/button";
 import { confirmDialog } from "primereact/confirmdialog";
 import { Dropdown } from "primereact/dropdown";
@@ -10,14 +8,15 @@ import { MenuItem } from "primereact/menuitem";
 import { SelectItem } from "primereact/selectitem";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useEffect, useMemo, useState } from 'react'
+import { v4 } from "uuid";
 
-import { WorkflowEditorProps, NewWorkflowModalProps, NewWorkflowData } from "./interface";
+import { WorkflowEditorProps, WorkflowCreatorProps } from "./interface";
 
-import { getAll, getFlow, updateFlow } from "@/api-helpers/flow-api";
+import { addFlow, getAll, getFlow, updateFlow } from "@/api-helpers/flow-api";
 import { getJobItemStatus, getJobslist } from "@/api-helpers/report-api";
-import { coverToQueryString } from "@/api-helpers/url-helper";
 import FlowEditor from "@/components/flow-editor";
-import { calculateDepth, resetDepth } from "@/components/flow-editor/lib";
+import { flowInfoMap } from "@/components/flow-editor/configuration";
+import { X_GAP, calculateDepth, getNewIdTrans, resetDepth } from "@/components/flow-editor/lib";
 import { FlowNameMapper } from "@/components/flow-editor/type";
 import FlowList from "@/components/flow-list";
 import Form from "@/components/form";
@@ -27,58 +26,118 @@ import Modal from "@/components/modal";
 import ObjectDropdown from "@/components/object-dropdown";
 import EmptyPane from "@/components/panes/empty";
 import TitlePane from "@/components/panes/title";
-import { IFlow, IFlowBase, IFlowNode } from "@/interface/flow";
+import { IEditFlow, IFlow, IFlowBase, IFlowNode } from "@/interface/flow";
 import { IJob } from "@/interface/job";
 import { useLayoutContext } from "@/layout/standard-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
-import { getFullUrl } from "@/lib/router";
 import { useLongPolling } from "@/lib/utils";
 
-const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
+function WorkFlowCreator({ openCreator, templateOpts, onCancel, onOk }: WorkflowCreatorProps) {
 
-function NewWorkflowModal({ addNewFlow, templateOpts, setAddNewFlow }: NewWorkflowModalProps) {
-    const router = useRouter();
-    const [form, setForm] = useState<FormInstance<NewWorkflowData>>();
+    const [form, setForm] = useState<FormInstance<IEditFlow>>();
+    const [workflow, setWorkflow] = useState<IFlow>();
 
-    return <Modal
-        visible={addNewFlow}
-        onOk={() => {
-            form?.submit()
-                .then(({ name, template }) => {
-                    const queries: { [key: string]: string | undefined } = { name, template }
-                    router.push(`${editorUrl}${coverToQueryString(queries)}`);
-                }).catch(() => {
-                    // 
-                });
-        }}
-        onCancel={() => {
-            setAddNewFlow(false)
-        }}>
-        <Form
-            onLoad={(form: FormInstance<NewWorkflowData>) => {
-                setForm(form)
-            }}
-            onDestroyed={() => {
-                setForm(undefined)
-            }}
-        >
-            {
-                ({ Item }) => (
-                    <>
-                        <Item name={'name'} label="Workflow Name" rules={{ required: 'Please give a name to workflow!', }}>
-                            <InputText />
-                        </Item>
-                        <Item name={'template'} label="Template">
-                            <Dropdown options={templateOpts} />
-                        </Item>
-                    </>
-                )
-            }
-        </Form>
-    </Modal>
+    const prepareNewWorkflow = async (paramObj: IEditFlow) => {
+        const id = '';
+        const template: (IFlow | undefined) =
+            (!!paramObj.template ? await getFlow(paramObj.template) : undefined);
+
+        if (!!template) {
+            /**
+             * if the user assigns a template,
+             * then the graph directly uses it
+             */
+            const id_trans = getNewIdTrans(template.flows)
+            let rootId = ''
+            const flows: IFlowNode[] = template.flows.reduce<IFlowNode[]>((wf, tf) => {
+                if (tf.type === 'Input') rootId = id_trans[tf.id]
+                wf.push({
+                    ...tf,
+                    id: id_trans[tf.id],
+                    forwards: map(tf.forwards, f => id_trans[f])
+                })
+                return wf;
+            }, []);
+            setWorkflow({ type: 'workflow', id, name: paramObj.name || '', flows, rootNdeId: [rootId], VERSION: 0 })
+
+        } else {
+            /**
+             * if the user does not assign any template,
+             * then the graph will append the Input and Output nodes as initialization
+             */
+            const rootId = `tmp_${v4()}`
+            const doneId = `tmp_${v4()}`
+            const flows: IFlowNode[] = [
+                {
+                    id: doneId,
+                    type: 'Output',
+                    name: flowInfoMap['Output'].nodeName,
+                    position: { x: X_GAP * 3, y: 0 },
+                    forwards: []
+                },
+                {
+                    id: rootId,
+                    type: 'Input',
+                    name: flowInfoMap['Input'].nodeName,
+                    position: { x: 0, y: 0 },
+                    forwards: []
+                },
+
+            ]
+            setWorkflow({ type: 'workflow', id, name: paramObj.name || '', flows, rootNdeId: [rootId], VERSION: 0 })
+        }
+    }
+
+    useEffect(() => {
+        if (!openCreator) {
+            setWorkflow(undefined)
+        }
+    }, [openCreator])
+
+
+    return (
+        <>
+            <Modal
+                visible={openCreator && !workflow}
+                title="Add New Workflow"
+                onOk={() => {
+                    form?.submit()
+                        .then(({ name, template }) => {
+                            prepareNewWorkflow({ name, template })
+                        }).catch(() => {
+                            // 
+                        });
+                }}
+                onCancel={onCancel}>
+                <Form
+                    onLoad={(form: FormInstance<IEditFlow>) => {
+                        setForm(form)
+                    }}
+                    onDestroyed={() => {
+                        setForm(undefined)
+                    }}
+                >
+                    {
+                        ({ Item }) => (
+                            <>
+                                <Item name={'name'} label="Workflow Name" rules={{ required: 'Please give a name to workflow!', }}>
+                                    <InputText />
+                                </Item>
+                                <Item name={'template'} label="Template">
+                                    <Dropdown options={templateOpts} />
+                                </Item>
+                            </>
+                        )
+                    }
+                </Form>
+            </Modal>
+            <WorkflowEditor workflow={workflow} onCancel={onCancel} onOk={onOk} />
+        </>
+    )
+
 }
 
-function WorkflowEditor({ editWf, workflows, onOk, onCancel }: WorkflowEditorProps) {
+function WorkflowEditor({ workflow: editWf, workflows, onOk, onCancel }: WorkflowEditorProps) {
     const { graphRef } = useGraphRef<IFlowNode, any>();
     const flowNameMapper: FlowNameMapper = useMemo(() => {
         if (!workflows) return {};
@@ -363,9 +422,40 @@ export default function Page() {
                     />
                 </SplitterPanel>
             </Splitter>
-            <NewWorkflowModal {...{ addNewFlow: openCreator, setAddNewFlow: setOpenCreator, templateOpts }} />
+            <WorkFlowCreator
+                openCreator={openCreator}
+                templateOpts={templateOpts}
+                onCancel={() => {
+                    confirmDialog({
+                        position: 'top',
+                        message: `Are you sure you want to cancel without saving? You will lose every modification.`,
+                        header: `Cancel modify`,
+                        icon: 'pi pi-info-circle',
+                        acceptClassName: 'p-button-danger',
+                        accept: async () => {
+                            setOpenCreator(false)
+                        },
+                    });
+                }}
+                onOk={async (result) => {
+                    const res = (await addFlow(result)).data;
+                    if (res.status === 'ok') {
+                        showMessage({
+                            type: 'success',
+                            message: res.message || 'Success',
+                        });
+                        getAllData();
+                        setOpenCreator(false);
+                    } else {
+                        showMessage({
+                            type: 'error',
+                            message: res.message || 'error',
+                        });
+                    }
+                }}
+            />
             <WorkflowEditor
-                editWf={editWorkflow}
+                workflow={editWorkflow}
                 workflows={workflows}
                 onOk={async (result) => {
                     const res = (await updateFlow(result)).data;
