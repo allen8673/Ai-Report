@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect } from "react";
+import React, { PropsWithChildren, useEffect } from "react";
 import { useRef } from "react"
 
 export interface AatrixAnimationPanelProps {
@@ -15,8 +15,9 @@ export default function MatrixAnimationPanel({
     fontColor = '#A226EF',
     text = 'abcdefghijklmnopqrstuvwxyz',
     randomPermutaion,
-    size = 30
-}: AatrixAnimationPanelProps) {
+    size = 30,
+    children
+}: PropsWithChildren<AatrixAnimationPanelProps>) {
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const ctxRef = React.useRef<CanvasRenderingContext2D | null>(null);
@@ -70,5 +71,8 @@ export default function MatrixAnimationPanel({
         }
     }
 
-    return <canvas className={`w-full h-full ${className || ''}`} ref={canvasRef} />
+    return <div className={`w-full h-full flex-center ${className || ''}`} >
+        <canvas className={`absolute t-0 z-0`} ref={canvasRef} />
+        <div className="z-1">{children}</div>
+    </div>
 }
