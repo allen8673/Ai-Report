@@ -608,8 +608,8 @@ export default function FlowEditor(props: FlowGraphProps) {
     }, [flows]);
 
     useEffect(() => {
-        graphRef.current.setNodes(n => ({ ...n, selectable: inEdit, selected: false }));
-        graphRef.current.setEdges(e => ({ ...e, deletable: inEdit, selected: false, }));
+        graphRef.current?.setNodes(n => ({ ...n, selectable: inEdit, selected: false }));
+        graphRef.current?.setEdges(e => ({ ...e, deletable: inEdit, selected: false, }));
     }, [inEdit]);
 
     return (
