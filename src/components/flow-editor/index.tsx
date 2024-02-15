@@ -603,7 +603,7 @@ export default function FlowEditor(props: FlowGraphProps) {
         setInitialEdges(edges);
         setInitialNodes(nodes);
         setTimeout(() => {
-            graphRef.current.resetAllElements(nodes, edges);
+            graphRef.current?.resetAllElements(nodes, edges);
         }, delayRender);
     }, [flows]);
 
@@ -668,7 +668,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                                 const edge = e[0];
                                 if (!edge) return;
                                 const { source, target } = edge;
-                                graphRef.current.setNode(source, pre => {
+                                graphRef.current?.setNode(source, pre => {
                                     if (!pre.data.forwards) return pre
                                     const idx = pre.data.forwards?.indexOf(target);
                                     pre.data.forwards.splice(idx, 1);
@@ -679,7 +679,7 @@ export default function FlowEditor(props: FlowGraphProps) {
                                 const change = find(changes, ['type', 'remove'])
                                 if (!!change) {
                                     const { id } = change as NodeRemoveChange;
-                                    graphRef.current.setNodes(pre => {
+                                    graphRef.current?.setNodes(pre => {
                                         if (!pre.data.forwards?.includes(id)) return pre;
                                         const idx = pre.data.forwards.indexOf(id);
                                         pre.data.forwards.splice(idx, 1);
