@@ -11,7 +11,6 @@ import { useEffect, useMemo, useState } from "react";
 import { v4 } from "uuid";
 
 import { addFlow, deleteFlow, getFlow, getFlows, updateFlow } from "@/api-helpers/flow-api";
-import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import FlowEditor from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
 import { X_GAP, calculateDepth, expandRefWF, getNewIdTrans, hasDependencyCycle, ifFlowIsCompleted, resetDepth, resetPosition } from "@/components/flow-editor/lib";
@@ -25,10 +24,9 @@ import { IEditFlow, IFlowNode, IFlow, IFlowBase } from "@/interface/flow";
 import { useLayoutContext } from "@/layout/standard-layout/context";
 import { useWfLayoutContext } from "@/layout/workflow-layout/context";
 import { getFullUrl } from "@/lib/router";
+import { coverSearchParamsToObj } from "@/lib/url";
 
 type EditMode = 'add' | 'normal'
-
-
 
 export default function Page() {
     const searchParams = useSearchParams();

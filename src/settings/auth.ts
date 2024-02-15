@@ -5,8 +5,9 @@ import Credentials from 'next-auth/providers/credentials';
 
 import RouterInfo from "./router"
 
-import { coverSearchParamsToObj } from "@/api-helpers/url-helper";
 import { getFullUrl } from "@/lib/router"
+import { coverSearchParamsToObj } from "@/lib/url";
+
 
 export const authConfig: NextAuthConfig = {
     debug: true,

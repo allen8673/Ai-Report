@@ -3,8 +3,6 @@ import { Dispatch, SetStateAction } from 'react'
 
 import { IFlow, IFlowBase } from "@/interface/flow";
 
-
-
 export interface NewWorkflowModalProps {
     addNewFlow?: boolean;
     templateOpts: SelectItem[];
