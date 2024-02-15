@@ -200,7 +200,8 @@ function WorkflowEditor({ workflow, workflows, onOk, onCancel, okLabel = 'save' 
 
 function WorkflowPreviewer({ onEdit, onRemove }: WorkflowPreviewerProps) {
     const { graphRef } = useGraphRef<IFlowNode, any>();
-    const { runWorkflow, cacheWorkflow, fetchingWorkflow } = useWfLayoutContext()
+    const { runWorkflow, workflow, fetchingWorkflow } = useWfLayoutContext();
+
     const [jobs, setJobs] = useState<IJob[]>([]);
     const [job, setJob] = useState<IJob>();
     const { startLongPolling: statusLongPolling } = useLongPolling();
@@ -243,7 +244,7 @@ function WorkflowPreviewer({ onEdit, onRemove }: WorkflowPreviewerProps) {
     }
 
     const onRunWorkflow = () => {
-        runWorkflow(cacheWorkflow?.id, (jobId: string) => fetchJobs({ workflow: cacheWorkflow, jobId }))
+        runWorkflow(workflow?.id, (jobId: string) => fetchJobs({ workflow: workflow, jobId }))
     }
 
     const reanderOption = (item?: IJob) => {
@@ -264,13 +265,13 @@ function WorkflowPreviewer({ onEdit, onRemove }: WorkflowPreviewerProps) {
     }
 
     useEffect(() => {
-        fetchJobs({ workflow: cacheWorkflow });
-    }, [cacheWorkflow]);
+        fetchJobs({ workflow });
+    }, [workflow]);
 
     useEffect(() => {
         jobsLongPolling(async () => {
             if (!jobs.length) return false
-            return await fetchJobs({ workflow: cacheWorkflow });
+            return await fetchJobs({ workflow });
         })
     }, [jobs]);
 
@@ -285,11 +286,11 @@ function WorkflowPreviewer({ onEdit, onRemove }: WorkflowPreviewerProps) {
         <EmptyPane
             icon='pi-send'
             title='Select a workflow to show the graph'
-            isEmpty={!cacheWorkflow?.flows && !fetchingWorkflow}
+            isEmpty={!workflow?.flows && !fetchingWorkflow}
         >
             <FlowEditor
                 loading={fetchingWorkflow}
-                flows={cacheWorkflow?.flows || []}
+                flows={workflow?.flows || []}
                 graphRef={graphRef}
                 hideMiniMap
                 hideCtrls
@@ -335,8 +336,8 @@ function WorkflowPreviewer({ onEdit, onRemove }: WorkflowPreviewerProps) {
                                 tooltipOptions={{ position: 'mouse' }}
                                 icon='pi pi-trash'
                                 onClick={() => {
-                                    if (!cacheWorkflow) return;
-                                    onRemove?.(cacheWorkflow)
+                                    if (!workflow) return;
+                                    onRemove?.(workflow)
                                 }}
                             />
                             <Button
@@ -345,8 +346,8 @@ function WorkflowPreviewer({ onEdit, onRemove }: WorkflowPreviewerProps) {
                                 tooltipOptions={{ position: 'left' }}
                                 icon='pi pi-pencil'
                                 onClick={() => {
-                                    if (!cacheWorkflow) return;
-                                    onEdit?.(cacheWorkflow)
+                                    if (!workflow) return;
+                                    onEdit?.(workflow)
                                 }}
                             />
                         </div >
@@ -359,7 +360,7 @@ function WorkflowPreviewer({ onEdit, onRemove }: WorkflowPreviewerProps) {
 
 export default function Page() {
     const { showMessage } = useLayoutContext();
-    const { runWorkflow, cacheWorkflow, fetchWorkflow } = useWfLayoutContext();
+    const { runWorkflow, workflow, fetchWorkflow } = useWfLayoutContext();
 
     const [workflows, setWorkflows] = useState<IFlowBase[]>([]);
     const [editWorkflow, setEditWorkflow] = useState<IFlow>();
@@ -422,7 +423,7 @@ export default function Page() {
                     })
                     return;
                 }
-                if (cacheWorkflow?.id === wf.id) {
+                if (workflow?.id === wf.id) {
                     fetchWorkflow(() => undefined)
                 }
                 await getAllData();
@@ -447,7 +448,7 @@ export default function Page() {
                 <SplitterPanel className="overflow-auto px-[7px]" size={20}>
                     <FlowList
                         loading={fetchingFlows}
-                        defaultSelectedItem={cacheWorkflow}
+                        defaultSelectedItem={workflow}
                         flows={workflows}
                         onAddWF={() => setOpenCreator(pre => !pre)}
                         onItemSelected={(item) => {
@@ -501,7 +502,7 @@ export default function Page() {
                             type: 'success',
                             message: res.message || 'Success',
                         });
-                        if (result.id === cacheWorkflow?.id) {
+                        if (result.id === workflow?.id) {
                             fetchWorkflow(async () => {
                                 return await getFlow(result.id)
                             })
