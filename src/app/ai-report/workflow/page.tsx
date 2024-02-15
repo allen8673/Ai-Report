@@ -9,7 +9,9 @@ import { InputText } from "primereact/inputtext";
 import { MenuItem } from "primereact/menuitem";
 import { SelectItem } from "primereact/selectitem";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+
+import { WorkflowEditorProps, NewWorkflowModalProps, NewWorkflowData } from "./interface";
 
 import { getAll, getFlow, updateFlow } from "@/api-helpers/flow-api";
 import { getJobItemStatus, getJobslist } from "@/api-helpers/report-api";
@@ -34,17 +36,6 @@ import { useLongPolling } from "@/lib/utils";
 
 const editorUrl = getFullUrl(RouterInfo.WORKFLOW_EDITOR);
 
-interface NewWorkflowData {
-    id?: string;
-    name?: string;
-    template?: string
-}
-
-interface NewWorkflowModalProps {
-    addNewFlow?: boolean;
-    templateOpts: SelectItem[];
-    setAddNewFlow: Dispatch<SetStateAction<boolean | undefined>>
-}
 function NewWorkflowModal({ addNewFlow, templateOpts, setAddNewFlow }: NewWorkflowModalProps) {
     const router = useRouter();
     const [form, setForm] = useState<FormInstance<NewWorkflowData>>();
@@ -87,13 +78,7 @@ function NewWorkflowModal({ addNewFlow, templateOpts, setAddNewFlow }: NewWorkfl
     </Modal>
 }
 
-interface EditWorkflowModalProps {
-    editWf?: IFlow;
-    workflows?: IFlowBase[];
-    onOk: (result: IFlow) => void;
-    onCancel: () => void
-}
-function EditWorkflowModal({ editWf, workflows, onOk, onCancel }: EditWorkflowModalProps) {
+function WorkflowEditor({ editWf, workflows, onOk, onCancel }: WorkflowEditorProps) {
     const { graphRef } = useGraphRef<IFlowNode, any>();
     const flowNameMapper: FlowNameMapper = useMemo(() => {
         if (!workflows) return {};
@@ -216,20 +201,6 @@ function WorkflowPreviewer({ onEdit }: { onEdit?: (wf: IFlow) => void }) {
         fetchJobs({ workflow: cacheWorkflow });
     }, [cacheWorkflow]);
 
-    // useEffect(() => {
-    //     if (!!job) {
-    //         checkJobStatus(job)
-    //     }
-    //     jobsLongPolling(async () => {
-    //         if (!jobs.length) return false;
-    //         if (!!job && jobs.filter(j => j.STATUS !== 'finish').some(j => j.JOB_ID === job.JOB_ID)) {
-    //             return await checkJobStatus(job)
-    //         }
-    //         return await fetchJobs(cacheWorkflow, job?.JOB_ID);
-    //     })
-    // }, [jobs, job]);
-
-
     useEffect(() => {
         jobsLongPolling(async () => {
             if (!jobs.length) return false
@@ -322,9 +293,8 @@ export default function Page() {
     const { runWorkflow, cacheWorkflow, fetchWorkflow } = useWfLayoutContext();
 
     const [workflows, setWorkflows] = useState<IFlowBase[]>([]);
-    const [editWf, setEditWf] = useState<IFlow>();
-
-    const [addNewFlow, setAddNewFlow] = useState<boolean>();
+    const [editWorkflow, setEditWorkflow] = useState<IFlow>();
+    const [openCreator, setOpenCreator] = useState<boolean>();
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([]);
     const [fetchingFlows, setFetchingFlows] = useState<boolean>();
 
@@ -335,7 +305,7 @@ export default function Page() {
             className: 'bg-primary hover:bg-primary-600',
             command: async () => {
                 const wf = await getFlow(item.id);
-                setEditWf(wf);
+                setEditWorkflow(wf);
             }
         },
         // {
@@ -376,14 +346,14 @@ export default function Page() {
             <TitlePane title='WorkFlow' />
             <Splitter className='shrink grow' style={{ height: '30px' }} layout='horizontal'>
                 <SplitterPanel className="px-[7px] " size={80}>
-                    <WorkflowPreviewer onEdit={(wf) => { setEditWf(wf) }} />
+                    <WorkflowPreviewer onEdit={(wf) => { setEditWorkflow(wf) }} />
                 </SplitterPanel>
                 <SplitterPanel className="overflow-auto px-[7px]" size={20}>
                     <FlowList
                         loading={fetchingFlows}
                         defaultSelectedItem={cacheWorkflow}
                         flows={workflows}
-                        onAddWF={() => setAddNewFlow(pre => !pre)}
+                        onAddWF={() => setOpenCreator(pre => !pre)}
                         onItemSelected={(item) => {
                             fetchWorkflow(async () => {
                                 return await getFlow(item.id)
@@ -393,9 +363,9 @@ export default function Page() {
                     />
                 </SplitterPanel>
             </Splitter>
-            <NewWorkflowModal {...{ addNewFlow, setAddNewFlow, templateOpts }} />
-            <EditWorkflowModal
-                editWf={editWf}
+            <NewWorkflowModal {...{ addNewFlow: openCreator, setAddNewFlow: setOpenCreator, templateOpts }} />
+            <WorkflowEditor
+                editWf={editWorkflow}
                 workflows={workflows}
                 onOk={async (result) => {
                     const res = (await updateFlow(result)).data;
@@ -409,7 +379,7 @@ export default function Page() {
                                 return await getFlow(result.id)
                             })
                         }
-                        setEditWf(undefined);
+                        setEditWorkflow(undefined);
                     } else {
                         showMessage({
                             type: 'error',
@@ -425,7 +395,7 @@ export default function Page() {
                         icon: 'pi pi-info-circle',
                         acceptClassName: 'p-button-danger',
                         accept: async () => {
-                            setEditWf(undefined)
+                            setEditWorkflow(undefined)
                         },
                     });
                 }}
