@@ -10,9 +10,9 @@ import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useEffect, useMemo, useState } from 'react'
 import { v4 } from "uuid";
 
-import { WorkflowEditorProps, WorkflowCreatorProps } from "./interface";
+import { WorkflowEditorProps, WorkflowCreatorProps, WorkflowPreviewerProps } from "./interface";
 
-import { addFlow, getAll, getFlow, updateFlow } from "@/api-helpers/flow-api";
+import { addFlow, deleteFlow, getAll, getFlow, updateFlow } from "@/api-helpers/flow-api";
 import { getJobItemStatus, getJobslist } from "@/api-helpers/report-api";
 import FlowEditor from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
@@ -198,7 +198,7 @@ function WorkflowEditor({ workflow, workflows, onOk, onCancel, okLabel = 'save' 
     )
 }
 
-function WorkflowPreviewer({ onEdit }: { onEdit?: (wf: IFlow) => void }) {
+function WorkflowPreviewer({ onEdit, onRemove }: WorkflowPreviewerProps) {
     const { graphRef } = useGraphRef<IFlowNode, any>();
     const { runWorkflow, cacheWorkflow, fetchingWorkflow } = useWfLayoutContext()
     const [jobs, setJobs] = useState<IJob[]>([]);
@@ -328,14 +328,17 @@ function WorkflowPreviewer({ onEdit }: { onEdit?: (wf: IFlow) => void }) {
                                 icon='pi pi-play'
                                 onClick={onRunWorkflow}
                             />
-                            {/* <Button
+                            <Button
                                 className="py-0 px-[0px] h-[40px]"
-                                severity='info'
-                                tooltip="Reports"
+                                severity='danger'
+                                tooltip="Run Workflow"
                                 tooltipOptions={{ position: 'mouse' }}
-                                icon='pi pi-eye'
-                                onClick={() => viewReports(cacheWorkflow?.id || '')}
-                            /> */}
+                                icon='pi pi-trash'
+                                onClick={() => {
+                                    if (!cacheWorkflow) return;
+                                    onRemove?.(cacheWorkflow)
+                                }}
+                            />
                             <Button
                                 className="h-[40px]"
                                 label="Edit Workflow"
@@ -374,14 +377,14 @@ export default function Page() {
                 setEditWorkflow(wf);
             }
         },
-        // {
-        //     label: 'Reports',
-        //     icon: 'pi pi-eye',
-        //     className: 'bg-info hover:bg-info-deep',
-        //     command: () => {
-        //         viewReports(item.id)
-        //     }
-        // },
+        {
+            label: 'Delete Workflow',
+            icon: 'pi pi-trash',
+            className: 'bg-danger hover:bg-danger-600',
+            command: () => {
+                removeWorkflow(item)
+            },
+        },
         {
             label: 'Run Workflow',
             icon: 'pi pi-play',
@@ -403,6 +406,30 @@ export default function Page() {
         }
     }
 
+    const removeWorkflow = async (wf: IFlowBase) => {
+        confirmDialog({
+            position: 'top',
+            message: `Do you want to delete ${wf?.name || 'this workflow'}?`,
+            header: `Delete Workflow`,
+            icon: 'pi pi-info-circle',
+            acceptClassName: 'p-button-danger',
+            accept: async () => {
+                const rsp = await deleteFlow(wf?.id);
+                if (rsp.data.status === 'failure' || rsp.data.status === 'NG') {
+                    if (rsp.data.message) showMessage({
+                        message: rsp.data.message,
+                        type: 'error'
+                    })
+                    return;
+                }
+                if (cacheWorkflow?.id === wf.id) {
+                    fetchWorkflow(() => undefined)
+                }
+                await getAllData();
+            },
+        });
+    }
+
     useEffect(() => {
         getAllData();
     }, [])
@@ -412,7 +439,10 @@ export default function Page() {
             <TitlePane title='WorkFlow' />
             <Splitter className='shrink grow' style={{ height: '30px' }} layout='horizontal'>
                 <SplitterPanel className="px-[7px] " size={80}>
-                    <WorkflowPreviewer onEdit={(wf) => { setEditWorkflow(wf) }} />
+                    <WorkflowPreviewer
+                        onEdit={(wf) => { setEditWorkflow(wf) }}
+                        onRemove={removeWorkflow}
+                    />
                 </SplitterPanel>
                 <SplitterPanel className="overflow-auto px-[7px]" size={20}>
                     <FlowList

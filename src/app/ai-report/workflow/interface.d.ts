@@ -23,3 +23,8 @@ export interface WorkflowEditorProps {
     onCancel: () => void;
     okLabel?: string;
 }
+
+export interface WorkflowPreviewerProps {
+    onEdit?: (wf: IFlow) => void;
+    onRemove?: (wf: IFlow) => void;
+}
