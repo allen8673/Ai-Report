@@ -100,6 +100,7 @@ function WorkFlowCreator({ openCreator, templateOpts, onCancel, onOk }: Workflow
             <Modal
                 visible={openCreator && !workflow}
                 title="Add New Workflow"
+                okLabel="Add"
                 onOk={() => {
                     form?.submit()
                         .then(({ name, template }) => {
@@ -137,13 +138,13 @@ function WorkFlowCreator({ openCreator, templateOpts, onCancel, onOk }: Workflow
 
 }
 
-function WorkflowEditor({ workflow: editWf, workflows, onOk, onCancel }: WorkflowEditorProps) {
+function WorkflowEditor({ workflow, workflows, onOk, onCancel, okLabel = 'save' }: WorkflowEditorProps) {
     const { graphRef } = useGraphRef<IFlowNode, any>();
     const flowNameMapper: FlowNameMapper = useMemo(() => {
         if (!workflows) return {};
 
         return workflows.reduce<FlowNameMapper>((pre, wf) => {
-            if (wf.id !== editWf?.id) pre[wf.id] = wf.name
+            if (wf.id !== workflow?.id) pre[wf.id] = wf.name
             return pre;
         }, {})
 
@@ -151,28 +152,34 @@ function WorkflowEditor({ workflow: editWf, workflows, onOk, onCancel }: Workflo
 
     return (
         <Modal
+            title={
+                <h3 className="m-0">
+                    {workflow?.name}
+                    {!!workflow?.id && <i className="text-base ml-2 text-light-weak">({workflow?.id})</i>}
+                </h3>
+            }
             className='w-[90%] h-[90%] '
             footerClass="flex justify-end"
-            showHeader={false}
-            visible={!!editWf}
+            showHeader={!!workflow?.name}
+            visible={!!workflow}
             onOk={() => {
-                if (!editWf) return
+                if (!workflow) return
                 const flows: IFlowNode[] = map(graphRef.current?.getNodes() || [], n => ({
                     ...n.data, position: n.position
                 }));
-                const result: IFlow = ({ ...editWf, type: 'workflow', flows });
+                const result: IFlow = ({ ...workflow, type: 'workflow', flows });
 
                 resetDepth(result.flows);
                 const calculatedIds = calculateDepth(result.flows.filter(n => n.type === 'Input'), result.flows);
                 resetDepth(result.flows, calculatedIds, 9999);
                 onOk(result);
             }}
-            okLabel='Save'
+            okLabel={okLabel}
             onCancel={() => {
                 onCancel()
             }}>
             <FlowEditor
-                flows={editWf?.flows || []}
+                flows={workflow?.flows || []}
                 graphRef={graphRef}
                 hideMiniMap
                 hideCtrls
@@ -429,7 +436,7 @@ export default function Page() {
                     confirmDialog({
                         position: 'top',
                         message: `Are you sure you want to cancel without saving? You will lose every modification.`,
-                        header: `Cancel modify`,
+                        header: `Cancel Add New Workflow`,
                         icon: 'pi pi-info-circle',
                         acceptClassName: 'p-button-danger',
                         accept: async () => {
@@ -481,7 +488,7 @@ export default function Page() {
                     confirmDialog({
                         position: 'top',
                         message: `Are you sure you want to cancel without saving? You will lose every modification.`,
-                        header: `Cancel modify`,
+                        header: `Cancel Edit Workflow`,
                         icon: 'pi pi-info-circle',
                         acceptClassName: 'p-button-danger',
                         accept: async () => {

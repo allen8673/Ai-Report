@@ -22,5 +22,6 @@ export interface WorkflowEditorProps {
     workflow?: IFlow;
     workflows?: IFlowBase[];
     onOk: (result: IFlow) => void;
-    onCancel: () => void
+    onCancel: () => void;
+    okLabel?: string;
 }

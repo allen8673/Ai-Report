@@ -11,7 +11,7 @@ export interface ModalProps extends Omit<DialogProps,
     | 'onHide'
     | 'modal'
     | 'onMaskClick'> {
-    title?: string;
+    title?: React.ReactNode;
     onOk?: () => void;
     onCancel?: () => void;
     okLabel?: string;
