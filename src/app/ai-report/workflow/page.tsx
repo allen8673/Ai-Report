@@ -10,13 +10,13 @@ import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useEffect, useMemo, useState } from 'react'
 import { v4 } from "uuid";
 
-import { WorkflowEditorProps, WorkflowCreatorProps, WorkflowPreviewerProps } from "./interface";
+import { WorkflowEditorProps, WorkflowCreatorProps, WorkflowPreviewerProps, TemplateCreatorProps } from "./interface";
 
 import { addFlow, deleteFlow, getAll, getFlow, updateFlow } from "@/api-helpers/flow-api";
 import { getJobItemStatus, getJobslist } from "@/api-helpers/report-api";
 import FlowEditor from "@/components/flow-editor";
 import { flowInfoMap } from "@/components/flow-editor/configuration";
-import { X_GAP, calculateDepth, getNewIdTrans, resetDepth } from "@/components/flow-editor/lib";
+import { X_GAP, calculateDepth, expandRefWF, getNewIdTrans, hasDependencyCycle, ifFlowIsCompleted, resetDepth, resetPosition } from "@/components/flow-editor/lib";
 import { FlowNameMapper } from "@/components/flow-editor/type";
 import FlowList from "@/components/flow-list";
 import Form from "@/components/form";
@@ -198,7 +198,7 @@ function WorkflowEditor({ workflow, workflows, onOk, onCancel, okLabel = 'save' 
     )
 }
 
-function WorkflowPreviewer({ onEdit, onRemove }: WorkflowPreviewerProps) {
+function WorkflowPreviewer({ onEdit, onRemove, onAddTemplate }: WorkflowPreviewerProps) {
     const { graphRef } = useGraphRef<IFlowNode, any>();
     const { runWorkflow, workflow, fetchingWorkflow } = useWfLayoutContext();
 
@@ -331,6 +331,16 @@ function WorkflowPreviewer({ onEdit, onRemove }: WorkflowPreviewerProps) {
                             />
                             <Button
                                 className="py-0 px-[0px] h-[40px]"
+                                tooltip="Save as Template"
+                                tooltipOptions={{ position: 'mouse' }}
+                                icon='pi pi-tag'
+                                onClick={() => {
+                                    if (!workflow) return;
+                                    onAddTemplate?.(workflow)
+                                }}
+                            />
+                            <Button
+                                className="py-0 px-[0px] h-[40px]"
                                 severity='danger'
                                 tooltip="Run Workflow"
                                 tooltipOptions={{ position: 'mouse' }}
@@ -358,13 +368,131 @@ function WorkflowPreviewer({ onEdit, onRemove }: WorkflowPreviewerProps) {
     )
 }
 
+function TemplateCreator({ openCreator: openCreator, workflow, onCancel, onOk }: TemplateCreatorProps) {
+
+    const { showMessage } = useLayoutContext();
+    const [templateNodes, setTemplateNodes] = useState<IFlowNode[]>();
+    const [form, setForm] = useState<FormInstance<IFlow>>();
+
+    const createTemplateNodes = async (_workflow?: IFlow) => {
+        const nodes = await expandRefWF({
+            nodes: _workflow?.flows || [],
+            workflowSource: async (ref_wf) => { return (await getFlow(ref_wf.workflowid)) }
+        })
+        // assign new ids to nodes
+        const id_trans: Record<string, string> = getNewIdTrans(nodes)
+
+        // calculate new position for all nodes
+        const input_id = nodes.find(n => n.type === 'Input')?.id || '';
+        resetPosition(nodes, [input_id])
+
+        const _nodes = nodes.reduce<IFlowNode[]>((result, cur) => {
+            result.push({
+                ...cur,
+                id: (id_trans[cur.id] || ''),
+                forwards: (cur.forwards?.map(f => id_trans[f] || '').filter(i => !!i)) || [],
+            })
+            return result;
+        }, []);
+
+        return _nodes
+    }
+
+    const saveToNewTemplate = async (templateNodes: IFlowNode[], name: string) => {
+        const template: IFlow = {
+            type: 'template',
+            id: '',
+            rootNdeId: [],
+            name,
+            flows: templateNodes,
+            VERSION: 0
+        }
+        const res = await addFlow(template);
+        if (res.data.status === 'ok') {
+            showMessage({
+                type: 'success',
+                message: res.data.message || 'Success',
+            });
+            setTemplateNodes(undefined)
+        } else {
+            showMessage({
+                type: 'error',
+                message: res.data.message || 'error',
+            });
+        }
+    }
+
+    useEffect(() => {
+        if (!openCreator) {
+            setTemplateNodes(undefined)
+            return;
+        }
+
+        createTemplateNodes(workflow)
+            .then(nodes => {
+                setTemplateNodes(nodes)
+            })
+    }, [openCreator])
+
+    return (
+        <Modal
+            title='Preview & Save as Template'
+            className='w-[80%] h-[80%]'
+            contentClassName="flex flex-col"
+            visible={!!openCreator}
+            onOk={async () => {
+                const result = await form?.submit();
+                if (!result) return;
+                const template: IFlow = {
+                    type: 'template',
+                    id: '',
+                    rootNdeId: [],
+                    name: result.name || '',
+                    flows: templateNodes || [],
+                    VERSION: 0
+                };
+                await onOk(template);
+            }}
+            onCancel={onCancel}>
+            <FlowEditor
+                className="rounded-std bg-deep"
+                flows={templateNodes || []}
+                hideMiniMap
+                delayRender={500}
+            />
+            <Form
+                className="p-[20px]"
+                onLoad={(form: FormInstance<IFlow>) => setForm(form)}
+                onDestroyed={() => {
+                    setForm(undefined)
+                }}
+                onSubmit={async ({ name }) => {
+                    await saveToNewTemplate(templateNodes || [], name)
+                }}
+            >
+                {
+                    ({ Item }) => (
+                        <>
+                            <Item name={'name'} label="Template Name" rules={{ required: 'Please give a template name!' }}>
+                                <InputText />
+                            </Item>
+                        </>
+                    )
+                }
+            </Form>
+        </Modal>
+    )
+}
+
+
 export default function Page() {
     const { showMessage } = useLayoutContext();
     const { runWorkflow, workflow, fetchWorkflow } = useWfLayoutContext();
 
     const [workflows, setWorkflows] = useState<IFlowBase[]>([]);
     const [editWorkflow, setEditWorkflow] = useState<IFlow>();
-    const [openCreator, setOpenCreator] = useState<boolean>();
+    const [openWfCreator, setOpenWfCreator] = useState<boolean>();
+    const [openTempCreator, setOpenTempCreator] = useState<boolean>();
     const [templateOpts, setTemplateOpts] = useState<SelectItem[]>([]);
     const [fetchingFlows, setFetchingFlows] = useState<boolean>();
 
@@ -431,6 +559,41 @@ export default function Page() {
         });
     }
 
+    const saveToNewTemplate = async (result: IFlow) => {
+        const res = (await addFlow(result)).data;
+        if (res.status === 'ok') {
+            showMessage({
+                type: 'success',
+                message: res.message || 'Success',
+            });
+            setOpenTempCreator(false);
+        } else {
+            showMessage({
+                type: 'error',
+                message: res.message || 'error',
+            });
+        }
+    }
+
+    const onAddTemplate = (wf: IFlow) => {
+        if (!ifFlowIsCompleted(wf.flows)) {
+            showMessage({
+                message: 'Cannot be saved as a template since the workflow is not completed.',
+                type: 'error'
+            })
+            return
+        }
+        if (hasDependencyCycle(wf.id, workflows || [])) {
+            showMessage({
+                message: 'Cannot be saved as a template since there are some dependency cycles.',
+                type: 'error'
+            })
+            return
+        }
+        setOpenTempCreator(true)
+
+    }
+
     useEffect(() => {
         getAllData();
     }, [])
@@ -443,6 +606,7 @@ export default function Page() {
                     <WorkflowPreviewer
                         onEdit={(wf) => { setEditWorkflow(wf) }}
                         onRemove={removeWorkflow}
+                        onAddTemplate={onAddTemplate}
                     />
                 </SplitterPanel>
                 <SplitterPanel className="overflow-auto px-[7px]" size={20}>
@@ -450,7 +614,7 @@ export default function Page() {
                         loading={fetchingFlows}
                         defaultSelectedItem={workflow}
                         flows={workflows}
-                        onAddWF={() => setOpenCreator(pre => !pre)}
+                        onAddWF={() => setOpenWfCreator(pre => !pre)}
                         onItemSelected={(item) => {
                             fetchWorkflow(async () => {
                                 return await getFlow(item.id)
@@ -461,7 +625,7 @@ export default function Page() {
                 </SplitterPanel>
             </Splitter>
             <WorkFlowCreator
-                openCreator={openCreator}
+                openCreator={openWfCreator}
                 templateOpts={templateOpts}
                 onCancel={() => {
                     confirmDialog({
@@ -471,7 +635,7 @@ export default function Page() {
                         icon: 'pi pi-info-circle',
                         acceptClassName: 'p-button-danger',
                         accept: async () => {
-                            setOpenCreator(false)
+                            setOpenWfCreator(false)
                         },
                     });
                 }}
@@ -483,7 +647,7 @@ export default function Page() {
                             message: res.message || 'Success',
                         });
                         getAllData();
-                        setOpenCreator(false);
+                        setOpenWfCreator(false);
                     } else {
                         showMessage({
                             type: 'error',
@@ -527,6 +691,12 @@ export default function Page() {
                         },
                     });
                 }}
+            />
+            <TemplateCreator
+                openCreator={openTempCreator}
+                workflow={workflow}
+                onCancel={() => setOpenTempCreator(false)}
+                onOk={saveToNewTemplate}
             />
         </div >
     )

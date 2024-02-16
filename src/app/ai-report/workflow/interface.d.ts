@@ -27,4 +27,12 @@ export interface WorkflowEditorProps {
 export interface WorkflowPreviewerProps {
     onEdit?: (wf: IFlow) => void;
     onRemove?: (wf: IFlow) => void;
+    onAddTemplate?: (wf: IFlow) => void;
+}
+
+export interface TemplateCreatorProps {
+    openCreator?: boolean;
+    workflow?: IFlow
+    onCancel: () => void;
+    onOk: (result: IFlow) => void;
 }
